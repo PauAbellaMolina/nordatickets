@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
 import { AuthProvider } from "../context/AuthProvider";
+import { WalletProvider } from '../context/WalletProvider';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -14,7 +15,7 @@ export {
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  initialRouteName: '(tabs)', //TODO PAU info this makes everything work, if this is not (wallet), navigation fails
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -58,11 +59,14 @@ function RootLayoutNav() {
   return (
     <AuthProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          {/* <Stack.Screen name="wallet" options={{ headerShown: false }} /> */}
-          {/* <Stack.Screen name="modal" options={{ presentation: 'modal' }} /> not necessary, just to test how modal works */}
-        </Stack>
+        <WalletProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            {/* <Stack.Screen name="(pages)" options={{ headerShown: true }} /> */}
+            <Stack.Screen name="addFunds" options={{ headerShown: true }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal' }} /> {/* not necessary, just to test how modal works */}
+          </Stack>
+        </WalletProvider>
       </ThemeProvider>
     </AuthProvider>
   );

@@ -18,19 +18,20 @@ export default function TabOneScreen() {
   //   setFunds(funds ? funds - 1 : 0);
   // };
 
-  // const onGoToAddFunds = () => {
-  //   router.push('/wallet/modal');
-  // };
+  const onGoToAddFunds = () => {
+    router.push('/addFunds');
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tab One</Text>
       <Text style={styles.title}>Hello, { user?.phoneNumber }</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <Text style={styles.title}>{ funds === 0 ? 'Wallet empty, add funds' : 'Your funds: '+funds }</Text>
-      <Link href="/addFunds"><Text>Add funds</Text></Link>
+      {/* <Text style={styles.title}>{ funds === 0 ? 'Wallet empty, add funds' : 'Your funds: '+funds }</Text> */}
+      <Text style={styles.title}>Funds: { funds }</Text>
+      <Button title='Add Funds' onPress={onGoToAddFunds} />
       <Text>---</Text>
-      <Link href="/modal"><Text>Modal</Text></Link>
+      <Button title='Modal' onPress={() => router.push('/modal')} />
       {/* <Link href="/wallet/modal" asChild>
         <Button
           title={'Add funds'}

@@ -19,7 +19,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <WalletProvider>
+    // <WalletProvider>
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
@@ -60,6 +60,6 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
-    </WalletProvider>
+    // </WalletProvider>
   );
 }
