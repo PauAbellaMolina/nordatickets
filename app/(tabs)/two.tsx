@@ -17,7 +17,7 @@ export default function TabTwoScreen() {
   // };
 
   const onGoToAddFunds = () => {
-    router.push('/addFunds');
+    router.push('/wallet/addFunds');
   };
 
   return (

@@ -1,33 +1,28 @@
 import React from 'react';
 import { Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { Text, View } from '../../components/Themed';
-import { Event } from '../types/Event';
+import { Event, Ticket } from '../types/Event';
 import Colors from '../../constants/Colors';
 import { router } from 'expo-router';
 
-export default function EventCardComponent(event: Event ) {
+export default function TicketCardComponent(ticket: Ticket ) {
   const theme = useColorScheme() ?? 'light';
 
-  const goToEventDetail = () => {
-    router.push(`/event/${event.id}`);
-  }
+  // const goToEventDetail = () => {
+  //   router.push(`/event/${event.id}`);
+  // }
   
   return (
-    <Pressable onPress={goToEventDetail}>
+    // <Pressable onPress={goToEventDetail}>
       <View style={[styles.eventCard, {backgroundColor: Colors[theme].backgroundContrast}]}>
-        <View style={styles.roundedSquare} />
-        <View style={styles.eventInfo}>
-          <Text style={styles.eventTitle}>{event.name}</Text>
-          <Text ellipsizeMode='tail' numberOfLines={2} style={styles.eventDescription}>{event.description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}</Text>
-        </View>
+        <Text style={styles.eventTitle}>{ticket.name} · {ticket.price}€</Text>
       </View>
-    </Pressable>
+    // </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   eventCard: {
-    flexDirection: 'row',
     backgroundColor: '#fff',
     padding: 10,
     borderRadius: 10,

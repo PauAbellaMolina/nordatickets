@@ -22,7 +22,9 @@ export default function TabOneScreen() {
     .then((querySnapshot) => {
       const collection: Event[] = [];
       querySnapshot.forEach((doc) => {
-        collection.push(doc.data() as Event);
+        const event = doc.data() as Event;
+        event.id = doc.id;
+        collection.push(event);
       });
       setEvents(collection);
       console.log('PAU LOG-> collection: ', collection);
@@ -61,14 +63,9 @@ export default function TabOneScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    // borderWidth: 1,
-    // borderColor: '#fff',
     paddingTop: 55,
     paddingHorizontal: 15,
-    // padding: 20,
     flex: 1,
-    // alignItems: 'center',
-    justifyContent: 'center',
   },
   title: {
     fontSize: 30,
