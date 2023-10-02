@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { Button, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { Event, Ticket } from '../types/Event';
 import Colors from '../../constants/Colors';
@@ -14,19 +14,31 @@ export default function TicketCardComponent(ticket: Ticket ) {
   
   return (
     // <Pressable onPress={goToEventDetail}>
-      <View style={[styles.eventCard, {backgroundColor: Colors[theme].backgroundContrast}]}>
-        <Text style={styles.eventTitle}>{ticket.name} · {ticket.price}€</Text>
+      <View style={[styles.ticketCard, {backgroundColor: Colors[theme].backgroundContrast}]}>
+        <View style={styles.ticketContents}><Text style={styles.eventTitle}>{ticket.name} · {ticket.price}€</Text><View style={styles.ticketActions}><Button title='Remove' onPress={() => {}} /><Button title='Add' onPress={() => {}} /></View></View>
       </View>
     // </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  eventCard: {
+  ticketCard: {
     backgroundColor: '#fff',
     padding: 10,
     borderRadius: 10,
     // alignItems: 'center',
+  },
+  ticketContents: {
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  ticketActions: {
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   roundedSquare: {
     backgroundColor: '#ff7f50',

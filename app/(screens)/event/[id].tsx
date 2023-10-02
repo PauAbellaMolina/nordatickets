@@ -12,6 +12,7 @@ import TicketCardComponent from '../../components/ticketCardComponent';
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams();
   const [event, setEvent] = useState<Event>();
+  const [cart, setCart] = useState<Ticket[]>();
 
   // const halfWindowsWidth = Dimensions.get('window').height / 2
 
@@ -31,7 +32,7 @@ export default function EventDetailScreen() {
             if (doc.exists()) {
               event.tickets = doc.data() as { tickets: Ticket[] };
               setEvent(event);
-              console.log('PAU LOG-> event: ', event);
+              // console.log('PAU LOG-> event: ', event);
             } else {
               console.log('No references doc found');
             }
