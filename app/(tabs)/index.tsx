@@ -1,27 +1,33 @@
-import { Button, StyleSheet } from 'react-native';
+import { Button, FlatList, StyleSheet } from 'react-native';
 
 import EditScreenInfo from '../../components/EditScreenInfo';
 import { Text, View } from '../../components/Themed';
 import { useAuth } from '../../context/AuthProvider';
 import { useFunds } from '../../context/WalletProvider';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, router } from 'expo-router';
 import { FIRESTORE_DB } from '../../firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
+import EventCardComponent from '../components/eventCardComponent';
+import { Event } from '../types/Event';
 
 export default function TabOneScreen() {
   const { user } = useAuth();
   const { funds, setFunds } = useFunds();
+  const [events, setEvents] = useState<Event[]>([]);
 
-  // const colRef = collection(FIRESTORE_DB, 'events');
-  // getDocs(colRef)
-  // .then((querySnapshot) => {
-  //   let collection: { id: string; }[] = [];
-  //   querySnapshot.docs.forEach((doc) => {
-  //     collection.push({...doc.data(), id: doc.id })
-  //   });
-  //   console.log('PAU LOG-> collection: ', collection);
-  // });
+  useEffect(() => {
+    const colRef = collection(FIRESTORE_DB, 'events');
+    getDocs(colRef)
+    .then((querySnapshot) => {
+      const collection: Event[] = [];
+      querySnapshot.forEach((doc) => {
+        collection.push(doc.data() as Event);
+      });
+      setEvents(collection);
+      console.log('PAU LOG-> collection: ', collection);
+    });
+  }, []);
 
   // const onAddFunds = () => {
   //   setFunds(funds ? funds + 1 : 1);
@@ -30,20 +36,15 @@ export default function TabOneScreen() {
   //   setFunds(funds ? funds - 1 : 0);
   // };
 
-  const onGoToAddFunds = () => {
-    router.push('/addFunds');
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tab One</Text>
       <Text style={styles.title}>Hello, { user?.phoneNumber }</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      {/* <Text style={styles.title}>{ funds === 0 ? 'Wallet empty, add funds' : 'Your funds: '+funds }</Text> */}
-      <Text style={styles.title}>Funds: { funds }</Text>
-      <Button title='Add Funds' onPress={onGoToAddFunds} />
-      <Text>---</Text>
-      <Button title='Modal' onPress={() => router.push('/modal')} />
+      <FlatList
+        data={events}
+        renderItem={({ item }) => <EventCardComponent {...item} />}
+      />
       {/* <Link href="/wallet/modal" asChild>
         <Button
           title={'Add funds'}

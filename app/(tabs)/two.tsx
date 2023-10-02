@@ -3,6 +3,7 @@ import { Button, StyleSheet, TouchableOpacity } from 'react-native';
 import EditScreenInfo from '../../components/EditScreenInfo';
 import { Text, View } from '../../components/Themed';
 import { useFunds } from '../../context/WalletProvider';
+import { router } from 'expo-router';
 
 export default function TabTwoScreen() {
   
@@ -15,11 +16,18 @@ export default function TabTwoScreen() {
   //   setFunds(funds ? funds - 1 : 0);
   // };
 
+  const onGoToAddFunds = () => {
+    router.push('/addFunds');
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tab Two</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <Text style={styles.title}>Funds: { funds }</Text>
+      <Button title='Add Funds' onPress={onGoToAddFunds} />
+      <Text>---</Text>
+      <Button title='Modal' onPress={() => router.push('/modal')} />
       {/* <Button
         title={'Add funds'}
         onPress={onAddFunds}
