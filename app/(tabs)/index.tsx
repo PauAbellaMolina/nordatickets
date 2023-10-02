@@ -38,12 +38,12 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <Text style={styles.title}>Hello, { user?.phoneNumber }</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      <Text style={styles.title}>Event list</Text>
       <FlatList
+        style={styles.eventList}
         data={events}
         renderItem={({ item }) => <EventCardComponent {...item} />}
+        ItemSeparatorComponent={() => <View style={{height: 10}} />}
       />
       {/* <Link href="/wallet/modal" asChild>
         <Button
@@ -61,17 +61,26 @@ export default function TabOneScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    // borderWidth: 1,
+    // borderColor: '#fff',
+    paddingTop: 55,
+    paddingHorizontal: 15,
+    // padding: 20,
     flex: 1,
-    alignItems: 'center',
+    // alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: 'bold',
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  // separator: {
+  //   marginVertical: 30,
+  //   height: 1,
+  //   width: '80%',
+  // },
+  eventList: {
+    marginTop: 10,
+    gap: 10,
   },
 });
