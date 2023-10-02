@@ -25,7 +25,10 @@ export default function TabTwoScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Wallet</Text>
       <View style={styles.wrapper}>
-        <View style={styles.fundsContainer}><Text style={styles.fundsTitle}>Balance: {funds || '0'}€</Text><Button title='Add funds' onPress={() => {}} /></View>
+        <View style={styles.fundsContainer}>
+          <Text style={styles.fundsTitle}>Balance: {funds || '0'}€</Text>
+          <Button title='Add funds' onPress={onGoToAddFunds} />
+        </View>
 
         <View style={styles.ticketsContainer}>
           <Text style={styles.fundsTitle}>Tickets</Text>
@@ -41,20 +44,6 @@ export default function TabTwoScreen() {
           }
         </View>
       </View>
-      {/* <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <Text style={styles.title}>Funds: { funds }</Text>
-      <Button title='Add Funds' onPress={onGoToAddFunds} />
-      <Text>---</Text>
-      <Button title='Modal' onPress={() => router.push('/modal')} /> */}
-      {/* <Button
-        title={'Add funds'}
-        onPress={onAddFunds}
-      />
-      <Button
-        title={'Substract funds'}
-        onPress={onSubstractFunds}
-      /> */}
     </View>
   );
 }

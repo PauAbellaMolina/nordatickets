@@ -2,18 +2,19 @@ import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, Button, Dimensions, FlatList, Platform, StyleSheet } from 'react-native';
 
 import { Text, View } from '../../../components/Themed';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../firebaseConfig';
 import { Event, Ticket, WalletTickets } from '../../types';
 import TicketCardComponent from '../../components/ticketCardComponent';
 import { useWallet } from '../../../context/WalletProvider';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams();
   const [event, setEvent] = useState<Event>();
-  const { cart, setCart, walletTickets, setWalletTickets } = useWallet();
+  const { funds, setFunds, cart, setCart, walletTickets, setWalletTickets } = useWallet();
 
   useEffect(() => {
     setCart(null);
@@ -76,17 +77,20 @@ export default function EventDetailScreen() {
     }
   };
 
+  const cardTotalPrice = cart?.reduce((acc, cartItem) => acc + cartItem.ticket.price * cartItem.quantity, 0);
+
+  const getEnoughFunds = (): boolean => {
+    if (!funds || !cardTotalPrice) {
+      return false;
+    }
+    return funds >= cardTotalPrice;
+  };
+
   const onBuyCart = () => {
-    if (!cart?.length) {
+    if (!cart?.length || !funds || !cardTotalPrice) {
       return;
     }
 
-    // export type WalletTicket = {
-    //   eventName: string;
-    //   ticket: Ticket;
-    // };
-    // export type WalletTickets = Array<WalletTicket> | null;
-    //add cart tickets to setWalletTickets. if there is 3 tickets of the same type, add 3 wallet tickets of that type
     const newWalletTickets: WalletTickets = [];
     cart.forEach((cartItem) => {
       if (cartItem.quantity === 0) {
@@ -97,7 +101,9 @@ export default function EventDetailScreen() {
         } 
       }
     });
+    setFunds(funds - cardTotalPrice);
     setWalletTickets([...walletTickets ?? [], ...newWalletTickets]);
+    setCart(null);
   };
 
   
@@ -114,7 +120,7 @@ export default function EventDetailScreen() {
                 <FlatList
                   style={styles.ticketsList}
                   data={event.tickets.tickets}
-                  renderItem={({ item }) => <TicketCardComponent onAddTicket={onAddTicketHandler} onRemoveTicket={onRemoveTicketHandler} ticket={{...item}} />}
+                  renderItem={({ item }) => <TicketCardComponent showRemoveButton={!!cart?.find((cartItem) => cartItem.ticket.id === item.id)} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />}
                   ItemSeparatorComponent={() => <View style={{height: 10}} />}
                 />
               </View>
@@ -129,7 +135,12 @@ export default function EventDetailScreen() {
                       renderItem={({ item }) => <Text style={styles.cartItemsList}>{item.quantity}  -  {item.ticket.name} · {item.ticket.price}€</Text>}
                       ItemSeparatorComponent={() => <View style={{height: 3}} />}
                     />
-                    <View style={styles.totalContainer}><Text style={styles.totalPrice}>Total: {cart?.reduce((acc, cartItem) => acc + cartItem.ticket.price * cartItem.quantity, 0)}€</Text><Button title='Buy now' onPress={onBuyCart} /></View>
+                    <View style={styles.totalContainer}>
+                      <Text style={styles.totalPrice}>Total: {cardTotalPrice}€</Text>
+                      { getEnoughFunds() ? <Button title='Buy now' onPress={onBuyCart} /> : <Button title='Not enough funds!' color='red' /> }
+                    </View>
+                    <Text style={{marginTop: 10, textAlign: 'right', color: 'gray'}}><FontAwesome size={13} name='info-circle' /> Your balance is {funds}€</Text>
+                    { !getEnoughFunds() ? <View style={{width: 120, alignSelf: 'flex-end'}}><Button title='Add money' onPress={() => router.push('/wallet/addFunds')} /></View> : <></> }
                   </>
                 :
                   <Text style={styles.emptyCard}>No tickets added to cart</Text>

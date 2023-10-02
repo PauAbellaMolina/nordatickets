@@ -6,12 +6,13 @@ import Colors from '../../constants/Colors';
 import { router } from 'expo-router';
 
 export interface Props {
+  showRemoveButton: boolean,
   onRemoveTicket: (ticket: Ticket) => void,
   onAddTicket: (ticket: Ticket) => void,
   ticket: Ticket
 }
 
-export default function TicketCardComponent({ onRemoveTicket, onAddTicket, ticket}: Props) {
+export default function TicketCardComponent({ showRemoveButton, onRemoveTicket, onAddTicket, ticket}: Props) {
   const theme = useColorScheme() ?? 'light';
 
   // const goToEventDetail = () => {
@@ -29,7 +30,17 @@ export default function TicketCardComponent({ onRemoveTicket, onAddTicket, ticke
   return (
     // <Pressable onPress={goToEventDetail}>
       <View style={[styles.ticketCard, {backgroundColor: Colors[theme].backgroundContrast}]}>
-        <View style={styles.ticketContents}><Text style={styles.eventTitle}>{ticket.name} · {ticket.price}€</Text><View style={styles.ticketActions}><Button title='Remove' onPress={onRemove} /><Button title='Add' onPress={onAdd} /></View></View>
+        <View style={styles.ticketContents}>
+          <Text style={styles.eventTitle}>{ticket.name} · {ticket.price}€</Text>
+          <View style={styles.ticketActions}>
+            { showRemoveButton ?
+              <Button title='Remove' onPress={onRemove} />
+            :
+              <></>
+            }
+            <Button title='Add' onPress={onAdd} />
+          </View>
+        </View>
       </View>
     // </Pressable>
   );
