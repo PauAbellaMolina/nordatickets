@@ -3,17 +3,17 @@ import { Button, FlatList, StyleSheet } from 'react-native';
 import EditScreenInfo from '../../components/EditScreenInfo';
 import { Text, View } from '../../components/Themed';
 import { useAuth } from '../../context/AuthProvider';
-import { useFunds } from '../../context/WalletProvider';
 import { useEffect, useState } from 'react';
 import { Link, router } from 'expo-router';
 import { FIRESTORE_DB } from '../../firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
 import EventCardComponent from '../components/eventCardComponent';
-import { Event } from '../types/Event';
+import { Event } from '../types';
+import { useWallet } from '../../context/WalletProvider';
 
 export default function TabOneScreen() {
   const { user } = useAuth();
-  const { funds, setFunds } = useFunds();
+  // const { funds, setFunds } = useWallet();
   const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {

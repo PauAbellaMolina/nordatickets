@@ -49,14 +49,16 @@ export default function TabLayout() {
         <Tabs.Screen
           name="two"
           options={{
-            title: 'Tab Two',
-            tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />
+            headerShown: false,
+            title: '',
+            tabBarIcon: ({ color }) => <TabBarIcon name="ticket" color={color} />
           }}
         />
         <Tabs.Screen
           name="three"
           options={{
-            title: 'Tab Three',
+            headerShown: false,
+            title: '',
             tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />
           }}
         />

@@ -63,7 +63,7 @@ function RootLayoutNav() {
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             {/* <Stack.Screen name="(pages)" options={{ headerShown: true }} /> */}
-            <Stack.Screen name="addFunds" options={{ headerShown: true }} />
+            {/* <Stack.Screen name="addFunds" options={{ headerShown: true }} /> */}
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} /> {/* not necessary, just to test how modal works */}
           </Stack>
         </WalletProvider>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { Text, View } from '../../components/Themed';
-import { Event } from '../types/Event';
+import { Event } from '../types';
 import Colors from '../../constants/Colors';
 import { router } from 'expo-router';
 

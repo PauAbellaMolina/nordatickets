@@ -3,11 +3,11 @@ import { Button, Platform, StyleSheet } from 'react-native';
 
 import EditScreenInfo from '../../../components/EditScreenInfo';
 import { Text, View } from '../../../components/Themed';
-import { useFunds } from '../../../context/WalletProvider';
+import { useWallet } from '../../../context/WalletProvider';
 import { useRouter } from 'expo-router';
 
 export default function AddFundsScreen() {
-  const { funds, setFunds } = useFunds();
+  const { funds, setFunds } = useWallet();
   // const router = useRouter();
 
   const onAddFunds = () => {

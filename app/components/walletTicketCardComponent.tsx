@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { Text, View } from '../../components/Themed';
-import { Event, Ticket } from '../types';
+import { Event, Ticket, WalletTicket } from '../types';
 import Colors from '../../constants/Colors';
 import { router } from 'expo-router';
 
@@ -11,25 +11,17 @@ export interface Props {
   ticket: Ticket
 }
 
-export default function TicketCardComponent({ onRemoveTicket, onAddTicket, ticket}: Props) {
+export default function TicketCardComponent(walletTicket: WalletTicket) {
   const theme = useColorScheme() ?? 'light';
 
   // const goToEventDetail = () => {
   //   router.push(`/event/${event.id}`);
   // }
 
-  const onRemove = () => {
-    onRemoveTicket(ticket);
-  }
-
-  const onAdd = () => {
-    onAddTicket(ticket);
-  }
-  
   return (
     // <Pressable onPress={goToEventDetail}>
       <View style={[styles.ticketCard, {backgroundColor: Colors[theme].backgroundContrast}]}>
-        <View style={styles.ticketContents}><Text style={styles.eventTitle}>{ticket.name} · {ticket.price}€</Text><View style={styles.ticketActions}><Button title='Remove' onPress={onRemove} /><Button title='Add' onPress={onAdd} /></View></View>
+        <View style={styles.ticketContents}><Text style={styles.ticketName}>{walletTicket.ticket.name}</Text><Text style={styles.eventName}>{walletTicket.eventName}</Text></View>
       </View>
     // </Pressable>
   );
@@ -48,29 +40,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  ticketActions: {
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  roundedSquare: {
-    backgroundColor: '#ff7f50',
-    borderRadius: 10,
-    width: 90,
-    height: 90,
-  },
-  eventInfo: {
-    width: '70%',
-    marginTop: 5,
-    marginHorizontal: 10,
-    backgroundColor: 'transparent'
-  },
-  eventTitle: {
+  ticketName: {
     fontSize: 20,
     fontWeight: 'bold',
   },
-  eventDescription: {
-    marginTop: 5,
-  },
+  eventName: {
+    fontSize: 12,
+  }
 });
