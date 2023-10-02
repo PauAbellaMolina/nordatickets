@@ -28,7 +28,8 @@ export default function TabOneScreen() {
       <Text style={styles.title}>Hello, { user?.phoneNumber }</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <Text style={styles.title}>{ funds === 0 ? 'Wallet empty, add funds' : 'Your funds: '+funds }</Text>
-      <Link href="/wallet/addFunds"><Text>Add funds</Text></Link>
+      <Link href="/addFunds"><Text>Add funds</Text></Link>
+      <Text>---</Text>
       <Link href="/modal"><Text>Modal</Text></Link>
       {/* <Link href="/wallet/modal" asChild>
         <Button
