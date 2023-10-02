@@ -6,10 +6,22 @@ import { useAuth } from '../../context/AuthProvider';
 import { useFunds } from '../../context/WalletProvider';
 import { useState } from 'react';
 import { Link, router } from 'expo-router';
+import { FIRESTORE_DB } from '../../firebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
 
 export default function TabOneScreen() {
   const { user } = useAuth();
   const { funds, setFunds } = useFunds();
+
+  // const colRef = collection(FIRESTORE_DB, 'events');
+  // getDocs(colRef)
+  // .then((querySnapshot) => {
+  //   let collection: { id: string; }[] = [];
+  //   querySnapshot.docs.forEach((doc) => {
+  //     collection.push({...doc.data(), id: doc.id })
+  //   });
+  //   console.log('PAU LOG-> collection: ', collection);
+  // });
 
   // const onAddFunds = () => {
   //   setFunds(funds ? funds + 1 : 1);
