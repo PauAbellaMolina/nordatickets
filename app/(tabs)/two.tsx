@@ -5,10 +5,12 @@ import { Text, View } from '../../components/Themed';
 import { useWallet } from '../../context/WalletProvider';
 import { router } from 'expo-router';
 import WalletTicketCardComponent from '../components/walletTicketCardComponent';
+import { useEffect } from 'react';
+import { useAuth } from '../../context/AuthProvider';
 
-export default function TabTwoScreen() {
+export default function TabTwoScreen() { //TODO PAU WIP continue here displaying the refactored tickets
   
-  const { funds, walletTickets } = useWallet();
+  const { funds, walletTicketGroups } = useWallet();
 
   // const onAddFunds = () => {
   //   setFunds(funds ? funds + 1 : 1);
@@ -32,10 +34,10 @@ export default function TabTwoScreen() {
 
         <View style={styles.ticketsContainer}>
           <Text style={styles.fundsTitle}>Tickets</Text>
-          { walletTickets?.length ?
+          { walletTicketGroups?.length ?
             <FlatList
               style={styles.walletTicketList}
-              data={walletTickets}
+              data={walletTicketGroups}
               renderItem={({ item }) => <WalletTicketCardComponent {...item} />}
               ItemSeparatorComponent={() => <View style={{height: 10}} />}
             />

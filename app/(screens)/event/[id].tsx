@@ -6,7 +6,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../firebaseConfig';
-import { Event, Ticket, WalletTickets } from '../../types';
+import { Event, Ticket, WalletTicketGroup, WalletTicketGroups } from '../../types';
 import TicketCardComponent from '../../components/ticketCardComponent';
 import { useWallet } from '../../../context/WalletProvider';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -14,7 +14,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams();
   const [event, setEvent] = useState<Event>();
-  const { funds, setFunds, cart, setCart, walletTickets, setWalletTickets } = useWallet();
+  const { funds, setFunds, cart, setCart, walletTicketGroups, setWalletTicketGroups } = useWallet();
 
   useEffect(() => {
     setCart(null);
@@ -48,7 +48,7 @@ export default function EventDetailScreen() {
   }, []);
 
   const onAddTicketHandler = (ticket: Ticket) => {
-    console.log('PAU LOG-> ticket to add: ', cart, ticket);
+    // console.log('PAU LOG-> ticket to add: ', cart, ticket);
     if (cart) {
       const existingCartItem = cart.find((cartItem) => cartItem.ticket.id === ticket.id);
       if (existingCartItem) {
@@ -62,7 +62,7 @@ export default function EventDetailScreen() {
     }
   };
   const onRemoveTicketHandler = (ticket: Ticket) => {
-    console.log('PAU LOG-> ticket to remove: ', ticket);
+    // console.log('PAU LOG-> ticket to remove: ', ticket);
     if (cart) {
       const existingCartItem = cart.find((cartItem) => cartItem.ticket.id === ticket.id);
       if (existingCartItem) {
@@ -91,18 +91,54 @@ export default function EventDetailScreen() {
       return;
     }
 
-    const newWalletTickets: WalletTickets = [];
+    // const newWalletTickets: WalletTickets = [];
+    // cart.forEach((cartItem) => {
+    //   if (cartItem.quantity === 0) {
+    //     newWalletTickets.push({eventName: event?.name ?? '', ticket: cartItem.ticket});
+    //   } else {
+    //     for (let i = 0; i < cartItem.quantity; i++) {
+    //       newWalletTickets.push({eventName: event?.name ?? '', ticket: cartItem.ticket});
+    //     } 
+    //   }
+    // });
+    setFunds(funds - cardTotalPrice);
+    // setWalletTicketGroups([...walletTicketGroups ?? [], ...newWalletTickets]);
+    const newTickets: Array<Ticket> = [];
     cart.forEach((cartItem) => {
       if (cartItem.quantity === 0) {
-        newWalletTickets.push({eventName: event?.name ?? '', ticket: cartItem.ticket});
+        newTickets.push({ id: cartItem.ticket.id, name: cartItem.ticket.name, price: cartItem.ticket.price });
       } else {
         for (let i = 0; i < cartItem.quantity; i++) {
-          newWalletTickets.push({eventName: event?.name ?? '', ticket: cartItem.ticket});
+          newTickets.push({ id: cartItem.ticket.id, name: cartItem.ticket.name, price: cartItem.ticket.price });
         } 
       }
     });
-    setFunds(funds - cardTotalPrice);
-    setWalletTickets([...walletTickets ?? [], ...newWalletTickets]);
+    const existingWalletTicketGroup = walletTicketGroups?.find((walletTicketGroup) => walletTicketGroup.eventId === event?.id);
+    if (existingWalletTicketGroup) {
+      existingWalletTicketGroup.tickets = [...existingWalletTicketGroup.tickets, ...newTickets];
+      console.log("IF ON BUY->", existingWalletTicketGroup);
+      setWalletTicketGroups([...walletTicketGroups ?? []]);
+      // setWalletTicketGroups([...walletTicketGroups ?? []]);
+    } else {
+      const newWalletTicketGroup: WalletTicketGroup = {
+        eventId: event?.id ?? '',
+        tickets: newTickets
+      };
+      const newWalletTicketGroups: WalletTicketGroups = [newWalletTicketGroup];
+      console.log("ELSE ON BUY->", newWalletTicketGroup);
+      setWalletTicketGroups([...walletTicketGroups ?? [], ...newWalletTicketGroups]);
+      // setWalletTicketGroups([...walletTicketGroups ?? [], newWalletTicketGroup]);
+    }
+    // const newWalletTicketGroups: WalletTicketGroups = [
+    //   {
+    //     eventId: event?.id ?? '',
+    //     tickets: newTickets
+    //   }
+    // ];
+    // const test = [...walletTicketGroups ?? [], ...newWalletTicketGroups];
+    // console.log("ON BUY->", [...walletTicketGroups., ...newTickets]);
+    // console.log("ON BUY->", test);
+    // setWalletTicketGroups([...walletTicketGroups ?? [], ...newWalletTicketGroups]);
     setCart(null);
   };
 

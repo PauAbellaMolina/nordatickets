@@ -27,7 +27,7 @@ export default function TabOneScreen() {
         collection.push(event);
       });
       setEvents(collection);
-      console.log('PAU LOG-> collection: ', collection);
+      // console.log('PAU LOG-> collection: ', collection);
     });
   }, []);
 

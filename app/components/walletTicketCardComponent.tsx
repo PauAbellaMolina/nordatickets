@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { Text, View } from '../../components/Themed';
-import { Event, Ticket, WalletTicket } from '../types';
+import { Event, Ticket, WalletTicketGroup } from '../types';
 import Colors from '../../constants/Colors';
 import { router } from 'expo-router';
 
@@ -11,7 +11,7 @@ export interface Props {
   ticket: Ticket
 }
 
-export default function TicketCardComponent(walletTicket: WalletTicket) {
+export default function TicketCardComponent(walletTicket: WalletTicketGroup) {
   const theme = useColorScheme() ?? 'light';
 
   // const goToEventDetail = () => {
@@ -21,7 +21,7 @@ export default function TicketCardComponent(walletTicket: WalletTicket) {
   return (
     // <Pressable onPress={goToEventDetail}>
       <View style={[styles.ticketCard, {backgroundColor: Colors[theme].backgroundContrast}]}>
-        <View style={styles.ticketContents}><Text style={styles.ticketName}>{walletTicket.ticket.name}</Text><Text style={styles.eventName}>{walletTicket.eventName}</Text></View>
+        {/* <View style={styles.ticketContents}><Text style={styles.ticketName}>{walletTicket.ticket.name}</Text><Text style={styles.eventName}>{walletTicket.eventName}</Text></View> */}
       </View>
     // </Pressable>
   );

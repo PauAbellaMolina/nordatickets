@@ -1,3 +1,10 @@
+export type User = {
+  id: string;
+  phoneNumber: string;
+  walletFunds: number;
+  walletTicketGroups: WalletTicketGroups;
+}
+
 export type Event = {
   id: string;
   name: string;
@@ -14,8 +21,14 @@ export type Ticket = {
 
 export type Cart = Array<{ ticket: Ticket, quantity: number }> | null;
 
-export type WalletTicket = {
-  eventName: string;
-  ticket: Ticket;
+// export type WalletTicket = {
+//   eventName: string;
+//   ticket: Ticket;
+// };
+// export type WalletTickets = Array<WalletTicket> | null;
+
+export type WalletTicketGroup = {
+  eventId: string;
+  tickets: Array<Ticket>;
 };
-export type WalletTickets = Array<WalletTicket> | null;
+export type WalletTicketGroups = Array<WalletTicketGroup> | null;

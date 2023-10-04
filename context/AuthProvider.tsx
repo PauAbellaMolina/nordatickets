@@ -1,10 +1,8 @@
 import { useSegments, useRouter } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
-import { FIREBASE_AUTH } from "../firebaseConfig";
-
-type User = {
-  phoneNumber: string;
-}
+import { FIREBASE_AUTH, FIRESTORE_DB } from "../firebaseConfig";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { User, WalletTicketGroup, WalletTicketGroups } from "../app/types";
 
 type AuthType = {
   user: User | null;
@@ -41,7 +39,31 @@ export function AuthProvider({ children }: { children: JSX.Element }): JSX.Eleme
     useEffect(() => FIREBASE_AUTH.onAuthStateChanged(value => {
       if (value) {
         console.log("User is signed in");
-        setUser({ phoneNumber: value.providerData[0].phoneNumber ?? '' });
+        const userDocRef = doc(FIRESTORE_DB, 'users', value.uid);
+        getDoc(userDocRef)
+        .then((doc) => {
+          if (!doc.exists()) {
+            setDoc(userDocRef, {
+              phoneNumber: value.providerData[0].phoneNumber ?? '',
+              // creditCard: null, //TODO PAU in the future
+              walletFunds: 0,
+              walletTicketGroups: [] //this will be an array of { eventId: string, tickets: string[] }
+            });
+            setUser({
+              id: value.uid,
+              phoneNumber: value.providerData[0].phoneNumber ?? '',
+              walletFunds: 0,
+              walletTicketGroups: []
+            });
+          } else {
+            setUser({
+              id: value.uid,
+              phoneNumber: value.providerData[0].phoneNumber ?? '',
+              walletFunds: doc.data().walletFunds,
+              walletTicketGroups: doc.data().walletTicketGroups
+            });
+          }
+        });
       } else {
        console.log("User is signed out");
       }

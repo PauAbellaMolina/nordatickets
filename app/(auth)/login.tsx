@@ -6,8 +6,9 @@ import { useAuth } from "../../context/AuthProvider";
 import { StyleSheet, TextInput, Button } from "react-native";
 import { useRef, useState } from "react";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
-import { FIREBASE_CONFIG, FIREBASE_AUTH } from '../../firebaseConfig';
+import { FIREBASE_CONFIG, FIREBASE_AUTH, FIRESTORE_DB } from '../../firebaseConfig';
 import { PhoneAuthProvider, UserCredential, signInWithCredential } from "firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export default function Login() {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
@@ -39,6 +40,20 @@ export default function Login() {
     .then((result: UserCredential) => {
       console.log('PAU LOG-> result: ', result);
       // setUser({ phoneNumber: result.user.providerData[0].phoneNumber ?? '' });
+      
+      const userDocRef = doc(FIRESTORE_DB, 'users', result.user.uid);
+      getDoc(userDocRef)
+      .then((doc) => {
+        if (!doc.exists()) {
+          setDoc(userDocRef, {
+            phoneNumber: result.user.providerData[0].phoneNumber ?? '',
+            // creditCard: null, //TODO PAU in the future
+            userWalletFunds: 0,
+            userWalletTickets: [] //this will be an array of { eventId: string, ticketId: string }
+          });
+        }
+      });
+
     });
   };
 
