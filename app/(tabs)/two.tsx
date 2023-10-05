@@ -8,7 +8,7 @@ import WalletTicketCardComponent from '../components/walletTicketCardComponent';
 import { useEffect } from 'react';
 import { useAuth } from '../../context/AuthProvider';
 
-export default function TabTwoScreen() { //TODO PAU WIP continue here displaying the refactored tickets
+export default function TabTwoScreen() {
   
   const { funds, walletTicketGroups } = useWallet();
 

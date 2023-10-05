@@ -10,11 +10,15 @@ import { Event, Ticket, WalletTicketGroup, WalletTicketGroups } from '../../type
 import TicketCardComponent from '../../components/ticketCardComponent';
 import { useWallet } from '../../../context/WalletProvider';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { firestoreAutoId } from '../../../utils/firestoreAutoId';
+import { useAuth } from '../../../context/AuthProvider';
+
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams();
-  const [event, setEvent] = useState<Event>();
   const { funds, setFunds, cart, setCart, walletTicketGroups, setWalletTicketGroups } = useWallet();
+  const { user } = useAuth();
+  const [event, setEvent] = useState<Event>();
 
   useEffect(() => {
     setCart(null);
@@ -50,7 +54,7 @@ export default function EventDetailScreen() {
   const onAddTicketHandler = (ticket: Ticket) => {
     // console.log('PAU LOG-> ticket to add: ', cart, ticket);
     if (cart) {
-      const existingCartItem = cart.find((cartItem) => cartItem.ticket.id === ticket.id);
+      const existingCartItem = cart.find((cartItem) => cartItem.ticket.ticketId === ticket.ticketId);
       if (existingCartItem) {
         existingCartItem.quantity++;
         setCart([...cart]);
@@ -64,11 +68,11 @@ export default function EventDetailScreen() {
   const onRemoveTicketHandler = (ticket: Ticket) => {
     // console.log('PAU LOG-> ticket to remove: ', ticket);
     if (cart) {
-      const existingCartItem = cart.find((cartItem) => cartItem.ticket.id === ticket.id);
+      const existingCartItem = cart.find((cartItem) => cartItem.ticket.ticketId === ticket.ticketId);
       if (existingCartItem) {
         existingCartItem.quantity--;
         if (existingCartItem.quantity === 0) {
-          const newCart = cart.filter((cartTicket) => cartTicket.ticket.id !== ticket.id);
+          const newCart = cart.filter((cartTicket) => cartTicket.ticket.ticketId !== ticket.ticketId);
           setCart(newCart);
         } else {
           setCart([...cart]);
@@ -87,38 +91,34 @@ export default function EventDetailScreen() {
   };
 
   const onBuyCart = () => {
-    if (!cart?.length || !funds || !cardTotalPrice) {
+    if (!cart?.length || !funds || !cardTotalPrice || !event || !user) {
       return;
     }
 
-    // const newWalletTickets: WalletTickets = [];
-    // cart.forEach((cartItem) => {
-    //   if (cartItem.quantity === 0) {
-    //     newWalletTickets.push({eventName: event?.name ?? '', ticket: cartItem.ticket});
-    //   } else {
-    //     for (let i = 0; i < cartItem.quantity; i++) {
-    //       newWalletTickets.push({eventName: event?.name ?? '', ticket: cartItem.ticket});
-    //     } 
-    //   }
-    // });
     setFunds(funds - cardTotalPrice);
-    // setWalletTicketGroups([...walletTicketGroups ?? [], ...newWalletTickets]);
+
     const newTickets: Array<Ticket> = [];
     cart.forEach((cartItem) => {
       if (cartItem.quantity === 0) {
-        newTickets.push({ id: cartItem.ticket.id, name: cartItem.ticket.name, price: cartItem.ticket.price });
+        const ticketToPush = cartItem.ticket;
+        ticketToPush.id = event.id + '_' + user.id + '_' + firestoreAutoId();
+        delete ticketToPush.selling;
+        newTickets.push(ticketToPush);
       } else {
         for (let i = 0; i < cartItem.quantity; i++) {
-          newTickets.push({ id: cartItem.ticket.id, name: cartItem.ticket.name, price: cartItem.ticket.price });
-        } 
+          const ticketToPush = {...cartItem.ticket};
+          ticketToPush.id = event.id + '_' + user.id + '_' + firestoreAutoId();
+          delete ticketToPush.selling;
+          newTickets.push(ticketToPush);
+        }
       }
     });
+
     const existingWalletTicketGroup = walletTicketGroups?.find((walletTicketGroup) => walletTicketGroup.eventId === event?.id);
     if (existingWalletTicketGroup) {
       existingWalletTicketGroup.tickets = [...existingWalletTicketGroup.tickets, ...newTickets];
       console.log("IF ON BUY->", existingWalletTicketGroup);
       setWalletTicketGroups([...walletTicketGroups ?? []]);
-      // setWalletTicketGroups([...walletTicketGroups ?? []]);
     } else {
       const newWalletTicketGroup: WalletTicketGroup = {
         eventId: event?.id ?? '',
@@ -127,18 +127,8 @@ export default function EventDetailScreen() {
       const newWalletTicketGroups: WalletTicketGroups = [newWalletTicketGroup];
       console.log("ELSE ON BUY->", newWalletTicketGroup);
       setWalletTicketGroups([...walletTicketGroups ?? [], ...newWalletTicketGroups]);
-      // setWalletTicketGroups([...walletTicketGroups ?? [], newWalletTicketGroup]);
     }
-    // const newWalletTicketGroups: WalletTicketGroups = [
-    //   {
-    //     eventId: event?.id ?? '',
-    //     tickets: newTickets
-    //   }
-    // ];
-    // const test = [...walletTicketGroups ?? [], ...newWalletTicketGroups];
-    // console.log("ON BUY->", [...walletTicketGroups., ...newTickets]);
-    // console.log("ON BUY->", test);
-    // setWalletTicketGroups([...walletTicketGroups ?? [], ...newWalletTicketGroups]);
+
     setCart(null);
   };
 
@@ -156,7 +146,7 @@ export default function EventDetailScreen() {
                 <FlatList
                   style={styles.ticketsList}
                   data={event.tickets.tickets}
-                  renderItem={({ item }) => <TicketCardComponent showRemoveButton={!!cart?.find((cartItem) => cartItem.ticket.id === item.id)} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />}
+                  renderItem={({ item }) => <TicketCardComponent showRemoveButton={!!cart?.find((cartItem) => cartItem.ticket.ticketId === item.ticketId)} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />}
                   ItemSeparatorComponent={() => <View style={{height: 10}} />}
                 />
               </View>

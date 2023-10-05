@@ -38,7 +38,11 @@ export default function TicketCardComponent({ showRemoveButton, onRemoveTicket, 
             :
               <></>
             }
-            <Button title='Add' onPress={onAdd} />
+            { ticket.selling ?
+              <Button title='Add' onPress={onAdd} />
+            :
+              <Button disabled title='Not available' />
+            }
           </View>
         </View>
       </View>

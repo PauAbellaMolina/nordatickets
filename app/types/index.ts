@@ -10,13 +10,16 @@ export type Event = {
   name: string;
   description: string;
   selling: boolean;
-  tickets: { tickets: Ticket[] }
+  tickets: { tickets: Array<Ticket> }
 };
 
 export type Ticket = {
   id: string;
+  ticketId: string;
   name: string;
   price: number;
+  selling?: boolean;
+  // activable: boolean; //for the future, definetly not needed for the MVP
 };
 
 export type Cart = Array<{ ticket: Ticket, quantity: number }> | null;
