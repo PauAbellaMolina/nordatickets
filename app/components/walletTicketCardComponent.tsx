@@ -70,10 +70,14 @@ export default function TicketCardComponent(walletTicket: WalletTicketGroup) {
 function SingleTicketComponent({ ticket }: { ticket: Ticket }) {
   const theme = useColorScheme() ?? 'light';
 
+  const onActivateTicket = () => {
+    router.push(`/wallet/activateTicket/${ticket.id}`);
+  };
+
   return (
     <View style={[styles.singleTicketContainer, {backgroundColor: Colors[theme].background}]}>
       <Text style={styles.ticketName}>{ticket.name}</Text>
-      <Button title='Activate' />
+      <Button title='Activate' onPress={onActivateTicket} />
     </View>
   );
 }
