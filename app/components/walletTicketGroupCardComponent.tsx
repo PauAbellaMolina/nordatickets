@@ -25,8 +25,9 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
       if (doc.exists()) {
         const event = doc.data() as Event;
         event.id = doc.id;
+        event.usedTicketBucketId = doc.data().usedTicketBucketRef.id;
         delete (event as any).ticketBucketRef;
-        // console.log('PAU LOG-> event: ', event);
+        delete (event as any).usedTicketBucketRef;
         setEvent(event);
         // const ticketBucketRef = doc.data().ticketBucketRef;
         // if (ticketBucketRef) {
@@ -51,7 +52,7 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
 
   const SingleTicketComponent = ({ ticket }: { ticket: Ticket }) => {
     const onActivateTicket = () => {
-      router.push(`/wallet/activateTicket/${event?.name}/${ticket.id}/${ticket.name}`);
+      router.push(`/wallet/activateTicket/${event?.id}/${event?.name}/${ticket.id}/${ticket.ticketId}/${ticket.name}/${ticket.price}/${event?.usedTicketBucketId}`);
     };
   
     return (

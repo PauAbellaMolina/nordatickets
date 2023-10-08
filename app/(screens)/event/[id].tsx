@@ -107,7 +107,8 @@ export default function EventDetailScreen() {
       } else {
         for (let i = 0; i < cartItem.quantity; i++) {
           const ticketToPush = {...cartItem.ticket};
-          ticketToPush.id = event.id + '_' + user.id + '_' + firestoreAutoId();
+          // ticketToPush.id = event.id + '_' + user.id + '_' + firestoreAutoId(); //TODO PAU this is actually not needed
+          ticketToPush.id = firestoreAutoId();
           delete ticketToPush.selling;
           newTickets.push(ticketToPush);
         }
@@ -117,7 +118,6 @@ export default function EventDetailScreen() {
     const existingWalletTicketGroup = walletTicketGroups?.find((walletTicketGroup) => walletTicketGroup.eventId === event?.id);
     if (existingWalletTicketGroup) {
       existingWalletTicketGroup.tickets = [...existingWalletTicketGroup.tickets, ...newTickets];
-      console.log("IF ON BUY->", existingWalletTicketGroup);
       setWalletTicketGroups([...walletTicketGroups ?? []]);
     } else {
       const newWalletTicketGroup: WalletTicketGroup = {
@@ -125,7 +125,6 @@ export default function EventDetailScreen() {
         tickets: newTickets
       };
       const newWalletTicketGroups: WalletTicketGroups = [newWalletTicketGroup];
-      console.log("ELSE ON BUY->", newWalletTicketGroup);
       setWalletTicketGroups([...walletTicketGroups ?? [], ...newWalletTicketGroups]);
     }
 

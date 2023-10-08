@@ -65,8 +65,8 @@ function RootLayoutNav() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             {/* <Stack.Screen name="(pages)" options={{ headerShown: true }} /> */}
             {/* <Stack.Screen name="addFunds" options={{ headerShown: true }} /> */}
-            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="(screens)/wallet/activateTicket/[...activateTicketParams]" options={{ presentation: 'modal', headerRight: () => <CancelButton onPress={() => router.back()} /> }} />
+            {/* <Stack.Screen name="modal" options={{ presentation: 'modal' }} /> */}
+            <Stack.Screen name="(screens)/wallet/activateTicket/[...activateTicketParams]" options={{ presentation: 'modal', title: 'Activate ticket', headerRight: () => <CancelButton onPress={() => router.back()} /> }} />
           </Stack>
         </WalletProvider>
       </ThemeProvider>

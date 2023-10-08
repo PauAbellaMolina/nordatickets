@@ -10,6 +10,7 @@ export type Event = {
   name: string;
   description: string;
   selling: boolean;
+  usedTicketBucketId: string;
   tickets: { tickets: Array<Ticket> }
 };
 
