@@ -4,7 +4,7 @@ import EditScreenInfo from '../../components/EditScreenInfo';
 import { Text, View } from '../../components/Themed';
 import { useWallet } from '../../context/WalletProvider';
 import { router } from 'expo-router';
-import WalletTicketCardComponent from '../components/walletTicketCardComponent';
+import WalletTicketGroupCardComponent from '../components/walletTicketGroupCardComponent';
 import { useEffect } from 'react';
 import { useAuth } from '../../context/AuthProvider';
 
@@ -38,7 +38,7 @@ export default function TabTwoScreen() {
             <FlatList
               style={styles.walletTicketList}
               data={walletTicketGroups}
-              renderItem={({ item }) => <WalletTicketCardComponent {...item} />}
+              renderItem={({ item }) => <WalletTicketGroupCardComponent {...item} />}
               ItemSeparatorComponent={() => <View style={{height: 10}} />}
             />
           :

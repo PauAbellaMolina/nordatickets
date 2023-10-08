@@ -1,12 +1,13 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { SplashScreen, Stack } from 'expo-router';
+import { SplashScreen, Stack, router } from 'expo-router';
 import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { Pressable, useColorScheme } from 'react-native';
 
 import { AuthProvider } from "../context/AuthProvider";
 import { WalletProvider } from '../context/WalletProvider';
+import Colors from '../constants/Colors';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -64,11 +65,21 @@ function RootLayoutNav() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             {/* <Stack.Screen name="(pages)" options={{ headerShown: true }} /> */}
             {/* <Stack.Screen name="addFunds" options={{ headerShown: true }} /> */}
-            {/* <Stack.Screen name="modal" options={{ presentation: 'modal' }} /> */}
-            <Stack.Screen name="activateTicket" options={{ presentation: 'modal' }} /> {/* TODO PAU this is not finding screen */}
+            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="(screens)/wallet/activateTicket/[...activateTicketParams]" options={{ presentation: 'modal', headerRight: () => <CancelButton onPress={() => router.back()} /> }} />
           </Stack>
         </WalletProvider>
       </ThemeProvider>
     </AuthProvider>
+  );
+}
+
+function CancelButton({ onPress }: { onPress: () => void }) {
+  const theme = useColorScheme() ?? 'light';
+
+  return (
+    <Pressable onPress={onPress}>
+      <FontAwesome name="times" size={22} color={Colors[theme].text} />
+    </Pressable>
   );
 }
