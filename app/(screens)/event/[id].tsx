@@ -164,7 +164,7 @@ export default function EventDetailScreen() {
                       <Text style={styles.totalPrice}>Total: {cardTotalPrice}€</Text>
                       { getEnoughFunds() ? <Button title='Buy now' onPress={onBuyCart} /> : <Button title='Not enough funds!' color='red' /> }
                     </View>
-                    <Text style={{marginTop: 10, textAlign: 'right', color: 'gray'}}><FontAwesome size={13} name='info-circle' /> Your balance is {funds}€</Text>
+                    <Text style={{marginTop: 10, textAlign: 'right', color: 'gray'}}><FontAwesome size={13} name='info-circle' /> Your balance is {funds ?? 0}€</Text>
                     { !getEnoughFunds() ? <View style={{width: 120, alignSelf: 'flex-end'}}><Button title='Add money' onPress={() => router.push('/wallet/addFunds')} /></View> : <></> }
                   </>
                 :

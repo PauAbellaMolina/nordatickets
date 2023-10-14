@@ -57,7 +57,7 @@ export default function AddFundsScreen() {
   };
   
   return (
-    <View style={styles.container}> 
+    <View style={styles.container}>
       <Text style={styles.title}>Add funds</Text>
       <View style={styles.addFundsContainer}>
         <View style={styles.textInputContainer}>

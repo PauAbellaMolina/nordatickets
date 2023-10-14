@@ -3,23 +3,27 @@ import { View, Text} from "../../components/Themed";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 import { useAuth } from "../../context/AuthProvider";
-import { StyleSheet, TextInput, Button } from "react-native";
+import { StyleSheet, TextInput, Button, useColorScheme, ActivityIndicator } from "react-native";
 import { useRef, useState } from "react";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import { FIREBASE_CONFIG, FIREBASE_AUTH, FIRESTORE_DB } from '../../firebaseConfig';
 import { PhoneAuthProvider, UserCredential, signInWithCredential } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import Colors from "../../constants/Colors";
 
 export default function Login() {
+  const theme = useColorScheme() ?? 'light';
+  const [waitingForCode, setWaitingForCode] = useState<boolean>(false);
+  const [waitingForConfirmation, setWaitingForConfirmation] = useState<boolean>(false);
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [verificationId, setVerificationId] = useState<string>('');
   const [verificationCode, setVerificationCode] = useState<string>('');
 
-  const { setUser } = useAuth();
   const recaptchaRef = useRef<FirebaseRecaptchaVerifierModal>(null);
 
   const onSendCode = () => {
     if (recaptchaRef.current) {
+      setWaitingForCode(true);
       const phoneProvider = new PhoneAuthProvider(FIREBASE_AUTH);
       phoneProvider
       .verifyPhoneNumber('+34'+phoneNumber, recaptchaRef.current)
@@ -32,6 +36,7 @@ export default function Login() {
   }
 
   const onConfirmCode = () => {
+    setWaitingForConfirmation(true);
     const credential = PhoneAuthProvider.credential(
       verificationId,
       verificationCode
@@ -41,71 +46,100 @@ export default function Login() {
       console.log('PAU LOG-> result: ', result);
       // setUser({ phoneNumber: result.user.providerData[0].phoneNumber ?? '' });
       
-      const userDocRef = doc(FIRESTORE_DB, 'users', result.user.uid);
-      getDoc(userDocRef)
-      .then((doc) => {
-        if (!doc.exists()) {
-          setDoc(userDocRef, {
-            phoneNumber: result.user.providerData[0].phoneNumber ?? '',
-            // creditCard: null, //TODO PAU in the future
-            userWalletFunds: 0,
-            userWalletTickets: [] //this will be an array of { eventId: string, ticketId: string }
-          });
-        }
-      });
+      // const userDocRef = doc(FIRESTORE_DB, 'users', result.user.uid);
+      // getDoc(userDocRef)
+      // .then((doc) => {
+      //   if (!doc.exists()) {
+      //     setDoc(userDocRef, {
+      //       phoneNumber: result.user.providerData[0].phoneNumber ?? '',
+      //       // creditCard: null, //TODO PAU in the future
+      //       walletFunds: 0,
+      //       walletTicketGroups: [] //this will be an array of { eventId: string, ticketId: string }
+      //     });
+      //   }
+      // });
 
+    })
+    .catch((err) => {
+      console.log('PAU LOG-> err: ', err);
     });
   };
 
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      {/* <TouchableOpacity onPress={login}>
-        <Text
-          lightColor="rgba(0,0,0,0.8)"
-          darkColor="rgba(255,255,255,0.8)"
-        >
-          Login
-        </Text>
-      </TouchableOpacity> */}
+    <>
       <FirebaseRecaptchaVerifierModal
         ref={recaptchaRef}
         firebaseConfig={FIREBASE_CONFIG}
         attemptInvisibleVerification={true}
       />
-      <TextInput
-        style={styles.input}
-        autoComplete="tel"
-        keyboardType={'phone-pad'}
-        placeholder="Your phone number"
-        onChangeText={(text)=> setPhoneNumber(text.replace(/[^0-9]/g, ''))}
-      />
-      <Button
-        title={'Send code'}
-        onPress={onSendCode}
-      />
-
-      <TextInput
-        placeholder="Confirmation Code"
-        onChangeText={setVerificationCode}
-        keyboardType="number-pad"
-        style={styles.input}
-      />
-      <Button
-        title={'Confirm code'}
-        onPress={onConfirmCode}
-      />
-    </View>
+      <View style={styles.container}>
+        <View style={styles.inputContainer}>
+          { !waitingForCode ?
+            <>
+              <TextInput
+                style={[styles.input, {color: Colors[theme].text}]}
+                autoComplete="tel"
+                keyboardType={'phone-pad'}
+                placeholder="Your phone number"
+                onChangeText={(text)=> setPhoneNumber(text.replace(/[^0-9]/g, ''))}
+              />
+              <Button
+                disabled={phoneNumber.length !== 9}
+                title={'Send code'}
+                onPress={onSendCode}
+              />
+            </>
+          :
+            <Text style={{fontSize: 30}}>{phoneNumber}</Text>
+          }
+        </View>
+        { waitingForCode ?
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[styles.input, styles.confirmationCodeInput, {color: Colors[theme].text}]}
+              placeholder="SMS Confirmation Code"
+              onChangeText={setVerificationCode}
+              keyboardType="number-pad"
+            />
+            { waitingForConfirmation ?
+              <ActivityIndicator style={{marginTop: 10}} size="small" />
+            :
+              <Button
+                title={'Confirm code'}
+                onPress={onConfirmCode}
+              />
+            }
+          </View>
+        :
+          <></>
+        }
+      </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  input: {
-    width: 200,
-    height: 44,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: 'white',
-    color: 'white',
-    marginBottom: 10,
+  container: {
+    marginTop: 50,
+    paddingTop: 30,
+    paddingHorizontal: 15,
+    alignItems: 'center',
+    gap: 20,
+    // justifyContent: 'center',
   },
+  inputContainer: {
+    // marginTop: 50,
+    alignItems: 'center'
+  },
+  input: {
+    pointerEvents: 'box-only',
+    margin: 12,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    fontSize: 30,
+  },
+  confirmationCodeInput: {
+    fontSize: 20,
+  }
 });
