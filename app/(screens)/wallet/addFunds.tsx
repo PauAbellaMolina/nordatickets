@@ -23,16 +23,13 @@ export default function AddFundsScreen() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log("HEREEE", stripePaymentSheetParams);
     initializePaymentSheet();
   }, [stripePaymentSheetParams]);
 
   const initializePaymentSheet = async () => {
-    console.log("31", stripePaymentSheetParams);
     if (!stripePaymentSheetParams) {
       return;
     }
-    console.log("35");
     const { error } = await initPaymentSheet({
       merchantDisplayName: "Tickets MVP, Inc.",
       customerId: stripePaymentSheetParams.customer,
@@ -41,36 +38,38 @@ export default function AddFundsScreen() {
       // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
       //methods that complete payment after a delay, like SEPA Debit and Sofort.
       allowsDelayedPaymentMethods: false,
-      defaultBillingDetails: {
-        name: 'Jane Doe',
-      }
+      // defaultBillingDetails: {
+      //   name: 'Jane Doe',
+      // }
     });
-    if (!error) {
-      // setLoading(true);
-      console.log("50");
-      const { error } = await presentPaymentSheet();
-
-      if (error) {
-        Alert.alert(`Error code: ${error.code}`, error.message);
-        setLoading(false);
-      } else {
-        // Alert.alert('Success', 'Your order is confirmed!');
-        if (!user?.id) {
-          return;
-        }
-        const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
-        getDoc(userDocRef)
-        .then((doc) => {
-          if (doc.exists()) {
-            const currentFunds = doc.data().walletFunds;
-            console.log('currentFunds->', currentFunds, 'localFunds->', localFunds);
-            setFunds(currentFunds ? currentFunds + localFunds : localFunds);
-            router.back();
-          }
-        });
-      }
-    } else {
+    if (error) {
       console.log('PAU LOG-> error: ', error);
+      Alert.alert("Unexpected error", "Please try again.");
+      setLoading(false);
+    } else {
+      spawnPaymentSheet();
+    }
+  };
+
+  const spawnPaymentSheet = async () => {
+    const { error } = await presentPaymentSheet();
+    if (error) {
+      // Alert.alert(error.code, error.message);
+      setLoading(false);
+    } else {
+      // Alert.alert('Success', 'Your order is confirmed!');
+      if (!user?.id) {
+        return;
+      }
+      const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
+      getDoc(userDocRef)
+      .then((doc) => {
+        if (doc.exists()) {
+          const currentFunds = doc.data().walletFunds;
+          setFunds(currentFunds ? currentFunds + localFunds : localFunds);
+          router.back();
+        }
+      });
     }
   };
 
@@ -90,7 +89,6 @@ export default function AddFundsScreen() {
       onSnapshot(docRef, (snapshot) => {
         const data = snapshot.data();
         if (data && data.paymentIntentClientSecret && data.ephemeralKeySecret && data.customer) {
-          console.log("AAA", data);
           setStripePaymentSheetParams({
             paymentIntentClientSecret: data.paymentIntentClientSecret,
             ephemeralKeySecret: data.ephemeralKeySecret,
@@ -182,7 +180,6 @@ const styles = StyleSheet.create({
   input: {
     pointerEvents: 'box-only',
     margin: 12,
-    borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 10,
     fontSize: 80,

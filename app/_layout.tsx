@@ -72,6 +72,7 @@ function RootLayoutNav() {
               {/* <Stack.Screen name="(pages)" options={{ headerShown: true }} /> */}
               {/* <Stack.Screen name="addFunds" options={{ headerShown: true }} /> */}
               {/* <Stack.Screen name="modal" options={{ presentation: 'modal' }} /> */}
+              <Stack.Screen name="(screens)/loadingApp" options={{ headerShown: false }} />
               <Stack.Screen name="(auth)/login" options={{ title: 'Log In' }} />
               <Stack.Screen name="(screens)/event/[id]" options={{ title: 'Event details' }} />
               <Stack.Screen name="(screens)/wallet/addFunds" options={{ title: 'Add funds' }} />

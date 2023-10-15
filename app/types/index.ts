@@ -1,8 +1,9 @@
 export type User = {
   id: string;
-  phoneNumber: string;
+  phone: string;
   walletFunds: number;
   walletTicketGroups: WalletTicketGroups;
+  eventIdsFollowing: Array<string>;
 }
 
 export type Event = {
@@ -10,6 +11,7 @@ export type Event = {
   name: string;
   description: string;
   selling: boolean;
+  // visible: boolean; //TODO PAU make this a thing (basically not showing visible == false events in the list)
   usedTicketBucketId: string;
   tickets: { tickets: Array<Ticket> }
 };

@@ -44,21 +44,6 @@ export default function Login() {
     signInWithCredential(FIREBASE_AUTH, credential)
     .then((result: UserCredential) => {
       console.log('PAU LOG-> result: ', result);
-      // setUser({ phoneNumber: result.user.providerData[0].phoneNumber ?? '' });
-      
-      // const userDocRef = doc(FIRESTORE_DB, 'users', result.user.uid);
-      // getDoc(userDocRef)
-      // .then((doc) => {
-      //   if (!doc.exists()) {
-      //     setDoc(userDocRef, {
-      //       phoneNumber: result.user.providerData[0].phoneNumber ?? '',
-      //       // creditCard: null, //TODO PAU in the future
-      //       walletFunds: 0,
-      //       walletTicketGroups: [] //this will be an array of { eventId: string, ticketId: string }
-      //     });
-      //   }
-      // });
-
     })
     .catch((err) => {
       console.log('PAU LOG-> err: ', err);
@@ -134,7 +119,6 @@ const styles = StyleSheet.create({
   input: {
     pointerEvents: 'box-only',
     margin: 12,
-    borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 10,
     fontSize: 30,

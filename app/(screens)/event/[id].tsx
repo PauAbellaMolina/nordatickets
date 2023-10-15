@@ -4,7 +4,7 @@ import { ActivityIndicator, Button, Dimensions, FlatList, Platform, StyleSheet }
 import { Text, View } from '../../../components/Themed';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../firebaseConfig';
 import { Event, Ticket, WalletTicketGroup, WalletTicketGroups } from '../../types';
 import TicketCardComponent from '../../components/ticketCardComponent';
@@ -17,7 +17,7 @@ import { useAuth } from '../../../context/AuthProvider';
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams();
   const { funds, setFunds, cart, setCart, walletTicketGroups, setWalletTicketGroups } = useWallet();
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [event, setEvent] = useState<Event>();
 
   useEffect(() => {
@@ -50,6 +50,21 @@ export default function EventDetailScreen() {
       }
     });
   }, []);
+
+  useEffect(() => { //TODO PAU info this adds event to user's event following list. Idea is to make a qr to go to this page (event/id) and that will add it to user's event list.
+    if (!user || user.eventIdsFollowing.includes(id as string)) {
+      return;
+    }
+    const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
+    updateDoc(userDocRef, {
+      eventIdsFollowing: [...user.eventIdsFollowing, id]
+    }).then(() => {
+      setUser({
+        ...user,
+        eventIdsFollowing: [...user.eventIdsFollowing, id as string]
+      });
+    });
+  }, [event]);
 
   const onAddTicketHandler = (ticket: Ticket) => {
     // console.log('PAU LOG-> ticket to add: ', cart, ticket);

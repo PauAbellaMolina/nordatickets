@@ -2,7 +2,7 @@ import { useSegments, useRouter } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../firebaseConfig";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { User, WalletTicketGroup, WalletTicketGroups } from "../app/types";
+import { User } from "../app/types";
 
 type AuthType = {
   user: User | null;
@@ -16,25 +16,30 @@ const AuthContext = createContext<AuthType>({
 
 export const useAuth = () => useContext(AuthContext);
 
-function useProtectedRoute(user: any) {
+function useProtectedRoute(loaded: boolean, user: any) {
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
     const inAuthGroup = segments[0] === "(auth)";
-
-    if (!user && !inAuthGroup) { // If the user is not signed in and the initial segment is not anything in the auth group.
-      // Redirect to the sign-in page.
-      router.replace("/login");
-    } else if (user && inAuthGroup) {
-      // Redirect to the main page.
-      router.replace("/");
+    const inLoadingScreen = segments[0] === "(screens)" && segments[1] === "loadingApp";
+    if (loaded) {
+      if (!user && !inAuthGroup) { // If the user is not signed in and the initial segment is not anything in the auth group.
+        // Redirect to the sign-in page.
+        router.replace("/login");
+      } else if (user && (inAuthGroup || inLoadingScreen)) {
+        // Redirect to the main page.
+        router.replace("/");
+      }
+    } else {
+      router.replace("/loadingApp");
     }
-  }, [user, segments]);
+  }, [loaded, user, segments]);
 }
 
 export function AuthProvider({ children }: { children: JSX.Element }): JSX.Element {
     const [user, setUser] = useState<User | null>(null);
+    const [loaded, setLoaded] = useState<boolean>(false);
 
     useEffect(() => FIREBASE_AUTH.onAuthStateChanged(value => {
       if (value) {
@@ -44,32 +49,41 @@ export function AuthProvider({ children }: { children: JSX.Element }): JSX.Eleme
         .then((doc) => {
           if (!doc.exists()) {
             setDoc(userDocRef, {
-              phoneNumber: value.providerData[0].phoneNumber ?? '',
-              // creditCard: null, //TODO PAU in the future
+              phone: value.providerData[0].phoneNumber ?? '',
               walletFunds: 0,
-              walletTicketGroups: [] //this will be an array of { eventId: string, tickets: string[] }
+              walletTicketGroups: [], //this will be an array of { eventId: string, tickets: string[] }
+              eventIdsFollowing: []
             });
             setUser({
               id: value.uid,
-              phoneNumber: value.providerData[0].phoneNumber ?? '',
+              phone: value.providerData[0].phoneNumber ?? '',
               walletFunds: 0,
-              walletTicketGroups: []
+              walletTicketGroups: [],
+              eventIdsFollowing: []
             });
           } else {
             setUser({
               id: value.uid,
-              phoneNumber: value.providerData[0].phoneNumber ?? '',
+              phone: value.providerData[0].phoneNumber ?? '',
               walletFunds: doc.data().walletFunds,
-              walletTicketGroups: doc.data().walletTicketGroups
+              walletTicketGroups: doc.data().walletTicketGroups,
+              eventIdsFollowing: doc.data().eventIdsFollowing
             });
           }
+        })
+        .catch((error) => {
+          console.log('PAU LOG-> error: ', error);
+        })
+        .finally(() => {
+          setLoaded(true);
         });
       } else {
        console.log("User is signed out");
+       setLoaded(true);
       }
     }), [])
 
-    useProtectedRoute(user);
+    useProtectedRoute(loaded, user);
 
     const authContext: AuthType = {
       user,
