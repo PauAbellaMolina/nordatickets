@@ -140,7 +140,7 @@ export default function AddFundsScreen() {
         <ActivityIndicator style={{marginTop: 10}} size="small" />
       :
         <Button
-          disabled={localFunds === 0}
+          disabled={localFunds < 1 || localFunds > 100}
           title={'Add funds'}
           onPress={onAddFunds}
         />
