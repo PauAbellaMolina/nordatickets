@@ -1,20 +1,18 @@
-import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, Alert, Button, Platform, StyleSheet, TextInput, useColorScheme } from 'react-native';
-
-import EditScreenInfo from '../../../components/EditScreenInfo';
-import { Text, View } from '../../../components/Themed';
-import { useWallet } from '../../../context/WalletProvider';
-import { router, useRouter } from 'expo-router';
-import Colors from '../../../constants/Colors';
 import { useEffect, useState } from 'react';
-import { addDoc, collection, doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
+import { ActivityIndicator, Alert, Button, Platform, StyleSheet, TextInput, useColorScheme } from 'react-native';
+import { useStripe } from '@stripe/stripe-react-native';
+import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { addDoc, collection, doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../firebaseConfig';
 import { useAuth } from '../../../context/AuthProvider';
-import { useStripe } from '@stripe/stripe-react-native';
+import { useWallet } from '../../../context/WalletProvider';
+import Colors from '../../../constants/Colors';
+import { Text, View } from '../../../components/Themed';
 
 export default function AddFundsScreen() {
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const theme = useColorScheme() ?? 'light';
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const { funds, setFunds } = useWallet();
   const { user } = useAuth();
   const [textInput, setTextInput] = useState<string>('');

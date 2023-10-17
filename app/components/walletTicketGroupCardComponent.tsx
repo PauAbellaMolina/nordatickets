@@ -1,21 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Button, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
-import { Text, View } from '../../components/Themed';
-import { Event, Ticket, WalletTicketGroup } from '../types';
-import Colors from '../../constants/Colors';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Button, FlatList, StyleSheet, useColorScheme } from 'react-native';
 import { router } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../firebaseConfig';
-
-export interface Props {
-  onRemoveTicket: (ticket: Ticket) => void,
-  onAddTicket: (ticket: Ticket) => void,
-  ticket: Ticket
-}
+import { Event, Ticket, WalletTicketGroup } from '../types';
+import Colors from '../../constants/Colors';
+import { Text, View } from '../../components/Themed';
 
 export default function WalletTicketGroupCardComponent(walletTicket: WalletTicketGroup) {
   const theme = useColorScheme() ?? 'light';
-
   const [event, setEvent] = useState<Event>();
 
   useEffect(() => {
@@ -29,21 +22,6 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
         delete (event as any).ticketBucketRef;
         delete (event as any).usedTicketBucketRef;
         setEvent(event);
-        // const ticketBucketRef = doc.data().ticketBucketRef;
-        // if (ticketBucketRef) {
-        //   getDoc(ticketBucketRef)
-        //   .then((doc) => {
-        //     if (doc.exists()) {
-        //       event.tickets = doc.data() as { tickets: Ticket[] };
-        //       setEvent(event);
-        //       // console.log('PAU LOG-> event: ', event);
-        //     } else {
-        //       console.log('No tickets doc found');
-        //     }
-        //   });
-        // } else {
-        //   setEvent(event);
-        // }
       } else {
         console.log('No event doc found with id: ', walletTicket.eventId);
       }
@@ -86,7 +64,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 10,
+    borderRadius: 10
   },
   eventName: {
     fontSize: 16,
@@ -108,5 +86,5 @@ const styles = StyleSheet.create({
   },
   ticketName: {
     fontSize: 19
-  },
+  }
 });

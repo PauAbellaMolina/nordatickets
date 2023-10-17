@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useEffect } from "react";
 import { useState } from "react";
-import { Cart, Ticket, WalletTicketGroups } from "../app/types";
-import { FIREBASE_AUTH, FIRESTORE_DB } from "../firebaseConfig";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import React, { createContext, useContext, useEffect } from "react";
+import { doc, updateDoc } from "firebase/firestore";
+import { FIRESTORE_DB } from "../firebaseConfig";
+import { Cart, WalletTicketGroups } from "../app/types";
 import { useAuth } from "./AuthProvider";
 
 type WalletContextType = {
@@ -32,19 +32,17 @@ export function WalletProvider({ children }: { children: JSX.Element }): JSX.Ele
 
   const { user, setUser } = useAuth();
 
-  // useEffect(() => {
-  //   console.log('PAU LOG-> cart: ', cart);
-  // }, [cart]);
-
   useEffect(() => {
-    if (funds === undefined && user && user.walletFunds !== funds) {
+    if (!funds && user && user.walletFunds) {
       setFunds(user.walletFunds);
+    }
+    if (!walletTicketGroups && user && user.walletTicketGroups) {
       setWalletTicketGroups(user.walletTicketGroups);
     }
   }, [user]);
 
   useEffect(() => {
-    if (funds !== undefined && user && user.walletFunds !== funds) {
+    if (funds && user && user.walletFunds !== funds) {
       const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
       updateDoc(userDocRef, {
         walletFunds: funds
@@ -58,7 +56,7 @@ export function WalletProvider({ children }: { children: JSX.Element }): JSX.Ele
   }, [funds]);
 
   useEffect(() => {
-    if (walletTicketGroups !== null && user && user.walletTicketGroups !== walletTicketGroups) {
+    if (walletTicketGroups && user && user.walletTicketGroups !== walletTicketGroups) {
       const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
       updateDoc(userDocRef, {
         walletTicketGroups: walletTicketGroups

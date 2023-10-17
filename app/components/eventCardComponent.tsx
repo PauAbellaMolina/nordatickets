@@ -1,9 +1,9 @@
 import React from 'react';
 import { Pressable, StyleSheet, useColorScheme } from 'react-native';
-import { Text, View } from '../../components/Themed';
+import { router } from 'expo-router';
 import { Event } from '../types';
 import Colors from '../../constants/Colors';
-import { router } from 'expo-router';
+import { Text, View } from '../../components/Themed';
 
 export default function EventCardComponent(event: Event ) {
   const theme = useColorScheme() ?? 'light';
@@ -30,14 +30,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#fff',
     padding: 10,
-    borderRadius: 10,
-    // alignItems: 'center',
+    borderRadius: 10
   },
   roundedSquare: {
     backgroundColor: '#ff7f50',
     borderRadius: 10,
     width: 90,
-    height: 90,
+    height: 90
   },
   eventInfo: {
     width: '70%',
@@ -47,9 +46,9 @@ const styles = StyleSheet.create({
   },
   eventTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   eventDescription: {
-    marginTop: 5,
-  },
+    marginTop: 5
+  }
 });

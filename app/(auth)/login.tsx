@@ -1,15 +1,10 @@
-import { Link } from "expo-router";
-import { View, Text} from "../../components/Themed";
-import { TouchableOpacity } from "react-native-gesture-handler";
-
-import { useAuth } from "../../context/AuthProvider";
-import { StyleSheet, TextInput, Button, useColorScheme, ActivityIndicator } from "react-native";
 import { useRef, useState } from "react";
-import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
-import { FIREBASE_CONFIG, FIREBASE_AUTH, FIRESTORE_DB } from '../../firebaseConfig';
+import { StyleSheet, TextInput, Button, useColorScheme, ActivityIndicator } from "react-native";
 import { PhoneAuthProvider, UserCredential, signInWithCredential } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
+import { FIREBASE_CONFIG, FIREBASE_AUTH } from '../../firebaseConfig';
 import Colors from "../../constants/Colors";
+import { View, Text} from "../../components/Themed";
 
 export default function Login() {
   const theme = useColorScheme() ?? 'light';
@@ -110,10 +105,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     alignItems: 'center',
     gap: 20,
-    // justifyContent: 'center',
   },
   inputContainer: {
-    // marginTop: 50,
     alignItems: 'center'
   },
   input: {

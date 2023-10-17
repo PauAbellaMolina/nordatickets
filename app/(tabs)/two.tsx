@@ -1,23 +1,11 @@
-import { Button, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-
-import EditScreenInfo from '../../components/EditScreenInfo';
-import { Text, View } from '../../components/Themed';
-import { useWallet } from '../../context/WalletProvider';
+import { Button, FlatList, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+import { useWallet } from '../../context/WalletProvider';
+import { Text, View } from '../../components/Themed';
 import WalletTicketGroupCardComponent from '../components/walletTicketGroupCardComponent';
-import { useEffect } from 'react';
-import { useAuth } from '../../context/AuthProvider';
 
 export default function TabTwoScreen() {
-  
   const { funds, walletTicketGroups } = useWallet();
-
-  // const onAddFunds = () => {
-  //   setFunds(funds ? funds + 1 : 1);
-  // };
-  // const onSubstractFunds = () => {
-  //   setFunds(funds ? funds - 1 : 0);
-  // };
 
   const onGoToAddFunds = () => {
     router.push('/wallet/addFunds');
@@ -54,15 +42,15 @@ const styles = StyleSheet.create({
   container: {
     paddingTop: 55,
     paddingHorizontal: 15,
-    flex: 1,
+    flex: 1
   },
   title: {
     fontSize: 30,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   wrapper: {
     marginTop: 10,
-    marginHorizontal: 10,
+    marginHorizontal: 10
   },
   fundsContainer: {
     flexDirection: 'row',
@@ -72,15 +60,13 @@ const styles = StyleSheet.create({
   fundsTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    lineHeight: 20,
+    lineHeight: 20
   },
   ticketsContainer: {
-    marginTop: 20,
-    // borderWidth: 1,
-    // borderColor: 'blue',
+    marginTop: 20
   },
   walletTicketList: {
-    marginTop: 10,
+    marginTop: 10
   },
   emptyWallet: {
     textAlign: 'center',

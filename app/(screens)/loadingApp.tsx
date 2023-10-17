@@ -1,5 +1,5 @@
-import { View, Text} from "../../components/Themed";
 import { StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text} from "../../components/Themed";
 
 export default function LoadingApp() {
   return (

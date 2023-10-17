@@ -1,21 +1,18 @@
-import { StatusBar } from 'expo-status-bar';
+import { useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
-
-import EditScreenInfo from '../../../../components/EditScreenInfo';
-import { Text, View } from '../../../../components/Themed';
 import { useLocalSearchParams } from 'expo-router';
-import Colors from '../../../../constants/Colors';
+import { StatusBar } from 'expo-status-bar';
 import { arrayUnion, doc, updateDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../../firebaseConfig';
 import { useAuth } from '../../../../context/AuthProvider';
-import { useState } from 'react';
 import { useWallet } from '../../../../context/WalletProvider';
+import Colors from '../../../../constants/Colors';
+import { Text, View } from '../../../../components/Themed';
 
 export default function ActivateTicketScreen() {
   const theme = useColorScheme() ?? 'light';
   const { user } = useAuth();
   const { walletTicketGroups, setWalletTicketGroups } = useWallet();
-
   const [loading, setLoading] = useState<boolean>(false);
   const [ticketActive, setTicketActive] = useState<boolean>(true);
 

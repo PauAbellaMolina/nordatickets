@@ -1,7 +1,7 @@
-import { useSegments, useRouter } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
-import { FIREBASE_AUTH, FIRESTORE_DB } from "../firebaseConfig";
+import { useSegments, useRouter } from "expo-router";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { FIREBASE_AUTH, FIRESTORE_DB } from "../firebaseConfig";
 import { User } from "../app/types";
 
 type AuthType = {

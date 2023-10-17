@@ -1,58 +1,57 @@
-import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, Button, Dimensions, FlatList, Platform, StyleSheet } from 'react-native';
-
-import { Text, View } from '../../../components/Themed';
-import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
-import { FIRESTORE_DB } from '../../../firebaseConfig';
-import { Event, Ticket, WalletTicketGroup, WalletTicketGroups } from '../../types';
-import TicketCardComponent from '../../components/ticketCardComponent';
-import { useWallet } from '../../../context/WalletProvider';
+import { ActivityIndicator, Button, FlatList, Platform, StyleSheet } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { StatusBar } from 'expo-status-bar';
+import { router, useLocalSearchParams } from 'expo-router';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../../firebaseConfig';
 import { firestoreAutoId } from '../../../utils/firestoreAutoId';
+import { Event, Ticket, WalletTicketGroup, WalletTicketGroups } from '../../types';
 import { useAuth } from '../../../context/AuthProvider';
-
+import { useWallet } from '../../../context/WalletProvider';
+import { Text, View } from '../../../components/Themed';
+import TicketCardComponent from '../../components/ticketCardComponent';
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams();
   const { funds, setFunds, cart, setCart, walletTicketGroups, setWalletTicketGroups } = useWallet();
   const { user, setUser } = useAuth();
   const [event, setEvent] = useState<Event>();
+  const [cardTotalPrice, setCardTotalPrice] = useState<number>(0);
 
   useEffect(() => {
-    setCart(null);
-
     const eventDocRef = doc(FIRESTORE_DB, 'events', id as string);
     getDoc(eventDocRef)
     .then((doc) => {
       if (doc.exists()) {
-        const event = doc.data() as Event;
-        event.id = doc.id;
-        delete (event as any).ticketBucketRef;
+        const docEvent = doc.data() as Event;
+        docEvent.id = doc.id;
+        delete (docEvent as any).ticketBucketRef;
         const ticketBucketRef = doc.data().ticketBucketRef;
         if (ticketBucketRef) {
           getDoc(ticketBucketRef)
           .then((doc) => {
             if (doc.exists()) {
-              event.tickets = doc.data() as { tickets: Ticket[] };
-              setEvent(event);
+              docEvent.tickets = doc.data() as { tickets: Ticket[] };
+              setEvent(docEvent);
               // console.log('PAU LOG-> event: ', event);
             } else {
               console.log('No references doc found');
             }
           });
         } else {
-          setEvent(event);
+          setEvent(docEvent);
         }
       } else {
         console.log('No doc found with id: ', id);
       }
     });
+
+    return () => setCart(null);
   }, []);
 
   useEffect(() => { //TODO PAU info this adds event to user's event following list. Idea is to make a qr to go to this page (event/id) and that will add it to user's event list.
-    if (!user || user.eventIdsFollowing.includes(id as string)) {
+    if (!event || !user || user.eventIdsFollowing.includes(id as string)) {
       return;
     }
     const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
@@ -65,6 +64,15 @@ export default function EventDetailScreen() {
       });
     });
   }, [event]);
+
+  useEffect(() => {
+    if (!cart) {
+      setCardTotalPrice(0);
+      return;
+    }
+    const totalPrice = cart.reduce((acc, cartItem) => acc + cartItem.ticket.price * cartItem.quantity, 0);
+    setCardTotalPrice(totalPrice);
+  }, [cart]);
 
   const onAddTicketHandler = (ticket: Ticket) => {
     // console.log('PAU LOG-> ticket to add: ', cart, ticket);
@@ -95,8 +103,6 @@ export default function EventDetailScreen() {
       }
     }
   };
-
-  const cardTotalPrice = cart?.reduce((acc, cartItem) => acc + cartItem.ticket.price * cartItem.quantity, 0);
 
   const getEnoughFunds = (): boolean => {
     if (!funds || !cardTotalPrice) {
@@ -203,33 +209,33 @@ const styles = StyleSheet.create({
   container: {
     paddingTop: 15,
     paddingHorizontal: 15,
-    flex: 1,
+    flex: 1
   },
   title: {
     fontSize: 30,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   subtitle: {
     fontSize: 25,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   eventDescription: {
     fontSize: 18,
     marginTop: 10,
-    marginLeft: 10,
+    marginLeft: 10
   },
   ticketsContainer: {
     marginTop: 30,
-    marginHorizontal: 10,
+    marginHorizontal: 10
   },
   ticketsList: {
-    marginTop: 10,
+    marginTop: 10
   },
   cartList: {
-    marginVertical: 10,
+    marginVertical: 10
   },
   cartItemsList: {
-    fontSize: 18,
+    fontSize: 18
   },
   totalContainer: {
     flexDirection: 'row',
@@ -239,7 +245,7 @@ const styles = StyleSheet.create({
   totalPrice: {
     fontSize: 20,
     fontWeight: 'bold',
-    lineHeight: 20,
+    lineHeight: 20
   },
   emptyCard: {
     textAlign: 'center',
