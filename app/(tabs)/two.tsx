@@ -40,7 +40,9 @@ export default function TabTwoScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 55,
+    backgroundColor: 'transparent',
+    paddingTop: 60,
+    paddingBottom: 5,
     paddingHorizontal: 15,
     flex: 1
   },
@@ -65,7 +67,7 @@ const styles = StyleSheet.create({
   ticketsContainer: {
     marginTop: 20
   },
-  walletTicketList: {
+  walletTicketList: { //TODO PAU fix list underlapping tabs when list gets long
     marginTop: 10
   },
   emptyWallet: {

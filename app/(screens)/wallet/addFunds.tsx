@@ -152,6 +152,7 @@ export default function AddFundsScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: 'transparent',
     paddingTop: 30,
     paddingHorizontal: 15,
     alignItems: 'center',

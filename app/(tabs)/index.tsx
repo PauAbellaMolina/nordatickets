@@ -11,7 +11,7 @@ export default function TabOneScreen() {
   const { user } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
 
-  useEffect(() => { //TODO PAU useMemo could also be used here, although useEffect does the same (and since this screen is only rendered once, it's not a problem) and it takes up cache memory.
+  useEffect(() => { //TODO PAU info useMemo could also be used here, although useEffect does the same (and since this screen is only rendered once, it's not a problem) and it takes up cache memory.
     setEvents([]);
     if (!user?.eventIdsFollowing) {
       return;
@@ -28,6 +28,7 @@ export default function TabOneScreen() {
       });
     });
 
+    //TODO PAU info following code is for retrieving all events and not just the ones the user is following
     // const colRef = collection(FIRESTORE_DB, 'events');
     // getDocs(colRef)
     // .then((querySnapshot) => {
@@ -45,11 +46,12 @@ export default function TabOneScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Event list</Text>
+      <Text style={styles.infoLabel}>Scan the QR code of the event to add</Text>
       <FlatList
         style={styles.eventList}
         data={events}
         renderItem={({ item }) => <EventCardComponent {...item} />}
-        ItemSeparatorComponent={() => <View style={{height: 10}} />}
+        ItemSeparatorComponent={() => <View style={{height: 10, backgroundColor: 'transparent'}} />}
       />
     </View>
   );
@@ -57,7 +59,9 @@ export default function TabOneScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 55,
+    backgroundColor: 'transparent',
+    paddingTop: 60,
+    paddingBottom: 5,
     paddingHorizontal: 15,
     flex: 1
   },
@@ -65,8 +69,13 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold'
   },
+  infoLabel: {
+    fontSize: 13,
+    marginLeft: 2,
+    color: '#8C90A3'
+  },
   eventList: {
-    marginTop: 10,
+    marginTop: 20,
     gap: 10
   }
 });

@@ -1,15 +1,7 @@
 import { useColorScheme } from 'react-native';
 import { Tabs } from 'expo-router';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Colors from '../../constants/Colors';
-
-// TODO PAU info available icons here -> https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
+import TabBarIcon from '../components/icons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -17,7 +9,24 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabIconActive,
+        tabBarActiveBackgroundColor: Colors[colorScheme ?? 'light'].tabIconActiveBackground,
+        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconInactive,
+        tabBarStyle: {
+          height: 65,
+          borderRadius: 35,
+          backgroundColor: Colors[colorScheme ?? 'light'].tabBarBackground,
+          marginHorizontal: 20,
+          marginBottom: 25,
+          paddingBottom: 0
+        },
+        tabBarLabelStyle: {
+          display: 'none'
+        },
+        tabBarItemStyle: {
+          borderRadius: 50,
+          margin: 5
+        }
       }}>
       <Tabs.Screen
         name="index"

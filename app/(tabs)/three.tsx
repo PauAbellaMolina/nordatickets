@@ -54,7 +54,9 @@ export default function TabThreeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 55,
+    backgroundColor: 'transparent',
+    paddingTop: 60,
+    paddingBottom: 5,
     paddingHorizontal: 15,
     flex: 1
   },
