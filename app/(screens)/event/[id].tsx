@@ -21,16 +21,16 @@ export default function EventDetailScreen() {
   const { user, setUser } = useAuth();
   const [event, setEvent] = useState<Event>();
   const [cardTotalPrice, setCardTotalPrice] = useState<number>(0);
-  const [eventCardBackgroundColor, setEventCardBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
+  const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
 
   const chooseRandomColor = (): string => {
-    const colors = Colors.eventCardBackgroundColorsArray
+    const colors = Colors.eventBackgroundColorsArray[theme]
     const randomIndex = Math.floor(Math.random() * colors.length);
     return colors[randomIndex];
   };
 
   useEffect(() => {
-    setEventCardBackgroundColor(chooseRandomColor);
+    setEventBackgroundColor(chooseRandomColor);
 
     const eventDocRef = doc(FIRESTORE_DB, 'events', id as string);
     getDoc(eventDocRef)
@@ -169,10 +169,10 @@ export default function EventDetailScreen() {
     <View style={[styles.container, {backgroundColor: Colors[theme].backgroundContrast}]}>
       { event ?
         <>
-          {/* <View style={[styles.eventInfoContainer, {backgroundColor: eventCardBackgroundColor}]}> */}
-          <View style={styles.eventInfoContainer}>
-            <Text style={styles.title}>{ event?.name }</Text>
-            <Text style={styles.eventDescription}>{event.description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}</Text>
+          <View style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor}]}>
+          {/* <View style={styles.eventInfoContainer}> */}
+            <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
+            <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}</Text>
           </View>
           { event.tickets ?
             <>
@@ -185,33 +185,26 @@ export default function EventDetailScreen() {
                 <FlatList
                   style={styles.ticketsList}
                   data={event.tickets.tickets}
-                  renderItem={({ item }) => <TicketCardComponent quantityInCart={cart?.find((cartItem) => cartItem.ticket.ticketId === item.ticketId)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />}
-                  // ItemSeparatorComponent={() => <View style={{height: 10, backgroundColor: 'transparent'}} />}
+                  renderItem={({ item }) => <TicketCardComponent eventSelling={event.selling} quantityInCart={cart?.find((cartItem) => cartItem.ticket.ticketId === item.ticketId)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />}
                 />
               </View>
 
-              <View style={styles.cartContainer}>
-                <View style={styles.cartTitleRowContainer}><Text style={[styles.subtitle, {color: Colors['light'].text}]}>Cart:</Text>{ cart?.length ? <Text style={{color: 'gray'}}><FeatherIcon size={13} name='info' color='gray' /> Your balance is {funds ?? 0}€</Text> : <></> }</View>
+              <View style={[styles.cartContainer, {backgroundColor: Colors[theme].cardContainerBackground}]}>
+                <View style={styles.cartTitleRowContainer}><Text style={styles.subtitle}>Cart:</Text>{ cart?.length ? <Text style={{color: Colors[theme].cardContainerBackgroundContrast}}><FeatherIcon size={13} name='info' color={Colors[theme].cardContainerBackgroundContrast} /> Your balance is {funds ?? 0}€</Text> : <></> }</View>
                 { cart?.length ?
                   <>
                     <FlatList
                       style={styles.cartList}
                       data={cart}
-                      renderItem={({ item }) => <Text style={[styles.cartItemsList, {color: Colors['light'].text}]}>{item.quantity}  -  {item.ticket.name} · {item.ticket.price}€</Text>}
-                      // ItemSeparatorComponent={() => <View style={{height: 3}} />}
+                      renderItem={({ item }) => <Text style={styles.cartItemsList}>{item.quantity}  -  {item.ticket.name} · {item.ticket.price}€</Text>}
                     />
-                    {/* <View style={styles.totalContainer}>
-                      <Text style={styles.totalPrice}>Total: {cardTotalPrice}€</Text>
-                      { getEnoughFunds() ? <Button title='Buy now' onPress={onBuyCart} /> : <Button title='Not enough funds!' color='red' /> }
-                    </View>
-                    { !getEnoughFunds() ? <View style={{width: 120, alignSelf: 'flex-end'}}><Button title='Add money' onPress={() => router.push('/wallet/addFunds')} /></View> : <></> } */}
                     { !getEnoughFunds() ? <Text style={styles.notEnoughFunds}>Not enough funds!</Text> : <></> }
                     <Pressable style={styles.buyButton} onPress={getEnoughFunds() ? onBuyCart : () => {router.push('/wallet/addFunds')}}>
                       <Text style={styles.buyButtonText}>{ getEnoughFunds() ? cardTotalPrice + '€  ·   Buy now' : 'Add funds' }</Text>
                     </Pressable>
                   </>
                 :
-                  <Text style={styles.emptyCard}>No tickets added to cart</Text>
+                  <Text style={[styles.emptyCard, {color: Colors[theme].cardContainerBackgroundContrast}]}>No tickets added to cart</Text>
                 }
               </View>
             </>
@@ -230,46 +223,41 @@ export default function EventDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    // paddingTop: 10,
-    paddingTop: 80,
-    paddingHorizontal: 20,
     flex: 1
   },
   eventInfoContainer: {
-    backgroundColor: 'transparent',
-    // paddingTop: 15,
-    // paddingBottom: 23,
-    // paddingHorizontal: 20,
+    paddingTop: 100,
+    paddingBottom: 30,
+    paddingHorizontal: 20,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
     borderRadius: 35,
-    // shadowColor: "#000",
-    // shadowOffset: {
-    //   width: 0,
-    //   height: -2,
-    // },
-    // shadowOpacity: 0.10,
-    // shadowRadius: 1.5,
-    // elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.10,
+    shadowRadius: 2.5,
+    elevation: 10,
   },
   title: {
-    fontSize: 30,
+    fontSize: 32,
     fontWeight: 'bold'
   },
   subtitle: {
     fontSize: 25,
-    fontWeight: 'bold'
+    fontWeight: '800'
   },
   eventDescription: {
-    fontSize: 18,
+    fontSize: 16,
     marginTop: 10,
     // marginLeft: 10
   },
   ticketsContainer: {
     backgroundColor: 'transparent',
-    marginTop: 40,
-    marginHorizontal: 10,
-    // paddingTop: 15,
-    // paddingBottom: 23,
-    // paddingHorizontal: 20,
+    marginTop: 25,
+    marginHorizontal: 30,
     borderRadius: 35,
     // shadowColor: "#000",
     // shadowOffset: {
@@ -310,11 +298,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: '95%',
     bottom: 25,
-    backgroundColor: '#C5EDDF',
     paddingTop: 15,
     paddingBottom: 23,
     paddingHorizontal: 20,
-    // marginHorizontal: 20,
     borderRadius: 35,
     shadowColor: "#000",
     shadowOffset: {
@@ -345,9 +331,8 @@ const styles = StyleSheet.create({
   buyButton: {
     width: '100%',
     marginTop: 10,
-    backgroundColor: '#161211',
+    backgroundColor: '#613AC5',
     paddingVertical: 10,
-    // paddingHorizontal: 15,
     borderRadius: 10
   },
   buyButtonText: {
@@ -356,20 +341,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center'
   },
-  // totalContainer: {
-  //   flexDirection: 'row',
-  //   justifyContent: 'space-between',
-  //   alignItems: 'center',
-  //   backgroundColor: 'transparent'
-  // },
-  // totalPrice: {
-  //   fontSize: 20,
-  //   fontWeight: 'bold',
-  //   // lineHeight: 20,
-  // },
   emptyCard: {
     textAlign: 'center',
-    color: 'grey',
     marginTop: 10
   }
 });

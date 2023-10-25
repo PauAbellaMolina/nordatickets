@@ -8,25 +8,25 @@ import { FeatherIcon } from './icons';
 
 export default function EventCardComponent(event: Event ) {
   const theme = useColorScheme() ?? 'light';
-  const [eventCardBackgroundColor, setEventCardBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
+  const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
 
   const goToEventDetail = () => {
     router.push(`/event/${event.id}`);
   }
 
   const chooseRandomColor = (): string => {
-    const colors = Colors.eventCardBackgroundColorsArray
+    const colors = Colors.eventBackgroundColorsArray[theme]
     const randomIndex = Math.floor(Math.random() * colors.length);
     return colors[randomIndex];
   };
 
   useEffect(() => {
-    setEventCardBackgroundColor(chooseRandomColor);
+    setEventBackgroundColor(chooseRandomColor);
   }, []);
   
   return (
     <Pressable onPress={goToEventDetail}>
-      <View style={[styles.eventCard, {backgroundColor: eventCardBackgroundColor}]}>
+      <View style={[styles.eventCard, {backgroundColor: eventBackgroundColor}]}>
         {/* <View style={styles.roundedSquare} /> */}
         <View style={styles.eventInfoContainer}>
           <Text style={[styles.eventTitle, {color: Colors['light'].text}]}>{event.name}</Text>

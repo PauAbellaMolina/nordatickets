@@ -6,24 +6,25 @@ import { Text, View } from '../../components/Themed';
 import { FeatherIcon } from './icons';
 
 export interface TicketCardComponentProps {
+  eventSelling: boolean,
   quantityInCart: number,
   onRemoveTicket: (ticket: Ticket) => void,
   onAddTicket: (ticket: Ticket) => void,
   ticket: Ticket
 }
 
-export default function TicketCardComponent({ quantityInCart, onRemoveTicket, onAddTicket, ticket}: TicketCardComponentProps) {
+export default function TicketCardComponent({ eventSelling, quantityInCart, onRemoveTicket, onAddTicket, ticket}: TicketCardComponentProps) {
   const theme = useColorScheme() ?? 'light';
-  const [eventCardBackgroundColor, setEventCardBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
+  const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
 
   const chooseRandomColor = (): string => {
-    const colors = Colors.eventCardBackgroundColorsArray
+    const colors = Colors.eventBackgroundColorsArray[theme]
     const randomIndex = Math.floor(Math.random() * colors.length);
     return colors[randomIndex];
   };
 
   useEffect(() => {
-    setEventCardBackgroundColor(chooseRandomColor);
+    setEventBackgroundColor(chooseRandomColor);
   }, []);
 
   const onRemove = () => {
@@ -41,24 +42,28 @@ export default function TicketCardComponent({ quantityInCart, onRemoveTicket, on
       <View style={styles.ticketContents}>
         <Text style={styles.eventTitle}>{ticket.name} · {ticket.price}€</Text>
         <View style={styles.ticketActions}>
-          { ticket.selling ? <>
-            <Pressable onPress={onRemove}>
-              <FeatherIcon name="minus-circle" size={30} color={Colors[theme].text} />
-            </Pressable>
-            <Text style={styles.quantityInCart}>{quantityInCart}</Text>
-            <Pressable onPress={onAdd}>
-              <FeatherIcon name="plus-circle" size={30} color={Colors[theme].text} />
-            </Pressable>
-            {/* TODO PAU info next snippet hides add button when reached 5 tickets of the same type added to cart  */}
-            {/* { !quantityInCart || quantityInCart < 5 ?
-              <Pressable onPress={onAdd}>
-                <FeatherIcon name="plus-circle" size={30} color={Colors['light'].text} />
+          { eventSelling ? <>
+            { ticket.selling ? <>
+              <Pressable onPress={onRemove}>
+                <FeatherIcon name="minus-circle" size={30} color={Colors[theme].text} />
               </Pressable>
-            :
-              <View style={{width: 30}} />
-            } */}
+              <Text style={styles.quantityInCart}>{quantityInCart}</Text>
+              <Pressable onPress={onAdd}>
+                <FeatherIcon name="plus-circle" size={30} color={Colors[theme].text} />
+              </Pressable>
+              {/* TODO PAU info next snippet hides add button when reached 5 tickets of the same type added to cart  */}
+              {/* { !quantityInCart || quantityInCart < 5 ?
+                <Pressable onPress={onAdd}>
+                  <FeatherIcon name="plus-circle" size={30} color={Colors['light'].text} />
+                </Pressable>
+              :
+                <View style={{width: 30}} />
+              } */}
+            </> :
+              <Text style={styles.notAvailable}>Not available</Text>
+            }
           </> :
-            <Text style={styles.notAvailable}>Not available</Text>
+            <></>
           }
         </View>
       </View>
@@ -94,7 +99,9 @@ export default function TicketCardComponent({ quantityInCart, onRemoveTicket, on
 
 const styles = StyleSheet.create({
   ticketCard: {
-    padding: 10,
+    paddingVertical: 15,
+    paddingLeft: 10,
+    paddingRight: 15,
     marginBottom: 10,
     borderRadius: 10,
     shadowColor: "#000",

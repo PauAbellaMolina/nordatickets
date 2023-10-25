@@ -51,10 +51,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   wrapper: {
+    backgroundColor: 'transparent',
     marginTop: 10,
     marginHorizontal: 10
   },
   fundsContainer: {
+    backgroundColor: 'transparent',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center'
@@ -65,6 +67,7 @@ const styles = StyleSheet.create({
     lineHeight: 20
   },
   ticketsContainer: {
+    backgroundColor: 'transparent',
     marginTop: 20
   },
   walletTicketList: { //TODO PAU fix list underlapping tabs when list gets long
