@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.10,
     shadowRadius: 1.5,
-    elevation: 10,
+    elevation: 10
   },
   roundedSquare: {
     backgroundColor: '#ff7f50',

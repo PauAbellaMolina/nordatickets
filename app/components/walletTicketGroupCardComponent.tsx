@@ -94,32 +94,24 @@ const styles = StyleSheet.create({
     gap: 10
   },
   singleTicketContainer: {
-    // marginHorizontal: 8,
     flex: 1,
-    // paddingHorizontal: 10,
-    // paddingVertical: 10,
     borderRadius: 10,
     borderWidth: 2,
     flexDirection: 'row',
-    // justifyContent: 'center',
-    alignItems: 'center',
-    // gap: 7
+    alignItems: 'center'
   },
   ticketIconWrapper: {
     backgroundColor: 'transparent',
-    // borderRadius: 50,
-    // borderWidth: 2,
-    // padding: 10,
     paddingVertical: 11,
     paddingHorizontal: 12,
     borderWidth: 2,
     borderRadius: 10,
     margin: -2,
-    borderStyle: 'dashed',
+    borderStyle: 'dashed'
   },
   ticketNameWrapper: {
     backgroundColor: 'transparent',
-    flex: 1,
+    flex: 1
   },
   ticketName: {
     fontSize: 19,

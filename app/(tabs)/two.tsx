@@ -1,4 +1,4 @@
-import { Button, FlatList, StyleSheet } from 'react-native';
+import { Button, FlatList, Platform, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { useWallet } from '../../context/WalletProvider';
 import { Text, View } from '../../components/Themed';

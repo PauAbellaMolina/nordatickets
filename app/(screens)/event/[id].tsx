@@ -215,7 +215,7 @@ export default function EventDetailScreen() {
         :
         <ActivityIndicator style={{marginTop: '90%'}} size="large" />
       }
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+      {/* <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} /> */}
     </View> 
   );
 }
