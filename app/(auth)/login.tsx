@@ -42,8 +42,63 @@ export default function Login() {
     })
     .catch((err) => {
       console.log('PAU LOG-> err: ', err);
+      alert(err);
+      setWaitingForConfirmation(false);
     });
   };
+
+  // return (
+  //   <>
+  //     <FirebaseRecaptchaVerifierModal
+  //       ref={recaptchaRef}
+  //       firebaseConfig={FIREBASE_CONFIG}
+  //       attemptInvisibleVerification={true}
+  //     />
+  //     <View style={styles.container}>
+  //       <Text style={styles.title}>Log In</Text>
+  //       <View style={styles.inputContainer}>
+  //         { !waitingForCode ?
+  //           <>
+  //             <TextInput
+  //               style={[styles.input, {color: Colors[theme].text}]}
+  //               autoComplete="tel"
+  //               keyboardType={'phone-pad'}
+  //               placeholder="Your phone number"
+  //               onChangeText={(text)=> setPhoneNumber(text.replace(/[^0-9]/g, ''))}
+  //             />
+  //             <Button
+  //               disabled={phoneNumber.length !== 9}
+  //               title={'Send code'}
+  //               onPress={onSendCode}
+  //             />
+  //           </>
+  //         :
+  //           <Text style={{fontSize: 30}}>{phoneNumber}</Text>
+  //         }
+  //       </View>
+  //       { waitingForCode ?
+  //         <View style={styles.inputContainer}>
+  //           <TextInput
+  //             style={[styles.input, styles.confirmationCodeInput, {color: Colors[theme].text}]}
+  //             placeholder="SMS Confirmation Code"
+  //             onChangeText={setVerificationCode}
+  //             keyboardType="number-pad"
+  //           />
+  //           { waitingForConfirmation ?
+  //             <ActivityIndicator style={{marginTop: 10}} size="small" />
+  //           :
+  //             <Button
+  //               title={'Confirm code'}
+  //               onPress={onConfirmCode}
+  //             />
+  //           }
+  //         </View>
+  //       :
+  //         <></>
+  //       }
+  //     </View>
+  //   </>
+  // );
 
   return (
     <>
@@ -53,46 +108,38 @@ export default function Login() {
         attemptInvisibleVerification={true}
       />
       <View style={styles.container}>
+        <Text style={styles.title}>Log In</Text>
         <View style={styles.inputContainer}>
-          { !waitingForCode ?
-            <>
-              <TextInput
-                style={[styles.input, {color: Colors[theme].text}]}
-                autoComplete="tel"
-                keyboardType={'phone-pad'}
-                placeholder="Your phone number"
-                onChangeText={(text)=> setPhoneNumber(text.replace(/[^0-9]/g, ''))}
-              />
-              <Button
-                disabled={phoneNumber.length !== 9}
-                title={'Send code'}
-                onPress={onSendCode}
-              />
-            </>
-          :
-            <Text style={{fontSize: 30}}>{phoneNumber}</Text>
-          }
-        </View>
-        { waitingForCode ?
-          <View style={styles.inputContainer}>
+          <TextInput
+            style={[styles.input, {color: Colors[theme].text}]}
+            editable={!waitingForCode}
+            autoComplete="tel"
+            keyboardType={'phone-pad'}
+            placeholder="Your phone number"
+            onChangeText={(text)=> setPhoneNumber(text.replace(/[^0-9]/g, ''))}
+          />
+          { waitingForCode ?
             <TextInput
               style={[styles.input, styles.confirmationCodeInput, {color: Colors[theme].text}]}
               placeholder="SMS Confirmation Code"
               onChangeText={setVerificationCode}
               keyboardType="number-pad"
             />
+          :
+            <></>
+          }
+          <View style={{backgroundColor: 'transparent', marginTop: 20}}>
             { waitingForConfirmation ?
               <ActivityIndicator style={{marginTop: 10}} size="small" />
             :
               <Button
-                title={'Confirm code'}
-                onPress={onConfirmCode}
+                disabled={!waitingForCode && phoneNumber.length !== 9}
+                title={waitingForCode ? 'Confirm code' : 'Send code'}
+                onPress={waitingForCode ? onConfirmCode : onSendCode}
               />
             }
           </View>
-        :
-          <></>
-        }
+        </View>
       </View>
     </>
   );
@@ -100,23 +147,30 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: 'transparent',
     marginTop: 50,
     paddingTop: 30,
     paddingHorizontal: 15,
     alignItems: 'center',
-    gap: 20,
+    gap: 20
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: 'bold'
   },
   inputContainer: {
+    backgroundColor: 'transparent',
+    marginTop: 100,
     alignItems: 'center'
   },
   input: {
     pointerEvents: 'box-only',
-    margin: 12,
+    marginBottom: 15,
     borderRadius: 10,
     paddingHorizontal: 10,
-    fontSize: 30,
+    fontSize: 30
   },
   confirmationCodeInput: {
-    fontSize: 20,
+    fontSize: 20
   }
 });

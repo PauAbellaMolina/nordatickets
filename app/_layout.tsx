@@ -60,10 +60,10 @@ function RootLayoutNav() {
           <WalletProvider>
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)/login" options={{ title: 'Log In', headerShown: false }} />
               <Stack.Screen name="(screens)/loadingApp" options={{ headerShown: false }} />
-              <Stack.Screen name="(auth)/login" options={{ title: 'Log In' }} />
               <Stack.Screen name="(screens)/event/[id]" options={{ title: 'Event details', headerShown: false }} />
-              <Stack.Screen name="(screens)/wallet/addFunds" options={{ title: 'Add funds' }} />
+              <Stack.Screen name="(screens)/wallet/addFunds" options={{ title: 'Add funds', headerShown: false }} />
               <Stack.Screen name="(screens)/wallet/activateTicket/[...activateTicketParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Activate ticket', headerShown: false }} />
               {/* , headerRight: () => <CancelButton onPress={() => router.back()} /> */}
             </Stack>
