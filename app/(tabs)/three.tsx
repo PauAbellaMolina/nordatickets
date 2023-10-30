@@ -37,16 +37,19 @@ export default function TabThreeScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Account</Text>
       <View style={styles.wrapper}>
+        {/* email is verified or not message */}
+        <View style={{backgroundColor: 'transparent', flexDirection: 'row'}}><Text>{user?.email}  ·  </Text><Text style={{color: user?.emailVerified ? '#3fde7a' : '#ff3737'}}>{user?.emailVerified ? 'Verified' : 'Not verified'}</Text></View>
+        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
         <Button
           title={'Log Out'}
           onPress={onLogOut}
         />
-        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+        {/* <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
         <Button
           disabled //TODO PAU to prevent accidental use, uncomment for deving
           title={'Test'}
           onPress={test}
-        />
+        /> */}
       </View>
     </View>
   );
@@ -65,6 +68,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   wrapper: {
+    backgroundColor: 'transparent',
     marginTop: 10,
     marginHorizontal: 10,
     alignItems: 'flex-start'
