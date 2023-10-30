@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSegments, useRouter } from "expo-router";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../firebaseConfig";
 import { User } from "../app/types";
 
@@ -43,28 +43,39 @@ export function AuthProvider({ children }: { children: JSX.Element }): JSX.Eleme
 
     useEffect(() => FIREBASE_AUTH.onAuthStateChanged(value => {
       if (value) {
-        console.log("User is signed in");
+        console.log("User is signed in. Is email verified? ", value.emailVerified);
         const userDocRef = doc(FIRESTORE_DB, 'users', value.uid);
         getDoc(userDocRef)
         .then((doc) => {
           if (!doc.exists()) {
             setDoc(userDocRef, {
-              phone: value.providerData[0].phoneNumber ?? '',
+              email: value.email ?? '',
+              emailVerified: value.emailVerified,
+              // phone: value.providerData[0].phoneNumber ?? '',
               walletFunds: 0,
               walletTicketGroups: [], //this will be an array of { eventId: string, tickets: string[] }
               eventIdsFollowing: []
             });
             setUser({
               id: value.uid,
-              phone: value.providerData[0].phoneNumber ?? '',
+              email: value.email ?? '',
+              emailVerified: value.emailVerified,
+              // phone: value.providerData[0].phoneNumber ?? '',
               walletFunds: 0,
               walletTicketGroups: [],
               eventIdsFollowing: []
             });
           } else {
+            if (doc.data().emailVerified !== value.emailVerified) {
+              updateDoc(userDocRef, {
+                emailVerified: value.emailVerified
+              });
+            }
             setUser({
               id: value.uid,
-              phone: value.providerData[0].phoneNumber ?? '',
+              email: value.email ?? '',
+              emailVerified: value.emailVerified,
+              // phone: value.providerData[0].phoneNumber ?? '',
               walletFunds: doc.data().walletFunds,
               walletTicketGroups: doc.data().walletTicketGroups,
               eventIdsFollowing: doc.data().eventIdsFollowing

@@ -1,6 +1,8 @@
 export type User = {
   id: string;
-  phone: string;
+  email: string;
+  emailVerified: boolean;
+  // phone: string;
   walletFunds: number;
   walletTicketGroups: WalletTicketGroups;
   eventIdsFollowing: Array<string>;

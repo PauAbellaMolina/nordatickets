@@ -33,7 +33,7 @@ export function WalletProvider({ children }: { children: JSX.Element }): JSX.Ele
   const { user, setUser } = useAuth();
 
   useEffect(() => {
-    if (!funds && user && user.walletFunds) {
+    if (funds === undefined && user && user.walletFunds) {
       setFunds(user.walletFunds);
     }
     if (!walletTicketGroups && user && user.walletTicketGroups) {
@@ -42,7 +42,7 @@ export function WalletProvider({ children }: { children: JSX.Element }): JSX.Ele
   }, [user]);
 
   useEffect(() => {
-    if (funds && user && user.walletFunds !== funds) {
+    if (funds !== undefined && user && user.walletFunds !== funds) {
       const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
       updateDoc(userDocRef, {
         walletFunds: funds
