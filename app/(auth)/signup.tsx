@@ -1,53 +1,69 @@
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, TextInput, Button, useColorScheme } from "react-native";
-import { UserCredential, signInWithEmailAndPassword } from "firebase/auth";
+import { UserCredential, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import { FIREBASE_CONFIG, FIREBASE_AUTH } from '../../firebaseConfig';
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
 import { router } from "expo-router";
 
-export default function Login() {
+export default function Signup() {
   const theme = useColorScheme() ?? 'light';
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [passwordRepeated, setPasswordRepeated] = useState<string>('');
+  const [emailErrorMessage, setEmailErrorMessage] = useState<string | undefined>(undefined);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState<string | undefined>(undefined);
 
   const recaptchaRef = useRef<FirebaseRecaptchaVerifierModal>(null);
 
   useEffect(() => {
-    if (passwordErrorMessage !== undefined) {
+    if (emailErrorMessage !== undefined) {
+      setEmailErrorMessage(undefined);
+    }
+    if (password.length > 0 && password.length < 8) {
+      setPasswordErrorMessage('Password must be at least 8 characters long');
+    }
+    else if (password.length > 0 && password !== passwordRepeated) {
+      setPasswordErrorMessage('Passwords do not match');
+    }
+    else {
       setPasswordErrorMessage(undefined);
     }
-  }, [email, password]);
+  }, [password, passwordRepeated]);
+  
+  useEffect(() => {
+    if (emailErrorMessage !== undefined) {
+      setEmailErrorMessage(undefined);
+    }
+  }, [email]);
 
-  const onEmailLogIn = () => {
+  const onEmailSignUp = () => {
     if (recaptchaRef.current) {
-      signInWithEmailAndPassword(FIREBASE_AUTH, email, password)
+      createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
       .then((result: UserCredential) => {
         console.log('PAU LOG-> result: ', result);
+        const user = result.user;
+        sendEmailVerification(user).
+        then(() => {
+          console.log('PAU LOG-> Email sent');
+        })
+        .catch((err) => {
+          console.log('PAU LOG-> err sending email: ', err);
+          alert(err);
+        });
       })
       .catch((err) => {
-        console.log('PAU LOG-> err login in: ', err);
+        console.log('PAU LOG-> err creating user: ', err);
         // alert(err);
-        switch (err.code) {
-          case 'auth/invalid-email':
-            setPasswordErrorMessage('Invalid email');
-            break;
-          case 'auth/invalid-login-credentials':
-            setPasswordErrorMessage('Wrong email or password');
-            break;
-          default:
-            setPasswordErrorMessage('Try again');
-            break;
-        }
+        setEmailErrorMessage('Invalid credentials, try again');
       });
     }
   }
 
-  const onGoToSignUp = () => {
-    router.push('/signup');
+  const onGoToLogIn = () => {
+    router.push('/login');
   };
 
   return (
@@ -58,10 +74,10 @@ export default function Login() {
         attemptInvisibleVerification={true}
       />
       <View style={styles.container}>
-        <Text style={styles.title}>Log In</Text>
+        <Text style={styles.title}>Sign Up</Text>
         <View style={styles.inputContainer}>
           <TextInput
-            style={[styles.input, {color: Colors[theme].text, borderColor: passwordErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
+            style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
             textContentType="emailAddress"
             autoComplete="email"
             keyboardType={'email-address'}
@@ -69,7 +85,7 @@ export default function Login() {
             onChangeText={setEmail}
           />
           <TextInput
-            style={[styles.inputPassword, {color: Colors[theme].text, borderColor: passwordErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
+            style={[styles.inputPassword, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined && passwordErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
             textContentType="password"
             secureTextEntry={true}
             autoComplete="password"
@@ -77,20 +93,29 @@ export default function Login() {
             placeholder="Your password"
             onChangeText={setPassword}
           />
-          <Text style={{color: '#ff3737', height: 20}}>{passwordErrorMessage}</Text>
+          <TextInput
+            style={[styles.inputPassword, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined && passwordErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
+            textContentType="password"
+            secureTextEntry={true}
+            autoComplete="password"
+            keyboardType={'visible-password'}
+            placeholder="Repeat password"
+            onChangeText={setPasswordRepeated}
+          />
+          <Text style={{color: '#ff3737', height: 20}}>{emailErrorMessage}{passwordErrorMessage}</Text>
           <View style={{marginTop: 20, backgroundColor: 'transparent'}}>
             <Button
               disabled={!email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined}
-              title='Log In'
-              onPress={onEmailLogIn}
+              title='Sign up'
+              onPress={onEmailSignUp}
             />
           </View>
         </View>
         <View style={{position: 'absolute', bottom: 0, backgroundColor: 'transparent'}}>
-          <Text>Don't have an account?</Text>
+          <Text>Already have an account?</Text>
           <Button
-            title='Sign up'
-            onPress={onGoToSignUp}
+            title='Log in'
+            onPress={onGoToLogIn}
           />
         </View>
       </View>
