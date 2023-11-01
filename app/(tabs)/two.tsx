@@ -1,38 +1,26 @@
-import { Button, FlatList, Platform, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
+import { FlatList, StyleSheet } from 'react-native';
 import { useWallet } from '../../context/WalletProvider';
 import { Text, View } from '../../components/Themed';
 import WalletTicketGroupCardComponent from '../components/walletTicketGroupCardComponent';
 
 export default function TabTwoScreen() {
-  const { funds, walletTicketGroups } = useWallet();
-
-  const onGoToAddFunds = () => {
-    router.push('/wallet/addFunds');
-  };
+  const { walletTicketGroups } = useWallet();
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Wallet</Text>
-      <View style={styles.wrapper}>
-        <View style={styles.fundsContainer}>
-          <Text style={styles.fundsTitle}>Balance: {funds || '0'}€</Text>
-          <Button title='Add funds' onPress={onGoToAddFunds} />
-        </View>
-
-        <View style={styles.ticketsContainer}>
-          <Text style={styles.fundsTitle}>Tickets</Text>
-          { walletTicketGroups?.length ?
-            <FlatList
-              style={styles.walletTicketList}
-              data={walletTicketGroups}
-              renderItem={({ item }) => <WalletTicketGroupCardComponent {...item} />}
-              ItemSeparatorComponent={() => <View style={{height: 10}} />}
-            />
-          :
-            <Text style={styles.emptyWallet}>No tickets in wallet</Text>
-          }
-        </View>
+      <View style={styles.ticketsContainer}>
+        <Text style={styles.ticketsTitle}>Tickets</Text>
+        { walletTicketGroups?.length ?
+          <FlatList
+            style={styles.walletTicketList}
+            data={walletTicketGroups}
+            renderItem={({ item }) => <WalletTicketGroupCardComponent {...item} />}
+            ItemSeparatorComponent={() => <View style={{height: 10}} />}
+          />
+        :
+          <Text style={styles.emptyWallet}>No tickets in wallet</Text>
+        }
       </View>
     </View>
   );
@@ -50,25 +38,15 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold'
   },
-  wrapper: {
-    backgroundColor: 'transparent',
-    marginTop: 10,
-    marginHorizontal: 10
-  },
-  fundsContainer: {
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  fundsTitle: {
+  ticketsTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     lineHeight: 20
   },
   ticketsContainer: {
     backgroundColor: 'transparent',
-    marginTop: 20
+    marginTop: 30,
+    marginHorizontal: 10
   },
   walletTicketList: { //TODO PAU fix list underlapping tabs when list gets long
     marginTop: 10

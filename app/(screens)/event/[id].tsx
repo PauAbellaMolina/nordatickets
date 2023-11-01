@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Button, FlatList, Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { StatusBar } from 'expo-status-bar';
+import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { FIRESTORE_DB } from '../../../firebaseConfig';
+import { addDoc, collection, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { useStripe } from '@stripe/stripe-react-native';
+import { FIREBASE_AUTH, FIRESTORE_DB } from '../../../firebaseConfig';
 import { firestoreAutoId } from '../../../utils/firestoreAutoId';
 import { Event, Ticket, WalletTicketGroup, WalletTicketGroups } from '../../types';
 import { useAuth } from '../../../context/AuthProvider';
@@ -17,11 +16,16 @@ import { FeatherIcon } from '../../components/icons';
 export default function EventDetailScreen() {
   const theme = useColorScheme() ?? 'light';
   const { id } = useLocalSearchParams();
-  const { funds, setFunds, cart, setCart, walletTicketGroups, setWalletTicketGroups } = useWallet();
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const { cart, setCart, walletTicketGroups, setWalletTicketGroups } = useWallet();
   const { user, setUser } = useAuth();
+  const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
   const [event, setEvent] = useState<Event>();
   const [cardTotalPrice, setCardTotalPrice] = useState<number>(0);
-  const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
+  const [stripePaymentSheetParams, setStripePaymentSheetParams] = useState<{ paymentIntentClientSecret: string, ephemeralKeySecret: string, customer: string }>();
+  const [loading, setLoading] = useState(false);
+  const [orderConfirmed, setOrderConfirmed] = useState(false);
+  const [emailVerified, setEmailVerified] = useState<boolean>(FIREBASE_AUTH.currentUser?.emailVerified ?? false);
 
   const chooseRandomColor = (): string => {
     const colors = Colors.eventBackgroundColorsArray[theme]
@@ -86,6 +90,46 @@ export default function EventDetailScreen() {
     setCardTotalPrice(totalPrice);
   }, [cart]);
 
+  useEffect(() => {
+    initializePaymentSheet();
+  }, [stripePaymentSheetParams]);
+
+  const initializePaymentSheet = async () => {
+    if (!stripePaymentSheetParams) {
+      return;
+    }
+    const { error } = await initPaymentSheet({
+      merchantDisplayName: "Tickets MVP, Inc.",
+      customerId: stripePaymentSheetParams.customer,
+      customerEphemeralKeySecret: stripePaymentSheetParams.ephemeralKeySecret,
+      paymentIntentClientSecret: stripePaymentSheetParams.paymentIntentClientSecret,
+      // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
+      //methods that complete payment after a delay, like SEPA Debit and Sofort.
+      allowsDelayedPaymentMethods: false,
+      // defaultBillingDetails: {
+      //   name: 'Jane Doe',
+      // }
+    });
+    if (error) {
+      console.log('PAU LOG-> error: ', error);
+      Alert.alert("Unexpected error", "Please try again.");
+      setLoading(false);
+    } else {
+      spawnPaymentSheet();
+    }
+  };
+
+  const spawnPaymentSheet = async () => {
+    const { error } = await presentPaymentSheet();
+    if (error) {
+      // Alert.alert(error.code, error.message);
+      setLoading(false);
+    } else {
+      // Alert.alert('Success', 'Your order is confirmed!');
+      stripeOrderConfirmed();
+    }
+  };
+
   const onAddTicketHandler = (ticket: Ticket) => {
     // console.log('PAU LOG-> ticket to add: ', cart, ticket);
     if (cart) {
@@ -116,19 +160,15 @@ export default function EventDetailScreen() {
     }
   };
 
-  const getEnoughFunds = (): boolean => {
-    if (!funds || !cardTotalPrice) {
-      return false;
-    }
-    return funds >= cardTotalPrice;
-  };
-
-  const onBuyCart = () => {
-    if (!cart?.length || !funds || !cardTotalPrice || !event || !user) {
+  const stripeOrderConfirmed = () => {
+    if (!cart?.length || !cardTotalPrice || !event || !user) {
       return;
     }
 
-    setFunds(funds - cardTotalPrice);
+    setOrderConfirmed(true);
+    // setTimeout(() => {
+    //   setOrderConfirmed(false);
+    // }, 5000);
 
     const newTickets: Array<Ticket> = [];
     cart.forEach((cartItem) => {
@@ -140,7 +180,6 @@ export default function EventDetailScreen() {
       } else {
         for (let i = 0; i < cartItem.quantity; i++) {
           const ticketToPush = {...cartItem.ticket};
-          // ticketToPush.id = event.id + '_' + user.id + '_' + firestoreAutoId(); //TODO PAU this is actually not needed
           ticketToPush.id = firestoreAutoId();
           delete ticketToPush.selling;
           newTickets.push(ticketToPush);
@@ -164,7 +203,59 @@ export default function EventDetailScreen() {
     setCart(null);
   };
 
+  const createCheckoutSession = () => {
+    if (!user?.id) {
+      return;
+    }
+    const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
+    const checkoutSessionsRef = collection(userDocRef, 'checkout_sessions');
+    addDoc(checkoutSessionsRef, {
+      client: 'mobile',
+      mode: 'payment',
+      amount: cardTotalPrice*100,
+      currency: 'eur'
+    }).then((docRef) => {
+      onSnapshot(docRef, (snapshot) => {
+        const data = snapshot.data();
+        if (data && data.paymentIntentClientSecret && data.ephemeralKeySecret && data.customer) {
+          setStripePaymentSheetParams({
+            paymentIntentClientSecret: data.paymentIntentClientSecret,
+            ephemeralKeySecret: data.ephemeralKeySecret,
+            customer: data.customer
+          });
+        }
+      });
+    }).catch((err) => {
+      console.log('PAU LOG-> addFunds: ', err);
+    });
+  };
   
+  const onBuyCart = () => {
+    if (loading) {
+      return;
+    }
+    setLoading(true);
+    if (!emailVerified) {
+      FIREBASE_AUTH.currentUser?.reload()
+      .then(() => {
+        if (!FIREBASE_AUTH.currentUser?.emailVerified) {
+          Alert.alert('Email not verified', 'Please verify your email to continue');
+          setLoading(false);
+        } else {
+          setEmailVerified(true);
+          createCheckoutSession();
+        }
+      });
+      return;
+    } else {
+      createCheckoutSession();
+    }
+  };
+
+  const onGoToWallet = () => {
+    router.push('/(tabs)/two');
+  };
+
   return (
     <View style={[styles.container, {backgroundColor: Colors[theme].backgroundContrast}]}>
       { event ?
@@ -188,25 +279,34 @@ export default function EventDetailScreen() {
                   renderItem={({ item }) => <TicketCardComponent eventSelling={event.selling} quantityInCart={cart?.find((cartItem) => cartItem.ticket.ticketId === item.ticketId)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />}
                 />
               </View>
-
-              <View style={[styles.cartContainer, {backgroundColor: Colors[theme].cardContainerBackground}]}>
-                <View style={styles.cartTitleRowContainer}><Text style={styles.subtitle}>Cart:</Text>{ cart?.length ? <Text style={{color: Colors[theme].cardContainerBackgroundContrast}}><FeatherIcon size={13} name='info' color={Colors[theme].cardContainerBackgroundContrast} /> Your balance is {funds ?? 0}€</Text> : <></> }</View>
-                { cart?.length ?
-                  <>
-                    <FlatList
-                      style={styles.cartList}
-                      data={cart}
-                      renderItem={({ item }) => <Text style={styles.cartItemsList}>{item.quantity}  -  {item.ticket.name} · {item.ticket.price}€</Text>}
-                    />
-                    { !getEnoughFunds() ? <Text style={styles.notEnoughFunds}>Not enough funds!</Text> : <></> }
-                    <Pressable style={styles.buyButton} onPress={getEnoughFunds() ? onBuyCart : () => {router.push('/wallet/addFunds')}}>
-                      <Text style={styles.buyButtonText}>{ getEnoughFunds() ? cardTotalPrice + '€  ·   Buy now' : 'Add funds' }</Text>
-                    </Pressable>
-                  </>
-                :
-                  <Text style={[styles.emptyCard, {color: Colors[theme].cardContainerBackgroundContrast}]}>No tickets added to cart</Text>
-                }
-              </View>
+              { orderConfirmed ?
+                <Pressable style={[styles.orderConfirmedContainer, {backgroundColor: Colors[theme].cardContainerBackground}]} onPress={onGoToWallet}>
+                  <FeatherIcon name="check-circle" size={40} color={Colors[theme].text} />
+                  <View style={{backgroundColor: 'transparent', flexDirection: 'row', alignItems: 'center', gap: 5}}><Text style={styles.orderConfirmedSubtitle}>Tickets added to your wallet</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
+                </Pressable>
+              :
+                <View style={[styles.cartContainer, {backgroundColor: Colors[theme].cardContainerBackground}]}>
+                  <View style={{backgroundColor: 'transparent', flexDirection: 'row', alignItems: 'center', gap: 5}}><Text style={styles.subtitle}>Cart</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
+                  { cart?.length ?
+                    <>
+                      <FlatList
+                        style={styles.cartList}
+                        data={cart}
+                        renderItem={({ item }) => <Text style={styles.cartItemsList}>{item.quantity}  -  {item.ticket.name} · {item.ticket.price}€</Text>}
+                      />
+                      <Pressable style={styles.buyButton} onPress={onBuyCart}>
+                      { loading ?
+                        <ActivityIndicator style={{marginVertical: 3.2}} size="small" />
+                      :
+                        <Text style={styles.buyButtonText}>{cardTotalPrice + '€  ·   Buy now'}</Text>
+                      }
+                      </Pressable>
+                    </>
+                  :
+                    <Text style={[styles.emptyCard, {color: Colors[theme].cardContainerBackgroundContrast}]}>No tickets added to cart</Text>
+                  }
+                </View>
+              }
             </>
           :
             <></>
@@ -292,6 +392,31 @@ const styles = StyleSheet.create({
   sellingStatus: {
     fontSize: 11,
     fontWeight: '600'
+  },
+  orderConfirmedContainer: {
+    position: 'absolute',
+    flexDirection: 'column',
+    alignItems: 'center',
+    alignSelf: 'center',
+    gap: 20,
+    width: '95%',
+    bottom: 25,
+    paddingTop: 20,
+    paddingBottom: 30,
+    paddingHorizontal: 20,
+    borderRadius: 35,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 10
+  },
+  orderConfirmedSubtitle: {
+    fontSize: 20,
+    fontWeight: '800'
   },
   cartContainer: {
     position: 'absolute',

@@ -1,9 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSegments, useRouter } from "expo-router";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../firebaseConfig";
 import { User } from "../app/types";
-import { useWallet } from "./WalletProvider";
 
 type AuthType = {
   user: User | null;
@@ -42,41 +41,28 @@ export function AuthProvider({ children }: { children: JSX.Element }): JSX.Eleme
     const [user, setUser] = useState<User | null>(null);
     const [loaded, setLoaded] = useState<boolean>(false);
 
-    const { funds, cart, walletTicketGroups, setCart, setFunds, setWalletTicketGroups } = useWallet();
-
     useEffect(() => FIREBASE_AUTH.onAuthStateChanged(value => {
       if (value) {
-        console.log("User is signed in. Is email verified? ", value.emailVerified);
+        console.log("User is signed in. Is email verified? ", FIREBASE_AUTH.currentUser?.emailVerified);
         const userDocRef = doc(FIRESTORE_DB, 'users', value.uid);
         getDoc(userDocRef)
         .then((doc) => {
           if (!doc.exists()) {
             setDoc(userDocRef, {
               email: value.email ?? '',
-              emailVerified: value.emailVerified,
-              walletFunds: 0,
               walletTicketGroups: [], //this will be an array of { eventId: string, tickets: string[] }
               eventIdsFollowing: []
             });
             setUser({
               id: value.uid,
               email: value.email ?? '',
-              emailVerified: value.emailVerified,
-              walletFunds: 0,
               walletTicketGroups: [],
               eventIdsFollowing: []
             });
           } else {
-            if (doc.data().emailVerified !== value.emailVerified) {
-              updateDoc(userDocRef, {
-                emailVerified: value.emailVerified
-              });
-            }
             setUser({
               id: value.uid,
               email: value.email ?? '',
-              emailVerified: value.emailVerified,
-              walletFunds: doc.data().walletFunds,
               walletTicketGroups: doc.data().walletTicketGroups,
               eventIdsFollowing: doc.data().eventIdsFollowing
             });
@@ -90,9 +76,6 @@ export function AuthProvider({ children }: { children: JSX.Element }): JSX.Eleme
         });
       } else {
         console.log("User is signed out");
-        setFunds(undefined);
-        setCart(null);
-        setWalletTicketGroups(null);
         setLoaded(true);
       }
     }), [])

@@ -71,26 +71,6 @@ export default function ActivateTicketScreen() {
   
   return (
     <View style={styles.container}>
-      {/* <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" /> */}
-      {/* <View style={styles.topContainer}>
-        <View style={[styles.statusContainer, {backgroundColor: ticketActive ? 'green' : 'red'}]}>
-          { ticketActive ?
-            <>
-              <Text style={styles.statusText}>Ticket is active</Text>
-              <Text style={styles.statusInfoText}>Deactivate when drink is served</Text>
-            </>
-          :
-            <>
-              <Text style={styles.statusText}>Ticket not active</Text>
-              <Text style={styles.statusInfoText}>This ticket has already been used</Text>
-            </>
-          }
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.subtitle}>{ eventName }</Text>
-          <Text style={styles.title}>{ ticketName }</Text>
-        </View>
-      </View> */}
       <View style={styles.expanderNotch}></View>
       <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
         <View style={styles.ticketTopContainer}>
@@ -125,12 +105,6 @@ export default function ActivateTicketScreen() {
           <Text style={styles.buttonText}>Deactivate ticket</Text>
         }
       </Pressable>
-      {/* { ticketActive ?
-        <>
-        </>
-      :
-        <></>
-      } */}
 
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
@@ -146,7 +120,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
-    // gap: 50,
     padding: 25,
     paddingBottom: 40
   },
@@ -271,9 +244,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     paddingVertical: 23
   }
-  // separator: {
-  //   marginVertical: 30,
-  //   height: 1,
-  //   width: '80%',
-  // },
 });
