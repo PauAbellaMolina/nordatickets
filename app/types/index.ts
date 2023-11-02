@@ -10,6 +10,7 @@ export type Event = {
   name: string;
   description: string;
   selling: boolean;
+  ticketFee: number; //in cents of euro (e.g. 0.25€ = 25)
   // visible: boolean; //TODO PAU make this a thing (basically not showing visible == false events in the list)
   usedTicketBucketId: string;
   tickets: { tickets: Array<Ticket> }

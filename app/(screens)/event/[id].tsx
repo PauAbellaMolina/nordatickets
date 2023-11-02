@@ -22,6 +22,7 @@ export default function EventDetailScreen() {
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
   const [event, setEvent] = useState<Event>();
   const [cardTotalPrice, setCardTotalPrice] = useState<number>(0);
+  const [cardTotalQuantity, setCardTotalQuantity] = useState<number>(0);
   const [stripePaymentSheetParams, setStripePaymentSheetParams] = useState<{ paymentIntentClientSecret: string, ephemeralKeySecret: string, customer: string }>();
   const [loading, setLoading] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
@@ -84,10 +85,13 @@ export default function EventDetailScreen() {
   useEffect(() => {
     if (!cart) {
       setCardTotalPrice(0);
+      setCardTotalQuantity(0);
       return;
     }
     const totalPrice = cart.reduce((acc, cartItem) => acc + cartItem.ticket.price * cartItem.quantity, 0);
     setCardTotalPrice(totalPrice);
+    const totalQuantity = cart.reduce((acc, cartItem) => acc + cartItem.quantity, 0);
+    setCardTotalQuantity(totalQuantity);
   }, [cart]);
 
   useEffect(() => {
@@ -209,10 +213,11 @@ export default function EventDetailScreen() {
     }
     const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
     const checkoutSessionsRef = collection(userDocRef, 'checkout_sessions');
+    const finalAmount = cardTotalPrice * 100 + (event?.ticketFee ? event.ticketFee * cardTotalQuantity : 0);
     addDoc(checkoutSessionsRef, {
       client: 'mobile',
       mode: 'payment',
-      amount: cardTotalPrice*100,
+      amount: finalAmount,
       currency: 'eur'
     }).then((docRef) => {
       onSnapshot(docRef, (snapshot) => {
@@ -293,12 +298,19 @@ export default function EventDetailScreen() {
                         style={styles.cartList}
                         data={cart}
                         renderItem={({ item }) => <Text style={styles.cartItemsList}>{item.quantity}  -  {item.ticket.name} · {item.ticket.price}€</Text>}
+                        ItemSeparatorComponent={() => <View style={{backgroundColor: 'transparent', height: 3}} />}
                       />
+                      { event.ticketFee ?
+                        <View style={{backgroundColor: 'transparent', marginHorizontal: 8, flexDirection: 'row', alignItems: 'flex-end'}}>
+                          <Text style={[styles.transactionFeePrice, {color: Colors[theme].cardContainerBackgroundContrast}]}>+ {event.ticketFee * cardTotalQuantity / 100}€ </Text>
+                          <Text style={[styles.transactionFeeText, {color: Colors[theme].cardContainerBackgroundContrast}]}>transaction fee</Text>
+                        </View>
+                      : null }
                       <Pressable style={styles.buyButton} onPress={onBuyCart}>
                       { loading ?
                         <ActivityIndicator style={{marginVertical: 3.2}} size="small" />
                       :
-                        <Text style={styles.buyButtonText}>{cardTotalPrice + '€  ·   Buy now'}</Text>
+                        <Text style={styles.buyButtonText}>{cardTotalPrice + (event?.ticketFee ? event.ticketFee * cardTotalQuantity / 100 : 0) + '€  ·   Buy now'}</Text>
                       }
                       </Pressable>
                     </>
@@ -443,16 +455,23 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent'
   },
   cartList: {
-    marginVertical: 10
+    marginVertical: 5,
+    marginHorizontal: 15
   },
   cartItemsList: {
     fontSize: 18
   },
-  notEnoughFunds: {
-    fontSize: 16,
-    color: '#ff5f5f',
-    textAlign: 'center'
+  transactionFeePrice: {
+    fontSize: 16
   },
+  transactionFeeText: {
+    fontSize: 14
+  },
+  // notEnoughFunds: {
+  //   fontSize: 16,
+  //   color: '#ff5f5f',
+  //   textAlign: 'center'
+  // },
   buyButton: {
     width: '100%',
     marginTop: 10,
