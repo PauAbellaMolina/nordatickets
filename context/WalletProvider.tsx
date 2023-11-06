@@ -6,8 +6,6 @@ import { Cart, WalletTicketGroups } from "../app/types";
 import { useAuth } from "./AuthProvider";
 
 type WalletContextType = {
-  funds: number | undefined;
-  setFunds: (funds: number | undefined) => void;
   cart: Cart;
   setCart: (cart: Cart) => void;
   walletTicketGroups: WalletTicketGroups;
@@ -15,8 +13,6 @@ type WalletContextType = {
 };
 
 const WalletContext = createContext<WalletContextType>({
-  funds: undefined,
-  setFunds: () => {},
   cart: null,
   setCart: () => {},
   walletTicketGroups: null,
@@ -26,38 +22,22 @@ const WalletContext = createContext<WalletContextType>({
 export const useWallet = () => useContext(WalletContext);
 
 export function WalletProvider({ children }: { children: JSX.Element }): JSX.Element {
-  const [funds, setFunds] = useState<number | undefined>(undefined);
   const [cart, setCart] = useState<Cart>(null);
   const [walletTicketGroups, setWalletTicketGroups] = useState<WalletTicketGroups>(null);
 
   const { user, setUser } = useAuth();
 
   useEffect(() => {
-    if (user && user.walletFunds) {
-      setFunds(user.walletFunds);
-    } else {
-      setFunds(undefined);
-    }
     if (user && user.walletTicketGroups) {
       setWalletTicketGroups(user.walletTicketGroups);
     } else {
       setWalletTicketGroups(null);
     }
-  }, [user]);
-
-  useEffect(() => {
-    if (funds !== undefined && user && user.walletFunds !== funds) {
-      const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
-      updateDoc(userDocRef, {
-        walletFunds: funds
-      }).then(() => {
-        setUser({
-          ...user,
-          walletFunds: funds
-        });
-      });
+    if (!user) {
+      setCart(null);
+      setWalletTicketGroups(null);
     }
-  }, [funds]);
+  }, [user]);
 
   useEffect(() => {
     if (walletTicketGroups && user && user.walletTicketGroups !== walletTicketGroups) {
@@ -74,8 +54,6 @@ export function WalletProvider({ children }: { children: JSX.Element }): JSX.Ele
   }, [walletTicketGroups]);
 
   const walletContext: WalletContextType = {
-    funds,
-    setFunds,
     cart,
     setCart,
     walletTicketGroups,

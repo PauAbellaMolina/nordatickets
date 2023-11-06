@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, TextInput, Button, useColorScheme } from "react-native";
+import { StyleSheet, TextInput, Button, useColorScheme, ActivityIndicator } from "react-native";
 import { UserCredential, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
+import { router } from "expo-router";
 import { FIREBASE_CONFIG, FIREBASE_AUTH } from '../../firebaseConfig';
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
-import { router } from "expo-router";
 
 export default function Signup() {
   const theme = useColorScheme() ?? 'light';
@@ -15,6 +15,7 @@ export default function Signup() {
   const [passwordRepeated, setPasswordRepeated] = useState<string>('');
   const [emailErrorMessage, setEmailErrorMessage] = useState<string | undefined>(undefined);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
 
   const recaptchaRef = useRef<FirebaseRecaptchaVerifierModal>(null);
 
@@ -41,23 +42,25 @@ export default function Signup() {
 
   const onEmailSignUp = () => {
     if (recaptchaRef.current) {
+      setLoading(true);
       createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
       .then((result: UserCredential) => {
         console.log('PAU LOG-> result: ', result);
         const user = result.user;
-        sendEmailVerification(user).
-        then(() => {
+        sendEmailVerification(user)
+        .then(() => {
           console.log('PAU LOG-> Email sent');
         })
         .catch((err) => {
           console.log('PAU LOG-> err sending email: ', err);
-          alert(err);
+          // alert(err);
         });
       })
       .catch((err) => {
         console.log('PAU LOG-> err creating user: ', err);
         // alert(err);
         setEmailErrorMessage('Invalid credentials, try again');
+        setLoading(false);
       });
     }
   }
@@ -104,11 +107,15 @@ export default function Signup() {
           />
           <Text style={{color: '#ff3737', height: 20}}>{emailErrorMessage}{passwordErrorMessage}</Text>
           <View style={{marginTop: 20, backgroundColor: 'transparent'}}>
-            <Button
-              disabled={!email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined}
-              title='Sign up'
-              onPress={onEmailSignUp}
-            />
+            { loading ?
+              <ActivityIndicator style={{marginTop: 12}} size="small" />
+            :
+              <Button
+                disabled={!email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined}
+                title='Sign up'
+                onPress={onEmailSignUp}
+              />
+            }
           </View>
         </View>
         <View style={{position: 'absolute', bottom: 0, backgroundColor: 'transparent'}}>

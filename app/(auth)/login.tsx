@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, TextInput, Button, useColorScheme } from "react-native";
+import { StyleSheet, TextInput, Button, useColorScheme, ActivityIndicator } from "react-native";
 import { UserCredential, signInWithEmailAndPassword } from "firebase/auth";
 import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
+import { router } from "expo-router";
 import { FIREBASE_CONFIG, FIREBASE_AUTH } from '../../firebaseConfig';
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
-import { router } from "expo-router";
 
 export default function Login() {
   const theme = useColorScheme() ?? 'light';
@@ -13,6 +13,7 @@ export default function Login() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [passwordErrorMessage, setPasswordErrorMessage] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
 
   const recaptchaRef = useRef<FirebaseRecaptchaVerifierModal>(null);
 
@@ -24,6 +25,7 @@ export default function Login() {
 
   const onEmailLogIn = () => {
     if (recaptchaRef.current) {
+      setLoading(true);
       signInWithEmailAndPassword(FIREBASE_AUTH, email, password)
       .then((result: UserCredential) => {
         console.log('PAU LOG-> result: ', result);
@@ -31,6 +33,7 @@ export default function Login() {
       .catch((err) => {
         console.log('PAU LOG-> err login in: ', err);
         // alert(err);
+        setLoading(false);
         switch (err.code) {
           case 'auth/invalid-email':
             setPasswordErrorMessage('Invalid email');
@@ -79,11 +82,15 @@ export default function Login() {
           />
           <Text style={{color: '#ff3737', height: 20}}>{passwordErrorMessage}</Text>
           <View style={{marginTop: 20, backgroundColor: 'transparent'}}>
-            <Button
-              disabled={!email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined}
-              title='Log In'
-              onPress={onEmailLogIn}
-            />
+            { loading ?
+              <ActivityIndicator style={{marginTop: 12}} size="small" />
+            :
+              <Button
+                disabled={!email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined}
+                title='Log In'
+                onPress={onEmailLogIn}
+              />
+            }
           </View>
         </View>
         <View style={{position: 'absolute', bottom: 0, backgroundColor: 'transparent'}}>

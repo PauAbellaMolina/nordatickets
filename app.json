@@ -43,6 +43,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "21bc3f3f-6e92-479b-bad6-10228e20b990"
+      }
+    },
+    "owner": "tickets-mvp"
   }
 }
