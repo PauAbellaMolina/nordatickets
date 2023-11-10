@@ -264,13 +264,14 @@ export default function EventDetailScreen() {
   const getPaymentFormInfo = () => {
     const finalAmount = cardTotalPrice + ((event?.ticketFee ? event.ticketFee * cardTotalQuantity : 0)/100); //TODO PAU info (this is in euros (49.99));
 
-    fetch('http://192.168.1.162:3344/getFormInfo', { //TODO PAU dev info; my ip and port used by the redsys node server
+    fetch('http://192.168.88.251:3344/getFormInfo', { //TODO PAU dev info; my ip and port used by the redsys node server
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        'totalAmount': finalAmount
+        'totalAmount': finalAmount,
+        'userId': user?.id
       })
     })
     .then((response) => response.json())
@@ -283,13 +284,47 @@ export default function EventDetailScreen() {
       const Ds_MerchantParameters = data.Ds_MerchantParameters.replace(/\//g, '%2F');
       const Ds_Signature = data.Ds_Signature.replace(/\//g, '%2F');
       const Ds_SignatureVersion = data.Ds_SignatureVersion.replace(/\//g, '%2F');
+
+      addPendingTicketsToUser(data.orderId);
+
       router.push(`/eventRedsys/paymentModal/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
       setLoading(false);
     })
     .catch((err) => {
       console.log('PAU LOG-> getFormInfo error: ', err);
+      setLoading(false);
     });
   }
+
+  const addPendingTicketsToUser = (orderId: string) => {
+    if (!cart?.length || !cardTotalPrice || !event || !user) {
+      return;
+    }
+
+    const newTickets: Array<Ticket> = [];
+    cart.forEach((cartItem) => {
+      for (let i = 0; i < cartItem.quantity; i++) {
+        const ticketToPush = {...cartItem.ticket};
+        ticketToPush.id = firestoreAutoId();
+        ticketToPush.orderId = orderId;
+        delete ticketToPush.selling;
+        newTickets.push(ticketToPush);
+      }
+    });
+
+    const existingWalletTicketGroup = walletTicketGroups?.find((walletTicketGroup) => walletTicketGroup.eventId === event?.id);
+    if (existingWalletTicketGroup) {
+      existingWalletTicketGroup.tickets = [...existingWalletTicketGroup.tickets, ...newTickets];
+      setWalletTicketGroups([...walletTicketGroups ?? []]);
+    } else {
+      const newWalletTicketGroup: WalletTicketGroup = {
+        eventId: event?.id ?? '',
+        tickets: newTickets
+      };
+      const newWalletTicketGroups: WalletTicketGroups = [newWalletTicketGroup];
+      setWalletTicketGroups([...walletTicketGroups ?? [], ...newWalletTicketGroups]);
+    }
+  };
 
   const onGoToWallet = () => {
     router.push('/(tabs)/two');
