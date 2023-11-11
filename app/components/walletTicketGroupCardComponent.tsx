@@ -38,9 +38,46 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
     });
   }, []);
 
-  const SingleTicketComponent = ({ ticket }: { ticket: Ticket }) => {
+  const SingleTicketComponent = (ticket: Ticket) => { //TODO PAU IMPORTANT; this is rerendering when navigating out of tab two, for no reason, fix this
+    const [ticketOrderStatus, setTicketOrderStatus] = useState<string>('');
+
+    const random = Math.random();
+
+    useEffect(() => {
+      console.log('init', random);
+      if (!ticket.orderId) {
+        return;
+      }
+      const orderIdDocRef = doc(FIRESTORE_DB, 'redsys_orders', ticket.orderId);
+      getDoc(orderIdDocRef)
+      .then((doc) => {
+        if (doc.exists()) {
+          // console.log(doc.data());
+          setTicketOrderStatus(doc.data().status);
+        } else {
+          console.log('No order doc found with id: ', ticket.orderId);
+        }
+      });
+    }, [ticket]);
+    
     const onActivateTicket = () => {
+      if (ticketOrderStatus !== 'PAYMENT_SUCCEDED') {
+        return;
+      }
       router.push(`/wallet/activateTicket/${event?.id}/${event?.name}/${ticket.id}/${ticket.ticketId}/${ticket.name}/${ticket.price}/${event?.usedTicketBucketId}`);
+    };
+
+    const orderStatus = () => {
+      switch (ticketOrderStatus) {
+        case 'PENDING_PAYMENT':
+          return 'Processing payment...';
+        case 'PAYMENT_SUCCEDED':
+          return 'Activable';
+        case 'PAYMENT_FAILED':
+          return 'Payment failed';
+        default:
+          return null;
+      }
     };
   
     return (
@@ -50,9 +87,12 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
         </View>
         <View style={styles.ticketNameWrapper}>
           <Text style={[styles.ticketName, {color: Colors['light'].text}]}>{ticket.name}</Text>
-          <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>Activable</Text>
+          { ticketOrderStatus ?
+            <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{orderStatus()}</Text>
+          :
+            <ActivityIndicator size="small" />
+          }
         </View>
-        {/* <Button title='Activate' onPress={onActivateTicket} /> */}
       </Pressable>
     );
   };
@@ -67,7 +107,7 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
             numColumns={2}
             style={styles.ticketsList}
             data={walletTicket.tickets}
-            renderItem={({ item }) => <SingleTicketComponent ticket={item} />}
+            renderItem={({ item }) => <SingleTicketComponent {...item} />}
           />
         </View>
       :
@@ -119,7 +159,7 @@ const styles = StyleSheet.create({
     fontWeight: '400'
   },
   ticketSubtitle: {
-    fontSize: 9,
+    fontSize: 12,
     textAlign: 'center'
   }
 });

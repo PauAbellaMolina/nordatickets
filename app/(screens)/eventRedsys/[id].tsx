@@ -264,7 +264,7 @@ export default function EventDetailScreen() {
   const getPaymentFormInfo = () => {
     const finalAmount = cardTotalPrice + ((event?.ticketFee ? event.ticketFee * cardTotalQuantity : 0)/100); //TODO PAU info (this is in euros (49.99));
 
-    fetch('http://192.168.88.251:3344/getFormInfo', { //TODO PAU dev info; my ip and port used by the redsys node server
+    fetch('http://192.168.0.18:3344/getFormInfo', { //TODO PAU dev info; my ip and port used by the redsys node server
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
