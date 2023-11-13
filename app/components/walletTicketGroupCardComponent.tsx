@@ -12,6 +12,9 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
   const theme = useColorScheme() ?? 'light';
   const [event, setEvent] = useState<Event>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
+  const [orderStatusAdded, setOrderStatusAdded] = useState<boolean>(false);
+  const [refreshingEvent, setRefreshingEvent] = useState<boolean>(false);
+  const [lastRefresed, setLastRefresed] = useState<Date>(new Date());
 
   const chooseRandomColor = (): string => {
     const colors = Colors.eventBackgroundColorsArray[theme]
@@ -31,6 +34,7 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
         event.usedTicketBucketId = doc.data().usedTicketBucketRef.id;
         delete (event as any).ticketBucketRef;
         delete (event as any).usedTicketBucketRef;
+        addTicketsPaymentStatus();
         setEvent(event);
       } else {
         console.log('No event doc found with id: ', walletTicket.eventId);
@@ -38,50 +42,68 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
     });
   }, []);
 
-  const SingleTicketComponent = (ticket: Ticket) => { //TODO PAU IMPORTANT; this is rerendering when navigating out of tab two, for no reason, fix this
-    const [ticketOrderStatus, setTicketOrderStatus] = useState<string>('');
-
-    const random = Math.random();
-
-    useEffect(() => {
-      console.log('init', random);
+  const addTicketsPaymentStatus = () => {
+    for (let i = 0; i < walletTicket.tickets.length; i++) {
+      const ticket = walletTicket.tickets[i];
       if (!ticket.orderId) {
-        return;
+        continue;
       }
       const orderIdDocRef = doc(FIRESTORE_DB, 'redsys_orders', ticket.orderId);
       getDoc(orderIdDocRef)
       .then((doc) => {
         if (doc.exists()) {
-          // console.log(doc.data());
-          setTicketOrderStatus(doc.data().status);
+          ticket.orderStatus = doc.data().status;
         } else {
           console.log('No order doc found with id: ', ticket.orderId);
         }
+      })
+      .finally(() => {
+        if (i === walletTicket.tickets.length - 1) {
+          setOrderStatusAdded(true);
+        }
       });
-    }, [ticket]);
+    }
+  };
+
+  const onRefreshEvent = () => {
+    if (refreshingEvent || (new Date().getTime() - lastRefresed.getTime()) < 15000) { //TODO PAU info 15 seconds between refresh calls
+      return;
+    }
+    setRefreshingEvent(true);
+    setLastRefresed(new Date());
+    for (let i = 0; i < walletTicket.tickets.length; i++) {
+      const ticket = walletTicket.tickets[i];
+      if (!ticket.orderId) {
+        continue;
+      }
+      const orderIdDocRef = doc(FIRESTORE_DB, 'redsys_orders', ticket.orderId);
+      getDoc(orderIdDocRef)
+      .then((doc) => {
+        if (doc.exists()) {
+          ticket.orderStatus = doc.data().status;
+        } else {
+          console.log('No order doc found with id: ', ticket.orderId);
+        }
+      })
+      .finally(() => {
+        if (i === walletTicket.tickets.length - 1) {
+          setRefreshingEvent(false);
+        }
+      });
+    }
+  };
+
+  const SingleTicketComponent = (ticket: Ticket) => {
     
     const onActivateTicket = () => {
-      if (ticketOrderStatus !== 'PAYMENT_SUCCEDED') {
+      if (ticket.orderStatus !== 'PAYMENT_SUCCEDED') {
         return;
       }
       router.push(`/wallet/activateTicket/${event?.id}/${event?.name}/${ticket.id}/${ticket.ticketId}/${ticket.name}/${ticket.price}/${event?.usedTicketBucketId}`);
     };
-
-    // const orderStatus = () => {
-    //   switch (ticketOrderStatus) {
-    //     case 'PENDING_PAYMENT':
-    //       return 'Processing payment...';
-    //     case 'PAYMENT_SUCCEDED':
-    //       return 'Activable';
-    //     case 'PAYMENT_FAILED':
-    //       return 'Payment failed';
-    //     default:
-    //       return null;
-    //   }
-    // };
   
     return (
-      <>{ ticketOrderStatus === 'PAYMENT_SUCCEDED' ?
+      <>{ ticket.orderStatus === 'PAYMENT_SUCCEDED' ?
         <Pressable style={[styles.singleTicketContainer, {backgroundColor: Colors[theme].backgroundHalfOpacity}]} onPress={onActivateTicket}>
           <View style={styles.ticketIconWrapper}>
             <FontAwesomeIcon name="ticket" size={30} color={Colors['light'].text} />
@@ -99,16 +121,26 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
   
   return (
     <>
-      { event ?
+      { event && orderStatusAdded ?
         <View style={[styles.eventContainer, {backgroundColor: eventBackgroundColor}]}>
-          <Text style={[styles.eventName, {color: Colors['light'].text}]}>{event.name}</Text>
-          <FlatList
-            columnWrapperStyle={{flexWrap: 'wrap', gap: 10}}
-            numColumns={2}
-            style={styles.ticketsList}
-            data={walletTicket.tickets}
-            renderItem={({ item }) => <SingleTicketComponent {...item} />}
-          />
+          <View style={styles.eventHeaderContainer}>
+            <Text style={[styles.eventName, {color: Colors['light'].text}]}>{event.name}</Text>
+            <Pressable style={{flexDirection: 'row', gap: 5, alignItems: 'center'}} onPress={() => onRefreshEvent()}>
+              <FontAwesomeIcon name="refresh" size={12} color={'#007AFF'} />
+              <Text style={{color: '#007AFF', fontWeight: '600', fontSize: 12}}>Refresca</Text>
+            </Pressable>
+          </View>
+          { refreshingEvent ?
+            <ActivityIndicator style={{marginVertical: 40}} size="small" />
+          :
+            <FlatList
+              columnWrapperStyle={{flexWrap: 'wrap', gap: 10}}
+              numColumns={2}
+              style={styles.ticketsList}
+              data={walletTicket.tickets}
+              renderItem={({ item }) => <SingleTicketComponent {...item} />}
+            />
+          }
         </View>
       :
         <ActivityIndicator style={{marginTop: '25%'}} size="large" />
@@ -123,6 +155,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 10
+  },
+  eventHeaderContainer: {
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
   eventName: {
     fontSize: 16,

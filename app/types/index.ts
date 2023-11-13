@@ -23,6 +23,7 @@ export type Ticket = {
   price: number;
   selling?: boolean;
   orderId?: string;
+  orderStatus?: string;
   // activable: boolean; //for the future, definetly not needed for the MVP
 };
 

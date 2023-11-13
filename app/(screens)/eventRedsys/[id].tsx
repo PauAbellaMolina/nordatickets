@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { addDoc, collection, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
-import { useStripe } from '@stripe/stripe-react-native';
 import { FIREBASE_AUTH, FIRESTORE_DB } from '../../../firebaseConfig';
 import { firestoreAutoId } from '../../../utils/firestoreAutoId';
 import { Event, Ticket, WalletTicketGroup, WalletTicketGroups } from '../../types';
@@ -16,19 +15,16 @@ import { FeatherIcon } from '../../components/icons';
 export default function EventDetailScreen() {
   const theme = useColorScheme() ?? 'light';
   const { id } = useLocalSearchParams();
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const { cart, setCart, walletTicketGroups, setWalletTicketGroups } = useWallet();
   const { user, setUser } = useAuth();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
   const [event, setEvent] = useState<Event>();
   const [cardTotalPrice, setCardTotalPrice] = useState<number>(0);
   const [cardTotalQuantity, setCardTotalQuantity] = useState<number>(0);
-  const [stripePaymentSheetParams, setStripePaymentSheetParams] = useState<{ paymentIntentClientSecret: string, ephemeralKeySecret: string, customer: string }>();
   const [loading, setLoading] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [emailVerified, setEmailVerified] = useState<boolean>(FIREBASE_AUTH.currentUser?.emailVerified ?? false);
-  const [showWebview, setShowWebview] = useState(false);
-  const [paymentFormInfo, setPaymentFormInfo] = useState<any>();
+  const [lastBuyAttempt, setLastBuyAttempt] = useState<Date | null>(null);
 
   const chooseRandomColor = (): string => {
     const colors = Colors.eventBackgroundColorsArray[theme]
@@ -96,46 +92,6 @@ export default function EventDetailScreen() {
     setCardTotalQuantity(totalQuantity);
   }, [cart]);
 
-  useEffect(() => {
-    initializePaymentSheet();
-  }, [stripePaymentSheetParams]);
-
-  const initializePaymentSheet = async () => {
-    if (!stripePaymentSheetParams) {
-      return;
-    }
-    const { error } = await initPaymentSheet({
-      merchantDisplayName: "Tickets MVP, Inc.",
-      customerId: stripePaymentSheetParams.customer,
-      customerEphemeralKeySecret: stripePaymentSheetParams.ephemeralKeySecret,
-      paymentIntentClientSecret: stripePaymentSheetParams.paymentIntentClientSecret,
-      // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
-      //methods that complete payment after a delay, like SEPA Debit and Sofort.
-      allowsDelayedPaymentMethods: false,
-      // defaultBillingDetails: {
-      //   name: 'Jane Doe',
-      // }
-    });
-    if (error) {
-      console.log('PAU LOG-> error: ', error);
-      Alert.alert("Unexpected error", "Please try again.");
-      setLoading(false);
-    } else {
-      spawnPaymentSheet();
-    }
-  };
-
-  const spawnPaymentSheet = async () => {
-    const { error } = await presentPaymentSheet();
-    if (error) {
-      // Alert.alert(error.code, error.message);
-      setLoading(false);
-    } else {
-      // Alert.alert('Success', 'Your order is confirmed!');
-      stripeOrderConfirmed();
-    }
-  };
-
   const onAddTicketHandler = (ticket: Ticket) => {
     // console.log('PAU LOG-> ticket to add: ', cart, ticket);
     if (cart) {
@@ -165,83 +121,13 @@ export default function EventDetailScreen() {
       }
     }
   };
-
-  const stripeOrderConfirmed = () => {
-    if (!cart?.length || !cardTotalPrice || !event || !user) {
-      return;
-    }
-
-    setOrderConfirmed(true);
-    // setTimeout(() => {
-    //   setOrderConfirmed(false);
-    // }, 5000);
-
-    const newTickets: Array<Ticket> = [];
-    cart.forEach((cartItem) => {
-      if (cartItem.quantity === 0) {
-        const ticketToPush = cartItem.ticket;
-        ticketToPush.id = event.id + '_' + user.id + '_' + firestoreAutoId();
-        delete ticketToPush.selling;
-        newTickets.push(ticketToPush);
-      } else {
-        for (let i = 0; i < cartItem.quantity; i++) {
-          const ticketToPush = {...cartItem.ticket};
-          ticketToPush.id = firestoreAutoId();
-          delete ticketToPush.selling;
-          newTickets.push(ticketToPush);
-        }
-      }
-    });
-
-    const existingWalletTicketGroup = walletTicketGroups?.find((walletTicketGroup) => walletTicketGroup.eventId === event?.id);
-    if (existingWalletTicketGroup) {
-      existingWalletTicketGroup.tickets = [...existingWalletTicketGroup.tickets, ...newTickets];
-      setWalletTicketGroups([...walletTicketGroups ?? []]);
-    } else {
-      const newWalletTicketGroup: WalletTicketGroup = {
-        eventId: event?.id ?? '',
-        tickets: newTickets
-      };
-      const newWalletTicketGroups: WalletTicketGroups = [newWalletTicketGroup];
-      setWalletTicketGroups([...walletTicketGroups ?? [], ...newWalletTicketGroups]);
-    }
-
-    setCart(null);
-  };
-
-  const createCheckoutSession = () => {
-    if (!user?.id) {
-      return;
-    }
-    const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
-    const checkoutSessionsRef = collection(userDocRef, 'checkout_sessions');
-    const finalAmount = cardTotalPrice * 100 + (event?.ticketFee ? event.ticketFee * cardTotalQuantity : 0);
-    addDoc(checkoutSessionsRef, {
-      client: 'mobile',
-      mode: 'payment',
-      amount: finalAmount,
-      currency: 'eur'
-    }).then((docRef) => {
-      onSnapshot(docRef, (snapshot) => {
-        const data = snapshot.data();
-        if (data && data.paymentIntentClientSecret && data.ephemeralKeySecret && data.customer) {
-          setStripePaymentSheetParams({
-            paymentIntentClientSecret: data.paymentIntentClientSecret,
-            ephemeralKeySecret: data.ephemeralKeySecret,
-            customer: data.customer
-          });
-        }
-      });
-    }).catch((err) => {
-      console.log('PAU LOG-> addFunds: ', err);
-    });
-  };
   
   const onBuyCart = () => {
-    if (loading) {
+    if (loading || lastBuyAttempt && (new Date().getTime() - lastBuyAttempt.getTime()) < 20000) { //TODO PAU info 20 seconds between buy attempts
       return;
     }
     setLoading(true);
+    setLastBuyAttempt(new Date());
     if (!emailVerified) {
       FIREBASE_AUTH.currentUser?.reload()
       .then(() => {
@@ -250,14 +136,14 @@ export default function EventDetailScreen() {
           setLoading(false);
         } else {
           setEmailVerified(true);
-          // createCheckoutSession(); //Stripe
           getPaymentFormInfo(); //Redsys
+          setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
         }
       });
       return;
     } else {
-      // createCheckoutSession(); //Stripe
       getPaymentFormInfo(); //Redsys
+      setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
     }
   };
 
