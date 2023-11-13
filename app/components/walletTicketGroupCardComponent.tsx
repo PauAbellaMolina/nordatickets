@@ -67,33 +67,33 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
       router.push(`/wallet/activateTicket/${event?.id}/${event?.name}/${ticket.id}/${ticket.ticketId}/${ticket.name}/${ticket.price}/${event?.usedTicketBucketId}`);
     };
 
-    const orderStatus = () => {
-      switch (ticketOrderStatus) {
-        case 'PENDING_PAYMENT':
-          return 'Processing payment...';
-        case 'PAYMENT_SUCCEDED':
-          return 'Activable';
-        case 'PAYMENT_FAILED':
-          return 'Payment failed';
-        default:
-          return null;
-      }
-    };
+    // const orderStatus = () => {
+    //   switch (ticketOrderStatus) {
+    //     case 'PENDING_PAYMENT':
+    //       return 'Processing payment...';
+    //     case 'PAYMENT_SUCCEDED':
+    //       return 'Activable';
+    //     case 'PAYMENT_FAILED':
+    //       return 'Payment failed';
+    //     default:
+    //       return null;
+    //   }
+    // };
   
     return (
-      <Pressable style={[styles.singleTicketContainer, {backgroundColor: Colors[theme].backgroundHalfOpacity}]} onPress={onActivateTicket}>
-        <View style={styles.ticketIconWrapper}>
-          <FontAwesomeIcon name="ticket" size={30} color={Colors['light'].text} />
-        </View>
-        <View style={styles.ticketNameWrapper}>
-          <Text style={[styles.ticketName, {color: Colors['light'].text}]}>{ticket.name}</Text>
-          { ticketOrderStatus ?
-            <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{orderStatus()}</Text>
-          :
-            <ActivityIndicator size="small" />
-          }
-        </View>
-      </Pressable>
+      <>{ ticketOrderStatus === 'PAYMENT_SUCCEDED' ?
+        <Pressable style={[styles.singleTicketContainer, {backgroundColor: Colors[theme].backgroundHalfOpacity}]} onPress={onActivateTicket}>
+          <View style={styles.ticketIconWrapper}>
+            <FontAwesomeIcon name="ticket" size={30} color={Colors['light'].text} />
+          </View>
+          <View style={styles.ticketNameWrapper}>
+            <Text style={[styles.ticketName, {color: Colors['light'].text}]}>{ticket.name}</Text>
+            <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>Activable</Text>
+          </View>
+        </Pressable>
+      :
+        null
+      }</>
     );
   };
   
@@ -130,15 +130,15 @@ const styles = StyleSheet.create({
     marginBottom: 5
   },
   ticketsList: {
-    marginTop: 10,
-    gap: 10
+    marginTop: 10
   },
   singleTicketContainer: {
     flex: 1,
     borderRadius: 10,
     borderWidth: 2,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginVertical: 5
   },
   ticketIconWrapper: {
     backgroundColor: 'transparent',

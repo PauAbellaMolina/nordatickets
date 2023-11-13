@@ -21,7 +21,7 @@ export default function ActivateTicketScreen() {
   return (
     <View style={styles.container}>
       <WebView
-        style={{ flex: 1, width: 300, height: 100 }}
+        containerStyle={styles.containerStyle}
         source={{ html: `
           <body onload="document.forms[0].submit();">
             <form action="${formUrl}" method="post">
@@ -40,12 +40,17 @@ export default function ActivateTicketScreen() {
 const styles = StyleSheet.create({
   container: {
     marginTop: 50,
-    borderTopLeftRadius: 75,
-    borderTopRightRadius: 75,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 25,
-    paddingBottom: 40
+    // padding: 25,
+    // paddingBottom: 40
+  },
+  containerStyle: {
+    width: '100%',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25
   }
 });
