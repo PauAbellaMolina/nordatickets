@@ -51,20 +51,29 @@ export function AuthProvider({ children }: { children: JSX.Element }): JSX.Eleme
             setDoc(userDocRef, {
               email: value.email ?? '',
               walletTicketGroups: [], //this will be an array of { eventId: string, tickets: string[] }
-              eventIdsFollowing: []
+              eventIdsFollowing: [],
+              redsysToken: '',
+              cardNumber: '',
+              expiryDate: ''
             });
             setUser({
               id: value.uid,
               email: value.email ?? '',
               walletTicketGroups: [],
-              eventIdsFollowing: []
+              eventIdsFollowing: [],
+              redsysToken: '',
+              cardNumber: '',
+              expiryDate: ''
             });
           } else {
             setUser({
               id: value.uid,
               email: value.email ?? '',
               walletTicketGroups: doc.data().walletTicketGroups,
-              eventIdsFollowing: doc.data().eventIdsFollowing
+              eventIdsFollowing: doc.data().eventIdsFollowing,
+              redsysToken: doc.data().redsysToken,
+              cardNumber: doc.data().cardNumber,
+              expiryDate: doc.data().expiryDate
             });
           }
         })

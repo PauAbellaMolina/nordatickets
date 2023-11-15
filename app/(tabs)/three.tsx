@@ -1,9 +1,10 @@
-import { Button, StyleSheet } from 'react-native';
+import { Button, Pressable, StyleSheet } from 'react-native';
 import { sendEmailVerification, signOut } from 'firebase/auth';
-import { FIREBASE_AUTH } from '../../firebaseConfig';
+import { FIREBASE_AUTH, FIRESTORE_DB } from '../../firebaseConfig';
 import { useAuth } from '../../context/AuthProvider';
 import { Text, View } from '../../components/Themed';
 import { useEffect, useState } from 'react';
+import { doc, updateDoc } from 'firebase/firestore';
 
 export default function TabThreeScreen() {
   const { setUser, user } = useAuth();
@@ -42,6 +43,25 @@ export default function TabThreeScreen() {
     }
   };
 
+  const onDeleteUserCard = () => {
+    if (!user) {
+      return;
+    }
+    const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
+    updateDoc(userDocRef, {
+      redsysToken: null,
+      cardNumber: null,
+      expiryDate: null
+    }).then(() => {
+      setUser({
+        ...user,
+        redsysToken: undefined,
+        cardNumber: undefined,
+        expiryDate: undefined
+      });
+    });
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Account</Text>
@@ -53,6 +73,9 @@ export default function TabThreeScreen() {
             title={'Resend verification email'}
             onPress={onResendVerificationEmail}
           />
+        : null }
+        { user && user.cardNumber ?
+          <View style={{backgroundColor: 'transparent', flexDirection: 'row'}}><Text>Saved credit card: {user.cardNumber}  ·  </Text><Pressable onPress={onDeleteUserCard}><Text style={{color: '#ff3737'}}>Delete</Text></Pressable></View>
         : null }
         <Button
           title={'Log Out'}

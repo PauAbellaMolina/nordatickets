@@ -137,18 +137,26 @@ export default function EventDetailScreen() {
         } else {
           setEmailVerified(true);
           getPaymentFormInfo(); //Redsys
-          setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
+          setTimeout(() => {
+            setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
+            listenToUserChanges();
+          }, 5000);
         }
       });
       return;
     } else {
       getPaymentFormInfo(); //Redsys
-      setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
+      setTimeout(() => {
+        setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
+        listenToUserChanges();
+      }, 5000);
     }
   };
 
   const getPaymentFormInfo = () => {
     const finalAmount = cardTotalPrice + ((event?.ticketFee ? event.ticketFee * cardTotalQuantity : 0)/100); //TODO PAU info (this is in euros (49.99));
+
+    const userRedsysToken = user?.redsysToken;
 
     fetch('http://192.168.1.162:3344/getFormInfo', { //TODO PAU dev info; my ip and port used by the redsys node server
       method: 'POST',
@@ -157,7 +165,8 @@ export default function EventDetailScreen() {
       },
       body: JSON.stringify({
         'totalAmount': finalAmount,
-        'userId': user?.id
+        'userId': user?.id,
+        'userRedsysToken': userRedsysToken
       })
     })
     .then((response) => response.json())
@@ -181,6 +190,27 @@ export default function EventDetailScreen() {
       setLoading(false);
     });
   }
+
+  const listenToUserChanges = () => {
+    if (!user) {
+      return;
+    }
+    const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
+    const userDocSubscription = onSnapshot(userDocRef, (doc) => {
+      if (doc.exists()) {
+        const docUser = doc.data();
+        if (docUser?.redsysToken && docUser?.cardNumber && docUser?.expiryDate) {
+          setUser({
+            ...user,
+            redsysToken: docUser.redsysToken,
+            cardNumber: docUser.cardNumber,
+            expiryDate: docUser.expiryDate
+          });
+          userDocSubscription();
+        }
+      }
+    });
+  };
 
   const addPendingTicketsToUser = (orderId: string) => {
     if (!cart?.length || !cardTotalPrice || !event || !user) {
@@ -261,6 +291,12 @@ export default function EventDetailScreen() {
                           <Text style={[styles.transactionFeeText, {color: Colors[theme].cardContainerBackgroundContrast}]}>transaction fee</Text>
                         </View>
                       : null }
+                        { user && user.cardNumber ?
+                          <View style={{backgroundColor: 'transparent', marginHorizontal: 8, marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 5}}>
+                            <FeatherIcon name="info" size={15} color={Colors[theme].cardContainerBackgroundContrast} />
+                            <Text style={[styles.transactionFeeText, {color: Colors[theme].cardContainerBackgroundContrast}]}>Using {user.cardNumber.slice(-7)} credit card</Text>
+                          </View>
+                        : null }
                       <Pressable style={styles.buyButton} onPress={onBuyCart}>
                       { loading ?
                         <ActivityIndicator style={{marginVertical: 3.2}} size="small" />
@@ -415,7 +451,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent'
   },
   cartList: {
-    marginVertical: 5,
+    marginVertical: 8,
     marginHorizontal: 15
   },
   cartItemsList: {

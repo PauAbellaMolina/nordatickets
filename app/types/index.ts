@@ -3,6 +3,9 @@ export type User = {
   email: string;
   walletTicketGroups: WalletTicketGroups;
   eventIdsFollowing: Array<string>;
+  redsysToken?: string;
+  cardNumber?: string;
+  expiryDate?: string;
 }
 
 export type Event = {
