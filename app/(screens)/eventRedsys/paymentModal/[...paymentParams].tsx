@@ -23,14 +23,35 @@ export default function ActivateTicketScreen() {
       <WebView
         containerStyle={styles.containerStyle}
         source={{ html: `
-          <body onload="document.forms[0].submit();">
+          <body class="body" onload="document.forms[0].submit();">
+            <h1>Carregant...</h1>
+            <p>Si no ets redireccionat a la pantalla de pagament automàticament, clica el següent botó.</p>
             <form action="${formUrl}" method="post">
               <input type="hidden" name="Ds_MerchantParameters" value="${Ds_MerchantParameters}" />
               <input type="hidden" name="Ds_Signature" value="${Ds_Signature}" />
               <input type="hidden" name="Ds_SignatureVersion" value="${Ds_SignatureVersion}" />
-              <input type="submit" value="Submit" />
+              <input class="submitBtn" type="submit" value="Anar-hi" />
             </form>
           </body>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 5dvh 0;
+              display: flex;
+              flex-flow: column;
+              align-items: center;
+              font-size: 2rem;
+            }
+            p {
+              margin: 1dvh 15dvw 0;
+              font-size: 2.4rem;
+              text-align: center;
+            }
+            .submitBtn {
+              margin-top: 2.2dvh;
+              font-size: 1.6rem;
+            }
+          </style>
         ` }}
       />
     </View>
