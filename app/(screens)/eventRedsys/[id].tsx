@@ -157,8 +157,9 @@ export default function EventDetailScreen() {
     const finalAmount = cardTotalPrice + ((event?.ticketFee ? event.ticketFee * cardTotalQuantity : 0)/100); //TODO PAU info (this is in euros (49.99));
 
     const userRedsysToken = user?.redsysToken;
-
-    fetch('http://192.168.1.162:3344/getFormInfo', { //TODO PAU dev info; my ip and port used by the redsys node server
+    
+    //TODO PAU IMPORTANT TODO!!!: once node server is uploaded to heroku, upload the url to firestore and fetch it here so it's not hardcoded. also add the hardcoded url fallback in case the firestore url is not found
+    fetch('https://tickets-mvp-62c6747fa81d.herokuapp.com/getFormInfo', { //TODO PAU dev info; my ip and port used by the redsys node server
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
