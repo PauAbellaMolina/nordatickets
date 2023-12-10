@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, TextInput, Button, useColorScheme, ActivityIndicator } from "react-native";
 import { UserCredential, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
-import { FirebaseRecaptchaVerifierModal } from "expo-firebase-recaptcha";
 import { router } from "expo-router";
-import { FIREBASE_CONFIG, FIREBASE_AUTH } from '../../firebaseConfig';
+import { FIREBASE_AUTH } from '../../firebaseConfig';
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
 
@@ -16,8 +15,6 @@ export default function Signup() {
   const [emailErrorMessage, setEmailErrorMessage] = useState<string | undefined>(undefined);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(false);
-
-  const recaptchaRef = useRef<FirebaseRecaptchaVerifierModal>(null);
 
   useEffect(() => {
     if (emailErrorMessage !== undefined) {
@@ -41,28 +38,26 @@ export default function Signup() {
   }, [email]);
 
   const onEmailSignUp = () => {
-    if (recaptchaRef.current) {
-      setLoading(true);
-      createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
-      .then((result: UserCredential) => {
-        console.log('PAU LOG-> result: ', result);
-        const user = result.user;
-        sendEmailVerification(user)
-        .then(() => {
-          console.log('PAU LOG-> Email sent');
-        })
-        .catch((err) => {
-          console.log('PAU LOG-> err sending email: ', err);
-          // alert(err);
-        });
+    setLoading(true);
+    createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
+    .then((result: UserCredential) => {
+      console.log('PAU LOG-> result: ', result);
+      const user = result.user;
+      sendEmailVerification(user)
+      .then(() => {
+        console.log('PAU LOG-> Email sent');
       })
       .catch((err) => {
-        console.log('PAU LOG-> err creating user: ', err);
+        console.log('PAU LOG-> err sending email: ', err);
         // alert(err);
-        setEmailErrorMessage('Invalid credentials, try again');
-        setLoading(false);
       });
-    }
+    })
+    .catch((err) => {
+      console.log('PAU LOG-> err creating user: ', err);
+      // alert(err);
+      setEmailErrorMessage('Invalid credentials, try again');
+      setLoading(false);
+    });
   }
 
   const onGoToLogIn = () => {
@@ -70,63 +65,56 @@ export default function Signup() {
   };
 
   return (
-    <>
-      <FirebaseRecaptchaVerifierModal
-        ref={recaptchaRef}
-        firebaseConfig={FIREBASE_CONFIG}
-        attemptInvisibleVerification={true}
-      />
-      <View style={styles.container}>
-        <Text style={styles.title}>Sign Up</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
-            textContentType="emailAddress"
-            autoComplete="email"
-            keyboardType={'email-address'}
-            placeholder="Your email"
-            onChangeText={setEmail}
-          />
-          <TextInput
-            style={[styles.inputPassword, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined && passwordErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
-            textContentType="password"
-            secureTextEntry={true}
-            autoComplete="password"
-            keyboardType={'visible-password'}
-            placeholder="Your password"
-            onChangeText={setPassword}
-          />
-          <TextInput
-            style={[styles.inputPassword, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined && passwordErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
-            textContentType="password"
-            secureTextEntry={true}
-            autoComplete="password"
-            keyboardType={'visible-password'}
-            placeholder="Repeat password"
-            onChangeText={setPasswordRepeated}
-          />
-          <Text style={{color: '#ff3737', height: 20}}>{emailErrorMessage}{passwordErrorMessage}</Text>
-          <View style={{marginTop: 20, backgroundColor: 'transparent'}}>
-            { loading ?
-              <ActivityIndicator style={{marginTop: 12}} size="small" />
-            :
-              <Button
-                disabled={!email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined}
-                title='Sign up'
-                onPress={onEmailSignUp}
-              />
-            }
-          </View>
-        </View>
-        <View style={{position: 'absolute', bottom: 0, backgroundColor: 'transparent'}}>
-          <Text>Already have an account?</Text>
-          <Button
-            title='Log in'
-            onPress={onGoToLogIn}
-          />
+    <View style={styles.container}>
+      <Text style={styles.title}>Sign Up</Text>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
+          textContentType="emailAddress"
+          autoComplete="email"
+          keyboardType={'email-address'}
+          placeholder="Your email"
+          onChangeText={setEmail}
+        />
+        <TextInput
+          style={[styles.inputPassword, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined && passwordErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
+          textContentType="password"
+          secureTextEntry={true}
+          autoComplete="password"
+          keyboardType={'visible-password'}
+          placeholder="Your password"
+          onChangeText={setPassword}
+        />
+        <TextInput
+          style={[styles.inputPassword, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined && passwordErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
+          textContentType="password"
+          secureTextEntry={true}
+          autoComplete="password"
+          keyboardType={'visible-password'}
+          placeholder="Repeat password"
+          onChangeText={setPasswordRepeated}
+        />
+        <Text style={{color: '#ff3737', height: 20}}>{emailErrorMessage}{passwordErrorMessage}</Text>
+        <View style={{marginTop: 20, backgroundColor: 'transparent'}}>
+          { loading ?
+            <ActivityIndicator style={{marginTop: 12}} size="small" />
+          :
+            <Button
+              disabled={!email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined}
+              title='Sign up'
+              onPress={onEmailSignUp}
+            />
+          }
         </View>
       </View>
-    </>
+      <View style={{position: 'absolute', bottom: 0, backgroundColor: 'transparent'}}>
+        <Text>Already have an account?</Text>
+        <Button
+          title='Log in'
+          onPress={onGoToLogIn}
+        />
+      </View>
+    </View>
   );
 }
 

@@ -57,7 +57,6 @@ function RootLayoutNav() {
             <Stack.Screen name="(auth)/login" options={{ title: 'Log In', headerShown: false }} />
             <Stack.Screen name="(auth)/signup" options={{ title: 'Sign Up', headerShown: false }} />
             <Stack.Screen name="(screens)/loadingApp" options={{ headerShown: false }} />
-            <Stack.Screen name="(screens)/event/[id]" options={{ title: 'Event details', headerShown: false }} />
             <Stack.Screen name="(screens)/eventRedsys/[id]" options={{ title: 'Event details', headerShown: false }} />
             <Stack.Screen name="(screens)/eventRedsys/paymentModal/[...paymentParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Pay', headerShown: false }} />
             <Stack.Screen name="(screens)/wallet/activateTicket/[...activateTicketParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Activate ticket', headerShown: false }} />

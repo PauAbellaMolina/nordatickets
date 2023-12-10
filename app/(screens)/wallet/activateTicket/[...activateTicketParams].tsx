@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { arrayUnion, doc, updateDoc } from 'firebase/firestore';
@@ -107,7 +107,8 @@ export default function ActivateTicketScreen() {
       </Pressable>
 
       {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+      {/* TODO PAU try if uncommenting this makes web crash, if not, leave it on */}
+      {/* <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} /> */}
     </View> 
   );
 }
