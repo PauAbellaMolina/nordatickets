@@ -159,8 +159,8 @@ export default function EventDetailScreen() {
 
     const userRedsysToken = user?.redsysToken;
     
-    // //TODO PAU IMPORTANT TODO!!!: once node server is uploaded to heroku, upload the url to firestore and fetch it here so it's not hardcoded. also add the hardcoded url fallback in case the firestore url is not found
-    // fetch('https://getforminfo-estcwhnvtq-ew.a.run.app', { //TODO PAU dev info; my ip and port used by the redsys node server
+    //TODO PAU info old fetch way
+    // fetch('https://getforminfo-estcwhnvtq-ew.a.run.app', {
     //   method: 'POST',
     //   headers: {
     //     'Content-Type': 'application/json'
@@ -192,6 +192,7 @@ export default function EventDetailScreen() {
     //   setLoading(false);
     // });
 
+    //TODO PAU info new firebase cloud functions firebase sdk way
     const getFormInfoCF = httpsCallable(FIREBASE_CF, 'getFormInfo');
     getFormInfoCF({
       totalAmount: finalAmount,
