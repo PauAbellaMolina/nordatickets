@@ -66,7 +66,7 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
   };
 
   const onRefreshEvent = () => {
-    if (refreshingEvent || (new Date().getTime() - lastRefresed.getTime()) < 15000) { //TODO PAU info 15 seconds between refresh calls
+    if (refreshingEvent || (new Date().getTime() - lastRefresed.getTime()) < 5000) { //TODO PAU info 5 seconds between refresh calls
       return;
     }
     setRefreshingEvent(true);
