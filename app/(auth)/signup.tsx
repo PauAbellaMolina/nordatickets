@@ -41,7 +41,7 @@ export default function Signup() {
     setLoading(true);
     createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
     .then((result: UserCredential) => {
-      console.log('PAU LOG-> result: ', result);
+      // console.log('PAU LOG-> result: ', result);
       const user = result.user;
       sendEmailVerification(user)
       .then(() => {

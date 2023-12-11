@@ -23,9 +23,9 @@ export default function Login() {
   const onEmailLogIn = () => {
     setLoading(true);
     signInWithEmailAndPassword(FIREBASE_AUTH, email, password)
-    .then((result: UserCredential) => {
-      console.log('PAU LOG-> result: ', result);
-    })
+    // .then((result: UserCredential) => {
+    //   console.log('PAU LOG-> result: ', result);
+    // })
     .catch((err) => {
       console.log('PAU LOG-> err login in: ', err);
       // alert(err);

@@ -159,7 +159,7 @@ export default function EventDetailScreen() {
     const userRedsysToken = user?.redsysToken;
     
     //TODO PAU IMPORTANT TODO!!!: once node server is uploaded to heroku, upload the url to firestore and fetch it here so it's not hardcoded. also add the hardcoded url fallback in case the firestore url is not found
-    fetch('https://tickets-mvp-62c6747fa81d.herokuapp.com/getFormInfo', { //TODO PAU dev info; my ip and port used by the redsys node server
+    fetch('https://getforminfo-estcwhnvtq-ew.a.run.app', { //TODO PAU dev info; my ip and port used by the redsys node server
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
