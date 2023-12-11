@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useLocalSearchParams } from 'expo-router';
@@ -10,13 +9,6 @@ export default function ActivateTicketScreen() {
   const Ds_MerchantParameters = paymentParams[1].replace(/%2F/g, '/');
   const Ds_Signature = paymentParams[2].replace(/%2F/g, '/');
   const Ds_SignatureVersion = paymentParams[3].replace(/%2F/g, '/');
-
-  useEffect(() => {
-    console.log('formUrl', formUrl);
-    console.log('Ds_MerchantParameters', Ds_MerchantParameters);
-    console.log('Ds_Signature', Ds_Signature);
-    console.log('Ds_SignatureVersion', Ds_SignatureVersion);
-  }, []);
   
   return (
     <View style={styles.container}>

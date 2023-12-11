@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { addDoc, collection, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
-import { FIREBASE_AUTH, FIRESTORE_DB } from '../../../firebaseConfig';
+import { FIREBASE_AUTH, FIREBASE_CF, FIRESTORE_DB } from '../../../firebaseConfig';
 import { firestoreAutoId } from '../../../utils/firestoreAutoId';
 import { Event, Ticket, WalletTicketGroup, WalletTicketGroups } from '../../types';
 import { useAuth } from '../../../context/AuthProvider';
@@ -11,6 +11,7 @@ import { Text, View } from '../../../components/Themed';
 import TicketCardComponent from '../../components/ticketCardComponent';
 import Colors from '../../../constants/Colors';
 import { FeatherIcon } from '../../components/icons';
+import { httpsCallable } from 'firebase/functions';
 
 export default function EventDetailScreen() {
   const theme = useColorScheme() ?? 'light';
@@ -158,24 +159,51 @@ export default function EventDetailScreen() {
 
     const userRedsysToken = user?.redsysToken;
     
-    //TODO PAU IMPORTANT TODO!!!: once node server is uploaded to heroku, upload the url to firestore and fetch it here so it's not hardcoded. also add the hardcoded url fallback in case the firestore url is not found
-    fetch('https://getforminfo-estcwhnvtq-ew.a.run.app', { //TODO PAU dev info; my ip and port used by the redsys node server
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        'totalAmount': finalAmount,
-        'userId': user?.id,
-        'userRedsysToken': userRedsysToken
-      })
+    // //TODO PAU IMPORTANT TODO!!!: once node server is uploaded to heroku, upload the url to firestore and fetch it here so it's not hardcoded. also add the hardcoded url fallback in case the firestore url is not found
+    // fetch('https://getforminfo-estcwhnvtq-ew.a.run.app', { //TODO PAU dev info; my ip and port used by the redsys node server
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify({
+    //     'totalAmount': finalAmount,
+    //     'userId': user?.id,
+    //     'userRedsysToken': userRedsysToken
+    //   })
+    // })
+    // .then((response) => response.json())
+    // .then((data) => {
+    //   console.log('PAU LOG-> getFormInfo response: ', data);
+    //   if (!data) {
+    //     return;
+    //   }
+    //   const formUrl = data.formUrl.replace(/\//g, '%2F');
+    //   const Ds_MerchantParameters = data.Ds_MerchantParameters.replace(/\//g, '%2F');
+    //   const Ds_Signature = data.Ds_Signature.replace(/\//g, '%2F');
+    //   const Ds_SignatureVersion = data.Ds_SignatureVersion.replace(/\//g, '%2F');
+
+    //   addPendingTicketsToUser(data.orderId);
+
+    //   router.push(`/eventRedsys/paymentModal/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
+    //   setLoading(false);
+    // })
+    // .catch((err) => {
+    //   console.log('PAU LOG-> getFormInfo error: ', err);
+    //   setLoading(false);
+    // });
+
+    const getFormInfoCF = httpsCallable(FIREBASE_CF, 'getFormInfo');
+    getFormInfoCF({
+      totalAmount: finalAmount,
+      userId: user?.id,
+      userRedsysToken: userRedsysToken
     })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log('PAU LOG-> getFormInfo response: ', data);
-      if (!data) {
+    .then((result) => {
+      console.log('PAU LOG-> getFormInfoCF result: ', result);
+      if (!result || !result.data) {
         return;
       }
+      const data = result.data as any;
       const formUrl = data.formUrl.replace(/\//g, '%2F');
       const Ds_MerchantParameters = data.Ds_MerchantParameters.replace(/\//g, '%2F');
       const Ds_Signature = data.Ds_Signature.replace(/\//g, '%2F');
@@ -187,7 +215,7 @@ export default function EventDetailScreen() {
       setLoading(false);
     })
     .catch((err) => {
-      console.log('PAU LOG-> getFormInfo error: ', err);
+      console.log('PAU LOG-> getFormInfoCF error: ', err?.code, err?.message, err?.details);
       setLoading(false);
     });
   }
