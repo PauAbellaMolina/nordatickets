@@ -212,7 +212,7 @@ export default function EventDetailScreen() {
 
       addPendingTicketsToUser(data.orderId);
 
-      router.push(`/eventRedsys/paymentModal/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
+      router.push(`/eventRedsys/paymentModal/${event?.id}/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
       setLoading(false);
     })
     .catch((err) => {
@@ -354,11 +354,6 @@ export default function EventDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  webview: {
-    width: '100%',
-    height: 50
-  },
-
   container: {
     backgroundColor: '#fff',
     flex: 1

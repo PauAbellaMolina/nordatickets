@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, useColorScheme } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { ActivityIndicator, Button, Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { arrayUnion, doc, updateDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../../firebaseConfig';
@@ -71,6 +71,7 @@ export default function ActivateTicketScreen() {
   
   return (
     <View style={styles.container}>
+      { Platform.OS === 'web' ? <Button title="Tornar" onPress={() => router.back()} /> : <></> } {/* TODO PAU keep refining these */}
       <View style={styles.expanderNotch}></View>
       <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
         <View style={styles.ticketTopContainer}>
