@@ -28,17 +28,17 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
     const eventDocRef = doc(FIRESTORE_DB, 'events', walletTicket.eventId);
     getDoc(eventDocRef)
     .then((doc) => {
-      if (doc.exists()) {
-        const event = doc.data() as Event;
-        event.id = doc.id;
-        event.usedTicketBucketId = doc.data().usedTicketBucketRef.id;
-        delete (event as any).ticketBucketRef;
-        delete (event as any).usedTicketBucketRef;
-        addTicketsPaymentStatus();
-        setEvent(event);
-      } else {
+      if (!doc.exists()) {
         console.log('No event doc found with id: ', walletTicket.eventId);
+        return;
       }
+      const event = doc.data() as Event;
+      event.id = doc.id;
+      event.usedTicketBucketId = doc.data().usedTicketBucketRef.id;
+      delete (event as any).ticketBucketRef;
+      delete (event as any).usedTicketBucketRef;
+      addTicketsPaymentStatus();
+      setEvent(event);
     });
   }, []);
 
@@ -79,11 +79,11 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
       const orderIdDocRef = doc(FIRESTORE_DB, 'redsys_orders', ticket.orderId);
       getDoc(orderIdDocRef)
       .then((doc) => {
-        if (doc.exists()) {
-          ticket.orderStatus = doc.data().status;
-        } else {
+        if (!doc.exists()) {
           console.log('No order doc found with id: ', ticket.orderId);
+          return;
         }
+        ticket.orderStatus = doc.data().status;
       })
       .finally(() => {
         if (i === walletTicket.tickets.length - 1) {
@@ -94,7 +94,6 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
   };
 
   const SingleTicketComponent = (ticket: Ticket) => {
-    
     const onActivateTicket = () => {
       if (ticket.orderStatus !== 'PAYMENT_SUCCEDED') {
         return;
@@ -189,12 +188,16 @@ const styles = StyleSheet.create({
   },
   ticketNameWrapper: {
     backgroundColor: 'transparent',
-    flex: 1
+    flex: 1,
+    paddingHorizontal: 5
   },
   ticketName: {
     fontSize: 19,
     textAlign: 'center',
-    fontWeight: '400'
+    fontWeight: '400',
+    textOverflow: 'ellipsis',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap'
   },
   ticketSubtitle: {
     fontSize: 12,

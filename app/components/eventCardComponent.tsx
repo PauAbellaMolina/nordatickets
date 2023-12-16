@@ -11,7 +11,7 @@ export default function EventCardComponent(event: Event ) {
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
 
   const goToEventDetail = () => {
-    router.push(`/eventRedsys/${event.id}`);
+    router.push(`/event/${event.id}`);
   }
 
   const chooseRandomColor = (): string => {

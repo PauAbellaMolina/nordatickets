@@ -67,7 +67,6 @@ export default function TabThreeScreen() {
       <Text style={styles.title}>Account</Text>
       <View style={styles.wrapper}>
         <View style={{backgroundColor: 'transparent', flexDirection: 'row'}}><Text>{user?.email}  ·  </Text><Text style={{color: emailVerified ? '#3fde7a' : '#ff3737'}}>{emailVerified ? 'Verified' : 'Not verified'}</Text></View>
-        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
         { !emailVerified ?
           <Button
             title={'Resend verification email'}
@@ -75,12 +74,10 @@ export default function TabThreeScreen() {
           />
         : null }
         { user && user.cardNumber ?
-          <View style={{backgroundColor: 'transparent', flexDirection: 'row'}}><Text>Saved credit card: {user.cardNumber}  ·  </Text><Pressable onPress={onDeleteUserCard}><Text style={{color: '#ff3737'}}>Delete</Text></Pressable></View>
+          <View style={{backgroundColor: 'transparent', flexDirection: 'row'}}><Text>Saved credit card: {user.cardNumber.slice(9, user.cardNumber.length)}  ·  </Text><Pressable onPress={onDeleteUserCard}><Text style={{color: '#ff3737'}}>Delete</Text></Pressable></View>
         : null }
-        <Button
-          title={'Log Out'}
-          onPress={onLogOut}
-        />
+        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+        <Pressable onPress={onLogOut}><Text style={{color: '#007aff'}}>Log out</Text></Pressable>
       </View>
     </View>
   );
@@ -100,12 +97,13 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     backgroundColor: 'transparent',
-    marginTop: 10,
+    marginTop: 30,
     marginHorizontal: 10,
-    alignItems: 'flex-start'
+    alignItems: 'flex-start',
+    gap: 15
   },
   separator: {
-    marginVertical: 15,
+    marginVertical: 5,
     height: 1,
     width: '80%'
   }

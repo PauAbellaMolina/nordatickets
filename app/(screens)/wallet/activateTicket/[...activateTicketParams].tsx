@@ -8,6 +8,7 @@ import { useAuth } from '../../../../context/AuthProvider';
 import { useWallet } from '../../../../context/WalletProvider';
 import Colors from '../../../../constants/Colors';
 import { Text, View } from '../../../../components/Themed';
+import { FeatherIcon } from '../../../components/icons';
 
 export default function ActivateTicketScreen() {
   const theme = useColorScheme() ?? 'light';
@@ -71,8 +72,7 @@ export default function ActivateTicketScreen() {
   
   return (
     <View style={styles.container}>
-      { Platform.OS === 'web' ? <Button title="Tornar" onPress={() => router.back()} /> : <></> } {/* TODO PAU keep refining these */}
-      <View style={styles.expanderNotch}></View>
+      { Platform.OS !== 'web' ? <View style={styles.expanderNotch}></View> : <></> }
       <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
         <View style={styles.ticketTopContainer}>
           <Text style={styles.title}>{ ticketName }</Text>
@@ -87,25 +87,32 @@ export default function ActivateTicketScreen() {
           <View style={[styles.statusContainer, {backgroundColor: ticketActive ? '#3fde7a' : '#ff3737'}]}>
             { ticketActive ?
               <>
-                <Text style={[styles.statusText, {color: Colors['light'].text}]}>Ticket is active</Text>
-                <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>Deactivate when drink is served</Text>
+                <Text style={[styles.statusText, {color: Colors['light'].text}]}>Ticket actiu</Text>
+                <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>Desactivar ticket al rebre la beguda</Text>
               </>
             :
               <>
-                <Text style={[styles.statusText, {color: Colors['light'].text}]}>Ticket not active</Text>
-                <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>This ticket has already been used</Text>
+                <Text style={[styles.statusText, {color: Colors['light'].text}]}>Ticket desactivat</Text>
+                <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>Aquest ticket ja ha sigut utilitzat</Text>
               </>
             }
           </View>
         </View>
       </View>
-      <Pressable disabled={!ticketActive} onPress={deactivateTicket} style={[styles.button, !ticketActive ? {opacity: 0} : {}, {backgroundColor: eventBackgroundColor}]}>
-        {loading ?
-          <ActivityIndicator style={styles.buttonLoading} size="large" />
-        :
-          <Text style={styles.buttonText}>Deactivate ticket</Text>
-        }
-      </Pressable>
+      <View style={styles.actionsContainer}>
+        { Platform.OS === 'web' ? <>
+          <Pressable onPress={() => router.back()} style={[styles.button, {height: '100%', flex: 1, justifyContent: 'center'}, {backgroundColor: eventBackgroundColor}]}>
+            <FeatherIcon name="arrow-left" size={38} color={Colors[theme].text} />
+          </Pressable>
+        </> : <></> }
+        <Pressable disabled={!ticketActive} onPress={deactivateTicket} style={[styles.button, !ticketActive ? {opacity: .8} : {}, {backgroundColor: eventBackgroundColor}]}>
+          {loading ?
+            <ActivityIndicator style={styles.buttonLoading} size="large" />
+          :
+            <Text style={styles.buttonText}>Desactivar ticket</Text>
+          }
+        </Pressable>
+      </View>
 
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       {/* TODO PAU try if uncommenting this makes web crash, if not, leave it on */}
@@ -222,13 +229,19 @@ const styles = StyleSheet.create({
   infoContainer: {
     alignItems: 'center'
   },
+  actionsContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10
+  },
   button: {
     verticalAlign: 'bottom',
     borderRadius: 30,
     borderWidth: 5,
     borderColor: '#0000001A',
     alignItems: 'center',
-    width: '90%',
+    flex: 3,
     shadowColor: "#000",
     shadowOffset: {
       width: 1,

@@ -1,10 +1,14 @@
-import { Button, StyleSheet } from 'react-native';
+import { Button, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { View } from '../../../../components/Themed';
+import { View, Text } from '../../../../components/Themed';
+import GoBackArrow from '../../../components/goBackArrow';
+import { FeatherIcon } from '../../../components/icons';
+import Colors from '../../../../constants/Colors';
 
 export default function PaymentModalScreen() {
+  const theme = useColorScheme() ?? 'light';
   const { paymentParams } = useLocalSearchParams();
   const eventId = paymentParams[0];
   const formUrl = paymentParams[1].replace(/%2F/g, '/');
@@ -13,14 +17,17 @@ export default function PaymentModalScreen() {
   const Ds_SignatureVersion = paymentParams[4].replace(/%2F/g, '/');
   
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, Platform.OS !== 'web' ? {marginTop: 50} : {}]}>
       { Platform.OS === 'web' ? <>
-        <Button title="Tornar" onPress={() => router.push(`/eventRedsys/${eventId}`)} /> {/* TODO PAU keep refining these */}
+        <Pressable onPress={() => router.push(`/event/${eventId}`)} style={{marginVertical: 10, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 5}}>
+          <FeatherIcon name="arrow-left" size={20} color={Colors[theme].text} />
+          <Text>Cancel·lar i tornar</Text>
+        </Pressable>
         <iframe 
             style={{ width: '100%', height: '100%', border: '25px 25px 0 0' }}
             srcDoc={`
               <html>
-                <body class='body' onload='document.forms[0].submit();'>
+                <body onload='document.forms[0].submit();'>
                   <h1>Carregant...</h1>
                   <p>Si no ets redireccionat a la pantalla de pagament automàticament, clica el següent botó.</p>
                   <form action='${formUrl}' method='post'>
@@ -37,17 +44,14 @@ export default function PaymentModalScreen() {
                     display: flex;
                     flex-flow: column;
                     align-items: center;
-                    font-size: 2rem;
                     background-color: #fff;
                   }
                   p {
                     margin: 1dvh 15dvw 0;
-                    font-size: 2.4rem;
                     text-align: center;
                   }
                   .submitBtn {
                     margin-top: 2.2dvh;
-                    font-size: 1.6rem;
                   }
                 </style>
               </html>
@@ -58,7 +62,7 @@ export default function PaymentModalScreen() {
         <WebView
           containerStyle={styles.containerStyle}
           source={{ html: `
-            <body class="body" onload="document.forms[0].submit();">
+            <body onload="document.forms[0].submit();">
               <h1>Carregant...</h1>
               <p>Si no ets redireccionat a la pantalla de pagament automàticament, clica el següent botó.</p>
               <form action="${formUrl}" method="post">
@@ -75,16 +79,13 @@ export default function PaymentModalScreen() {
                 display: flex;
                 flex-flow: column;
                 align-items: center;
-                font-size: 2rem;
               }
               p {
                 margin: 1dvh 15dvw 0;
-                font-size: 2.4rem;
                 text-align: center;
               }
               .submitBtn {
                 margin-top: 2.2dvh;
-                font-size: 1.6rem;
               }
             </style>
           ` }}
@@ -96,7 +97,6 @@ export default function PaymentModalScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 50,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     flex: 1,

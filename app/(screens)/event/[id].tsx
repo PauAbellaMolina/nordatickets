@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { addDoc, collection, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { FIREBASE_AUTH, FIREBASE_CF, FIRESTORE_DB } from '../../../firebaseConfig';
 import { firestoreAutoId } from '../../../utils/firestoreAutoId';
 import { Event, Ticket, WalletTicketGroup, WalletTicketGroups } from '../../types';
@@ -12,6 +12,7 @@ import TicketCardComponent from '../../components/ticketCardComponent';
 import Colors from '../../../constants/Colors';
 import { FeatherIcon } from '../../components/icons';
 import { httpsCallable } from 'firebase/functions';
+import GoBackArrow from '../../components/goBackArrow';
 
 export default function EventDetailScreen() {
   const theme = useColorScheme() ?? 'light';
@@ -39,28 +40,28 @@ export default function EventDetailScreen() {
     const eventDocRef = doc(FIRESTORE_DB, 'events', id as string);
     getDoc(eventDocRef)
     .then((doc) => {
-      if (doc.exists()) {
-        const docEvent = doc.data() as Event;
-        docEvent.id = doc.id;
-        delete (docEvent as any).ticketBucketRef;
-        const ticketBucketRef = doc.data().ticketBucketRef;
-        if (ticketBucketRef) {
-          getDoc(ticketBucketRef)
-          .then((doc) => {
-            if (doc.exists()) {
-              docEvent.tickets = doc.data() as { tickets: Ticket[] };
-              setEvent(docEvent);
-              // console.log('PAU LOG-> event: ', event);
-            } else {
-              console.log('No references doc found');
-            }
-          });
-        } else {
-          setEvent(docEvent);
-        }
-      } else {
+      if (!doc.exists()) {
         console.log('No doc found with id: ', id);
+        return;
       }
+      const docEvent = doc.data() as Event;
+      docEvent.id = doc.id;
+      delete (docEvent as any).ticketBucketRef;
+      const ticketBucketRef = doc.data().ticketBucketRef;
+      if (!ticketBucketRef) {
+        setEvent(docEvent);
+        return;
+      }
+      getDoc(ticketBucketRef)
+      .then((doc) => {
+        if (!doc.exists()) {
+          console.log('No references doc found');
+          return;
+        }
+        docEvent.tickets = doc.data() as { tickets: Ticket[] };
+        setEvent(docEvent);
+        // console.log('PAU LOG-> event: ', event);
+      });
     });
 
     return () => setCart(null);
@@ -95,31 +96,33 @@ export default function EventDetailScreen() {
 
   const onAddTicketHandler = (ticket: Ticket) => {
     // console.log('PAU LOG-> ticket to add: ', cart, ticket);
-    if (cart) {
-      const existingCartItem = cart.find((cartItem) => cartItem.ticket.ticketId === ticket.ticketId);
-      if (existingCartItem) {
-        existingCartItem.quantity++;
-        setCart([...cart]);
-      } else {
-        setCart([...cart, {ticket: ticket, quantity: 1}]);
-      }
-    } else {
+    if (!cart) {
       setCart([{ticket: ticket, quantity: 1}]);
+      return;
+    }
+    const existingCartItem = cart.find((cartItem) => cartItem.ticket.ticketId === ticket.ticketId);
+    if (existingCartItem) {
+      existingCartItem.quantity++;
+      setCart([...cart]);
+    } else {
+      setCart([...cart, {ticket: ticket, quantity: 1}]);
     }
   };
   const onRemoveTicketHandler = (ticket: Ticket) => {
     // console.log('PAU LOG-> ticket to remove: ', ticket);
-    if (cart) {
-      const existingCartItem = cart.find((cartItem) => cartItem.ticket.ticketId === ticket.ticketId);
-      if (existingCartItem) {
-        existingCartItem.quantity--;
-        if (existingCartItem.quantity === 0) {
-          const newCart = cart.filter((cartTicket) => cartTicket.ticket.ticketId !== ticket.ticketId);
-          setCart(newCart);
-        } else {
-          setCart([...cart]);
-        }
-      }
+    if (!cart) {
+      return;
+    }
+    const existingCartItem = cart.find((cartItem) => cartItem.ticket.ticketId === ticket.ticketId);
+    if (!existingCartItem) {
+      return;
+    }
+    existingCartItem.quantity--;
+    if (existingCartItem.quantity === 0) {
+      const newCart = cart.filter((cartTicket) => cartTicket.ticket.ticketId !== ticket.ticketId);
+      setCart(newCart);
+    } else {
+      setCart([...cart]);
     }
   };
   
@@ -184,7 +187,7 @@ export default function EventDetailScreen() {
 
     //   addPendingTicketsToUser(data.orderId);
 
-    //   router.push(`/eventRedsys/paymentModal/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
+    //   router.push(`/event/paymentModal/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
     //   setLoading(false);
     // })
     // .catch((err) => {
@@ -212,7 +215,7 @@ export default function EventDetailScreen() {
 
       addPendingTicketsToUser(data.orderId);
 
-      router.push(`/eventRedsys/paymentModal/${event?.id}/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
+      router.push(`/event/paymentModal/${event?.id}/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
       setLoading(false);
     })
     .catch((err) => {
@@ -282,16 +285,17 @@ export default function EventDetailScreen() {
         <>
           <View style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor}]}>
           {/* <View style={styles.eventInfoContainer}> */}
-            <Text style={[styles.title, {color: Colors['light'].text}]}>Redsys - { event?.name }</Text>
+            <GoBackArrow />
+            <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
             <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}</Text>
           </View>
           { event.tickets ?
             <>
               <View style={styles.ticketsContainer}>
-              <View style={styles.sellingStatusContainer}>
-                <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
-                <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{event.selling ? 'Selling' : 'Not selling'}</Text>
-              </View>
+                <View style={styles.sellingStatusContainer}>
+                  <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
+                  <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{event.selling ? 'Selling' : 'Not selling'}</Text>
+                </View>
                 <Text style={styles.subtitle}>Tickets:</Text>
                 <FlatList
                   style={styles.ticketsList}
@@ -356,7 +360,8 @@ export default function EventDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    flex: 1
+    display: 'flex',
+    height: '100%'
   },
   eventInfoContainer: {
     paddingTop: 100,
@@ -384,22 +389,14 @@ const styles = StyleSheet.create({
   },
   eventDescription: {
     fontSize: 16,
-    marginTop: 10,
-    // marginLeft: 10
+    marginTop: 10
   },
   ticketsContainer: {
+    flex: 1,
     backgroundColor: 'transparent',
     marginTop: 25,
     marginHorizontal: 30,
-    borderRadius: 35,
-    // shadowColor: "#000",
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2,
-    // },
-    // shadowOpacity: 0.10,
-    // shadowRadius: 1.5,
-    // elevation: 10,
+    borderRadius: 35
   },
   ticketsList: {
     marginTop: 10
@@ -452,10 +449,10 @@ const styles = StyleSheet.create({
     fontWeight: '800'
   },
   cartContainer: {
-    position: 'absolute',
+    position: 'relative',
+    marginBottom: 25,
     alignSelf: 'center',
     width: '95%',
-    bottom: 25,
     paddingTop: 15,
     paddingBottom: 23,
     paddingHorizontal: 20,
@@ -488,11 +485,6 @@ const styles = StyleSheet.create({
   transactionFeeText: {
     fontSize: 14
   },
-  // notEnoughFunds: {
-  //   fontSize: 16,
-  //   color: '#ff5f5f',
-  //   textAlign: 'center'
-  // },
   buyButton: {
     width: '100%',
     marginTop: 10,

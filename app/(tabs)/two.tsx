@@ -32,7 +32,8 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 5,
     paddingHorizontal: 15,
-    flex: 1
+    flex: 1,
+    overflow: 'scroll'
   },
   title: {
     fontSize: 30,
