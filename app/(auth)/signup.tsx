@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { StyleSheet, TextInput, Button, useColorScheme, ActivityIndicator } from "react-native";
+import { useEffect, useState } from "react";
+import { StyleSheet, TextInput, useColorScheme, ActivityIndicator, Pressable } from "react-native";
 import { UserCredential, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { router } from "expo-router";
 import { FIREBASE_AUTH } from '../../firebaseConfig';
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
+import { FeatherIcon } from "../components/icons";
 
 export default function Signup() {
   const theme = useColorScheme() ?? 'light';
@@ -66,7 +67,8 @@ export default function Signup() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+      <Text style={styles.title}>Tickets MVP</Text>
+      <Text style={styles.subtitle}>Sign Up</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
@@ -99,20 +101,20 @@ export default function Signup() {
           { loading ?
             <ActivityIndicator style={{marginTop: 12}} size="small" />
           :
-            <Button
+            <Pressable
               disabled={!email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined}
-              title='Sign up'
               onPress={onEmailSignUp}
-            />
+              style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 5}}
+            >
+              <Text style={{fontSize: 20, color: '#007aff', textAlign: 'center'}}>Sign up</Text>
+              <FeatherIcon name="arrow-right" size={20} color={'#007aff'} />
+            </Pressable>
           }
         </View>
       </View>
       <View style={{position: 'absolute', bottom: 0, backgroundColor: 'transparent'}}>
         <Text>Already have an account?</Text>
-        <Button
-          title='Log in'
-          onPress={onGoToLogIn}
-        />
+        <Pressable onPress={onGoToLogIn}><Text style={{color: '#007aff', textAlign: 'center', marginTop: 6}}>Log in</Text></Pressable>
       </View>
     </View>
   );
@@ -131,6 +133,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: 'bold'
+  },
+  subtitle: {
+    fontSize: 20,
+    fontWeight: '500'
   },
   inputContainer: {
     backgroundColor: 'transparent',
