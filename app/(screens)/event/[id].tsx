@@ -160,7 +160,7 @@ export default function EventDetailScreen() {
   const getPaymentFormInfo = () => {
     const finalAmount = cardTotalPrice + ((event?.ticketFee ? event.ticketFee * cardTotalQuantity : 0)/100); //TODO PAU info (this is in euros (49.99));
 
-    const userRedsysToken = user?.redsysToken;
+    const userRedsysToken = user?.redsysToken ? user.redsysToken : undefined;
     
     //TODO PAU info old fetch way
     // fetch('https://getforminfo-estcwhnvtq-ew.a.run.app', {
@@ -203,7 +203,7 @@ export default function EventDetailScreen() {
       userRedsysToken: userRedsysToken
     })
     .then((result) => {
-      console.log('PAU LOG-> getFormInfoCF result: ', result);
+      // console.log('PAU LOG-> getFormInfoCF result: ', result);
       if (!result || !result.data) {
         return;
       }
