@@ -34,7 +34,7 @@ export default function EventCardComponent(event: Event ) {
         </View>
         <View style={styles.sellingStatusContainer}>
           <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
-          <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{event.selling ? 'Selling' : 'Not selling'}</Text>
+          <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{event.selling ? 'Venent' : 'No venent'}</Text>
         </View>
         <View style={styles.goToDetailContainer}>
           <FeatherIcon name="arrow-up-right" size={40} color={Colors['light'].text} />

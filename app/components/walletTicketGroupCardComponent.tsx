@@ -108,7 +108,7 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
             <FontAwesomeIcon name="ticket" size={30} color={Colors['light'].text} />
           </View>
           <View style={styles.ticketNameWrapper}>
-            <Text style={[styles.ticketName, {color: Colors['light'].text}]}>{ticket.name}</Text>
+            <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{ticket.name}</Text>
             <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>Activable</Text>
           </View>
         </Pressable>
@@ -195,9 +195,7 @@ const styles = StyleSheet.create({
     fontSize: 19,
     textAlign: 'center',
     fontWeight: '400',
-    textOverflow: 'ellipsis',
-    overflow: 'hidden',
-    whiteSpace: 'nowrap'
+    overflow: 'hidden'
   },
   ticketSubtitle: {
     fontSize: 12,

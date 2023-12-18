@@ -10,6 +10,7 @@ export type User = {
 
 export type Event = {
   id: string;
+  code: number;
   name: string;
   description: string;
   selling: boolean;

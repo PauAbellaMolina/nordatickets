@@ -64,7 +64,7 @@ export default function TabThreeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Account</Text>
+      <Text style={styles.title}>Perfil</Text>
       <View style={styles.wrapper}>
         <View style={{backgroundColor: 'transparent', flexDirection: 'row'}}><Text>{user?.email}  ·  </Text><Text style={{color: emailVerified ? '#3fde7a' : '#ff3737'}}>{emailVerified ? 'Verified' : 'Not verified'}</Text></View>
         { !emailVerified ?

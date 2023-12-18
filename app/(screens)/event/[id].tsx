@@ -67,20 +67,20 @@ export default function EventDetailScreen() {
     return () => setCart(null);
   }, []);
 
-  useEffect(() => { //TODO PAU info this adds event to user's event following list. Idea is to make a qr to go to this page (event/id) and that will add it to user's event list.
-    if (!event || !user || user.eventIdsFollowing.includes(id as string)) {
-      return;
-    }
-    const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
-    updateDoc(userDocRef, {
-      eventIdsFollowing: [...user.eventIdsFollowing, id]
-    }).then(() => {
-      setUser({
-        ...user,
-        eventIdsFollowing: [...user.eventIdsFollowing, id as string]
-      });
-    });
-  }, [event]);
+  // useEffect(() => { //TODO PAU info this adds event to user's event following list. Idea is to make a qr to go to this page (event/id) and that will add it to user's event list.
+  //   if (!event || !user || user.eventIdsFollowing.includes(id as string)) {
+  //     return;
+  //   }
+  //   const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
+  //   updateDoc(userDocRef, {
+  //     eventIdsFollowing: [...user.eventIdsFollowing, id]
+  //   }).then(() => {
+  //     setUser({
+  //       ...user,
+  //       eventIdsFollowing: [...user.eventIdsFollowing, id as string]
+  //     });
+  //   });
+  // }, [event]);
 
   useEffect(() => {
     if (!cart) {
@@ -294,7 +294,7 @@ export default function EventDetailScreen() {
               <View style={styles.ticketsContainer}>
                 <View style={styles.sellingStatusContainer}>
                   <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
-                  <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{event.selling ? 'Selling' : 'Not selling'}</Text>
+                  <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{event.selling ? 'Venent' : 'No venent'}</Text>
                 </View>
                 <Text style={styles.subtitle}>Tickets:</Text>
                 <FlatList
