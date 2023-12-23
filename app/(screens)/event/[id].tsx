@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { FIREBASE_AUTH, FIREBASE_CF, FIRESTORE_DB } from '../../../firebaseConfig';
@@ -136,7 +136,11 @@ export default function EventDetailScreen() {
       FIREBASE_AUTH.currentUser?.reload()
       .then(() => {
         if (!FIREBASE_AUTH.currentUser?.emailVerified) {
-          Alert.alert('Email not verified', 'Please verify your email to continue');
+          if (Platform.OS === 'web') {
+            window.confirm('Email not verified. Please verify your email to continue');
+          } else {
+            Alert.alert('Email not verified', 'Please verify your email to continue');
+          }
           setLoading(false);
         } else {
           setEmailVerified(true);

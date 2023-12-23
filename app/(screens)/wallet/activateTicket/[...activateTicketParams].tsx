@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Button, Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { ActivityIndicator, Alert, Button, Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { arrayUnion, doc, updateDoc } from 'firebase/firestore';
@@ -37,10 +37,43 @@ export default function ActivateTicketScreen() {
     setEventBackgroundColor(chooseRandomColor);
   }, []);
 
-  const deactivateTicket = () => {
+  const deactivateTicket = async () => {
     if (!user || loading) {
       return;
     }
+
+    if (Platform.OS === 'web') {
+      if (!window.confirm("Segur que vols desactivar aquest ticket?")) {
+        return;
+      }
+    } else {
+      const AsyncAlert = async () => new Promise<boolean>((resolve) => {
+        Alert.prompt(
+          "Desactivar ticket",
+          "Segur que vols desactivar aquest ticket?",
+          [
+            {
+              text: "No",
+              onPress: () => {
+                resolve(true);
+              },
+              style: "cancel"
+            },
+            {
+              text: "Sí, desactivar",
+              onPress: () => {
+                resolve(false);
+              }
+            }
+          ],
+          "default"
+        );
+      });
+      if (await AsyncAlert()) {
+        return;
+      };
+    }
+
     setLoading(true);
     const ticketToActivate = {
       id: ticketUniqueId,

@@ -20,8 +20,8 @@ export default function PaymentModalScreen() {
     <View style={[styles.container, Platform.OS !== 'web' ? {marginTop: 50} : {}]}>
       { Platform.OS === 'web' ? <>
         <Pressable onPress={() => router.push(`/event/${eventId}`)} style={{marginVertical: 10, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 5}}>
-          <FeatherIcon name="arrow-left" size={20} color={Colors[theme].text} />
-          <Text>Cancel·lar i tornar</Text>
+          <FeatherIcon name="x" size={20} color={Colors[theme].text} />
+          <Text>Tancar</Text>
         </Pressable>
         <iframe 
             style={{ width: '100%', height: '100%', border: '25px 25px 0 0' }}

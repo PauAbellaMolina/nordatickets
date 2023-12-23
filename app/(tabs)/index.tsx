@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, TextInput, useColorScheme } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Platform, Pressable, StyleSheet, TextInput, useColorScheme } from 'react-native';
 import { collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../firebaseConfig';
 import { useAuth } from '../../context/AuthProvider';
@@ -55,11 +55,13 @@ export default function TabOneScreen() {
   };
 
   const onAddEventInput = () => {
-    if (!eventInput) {
+    if (!eventInput || !(/^\d+$/.test(eventInput))) {
+      spawnIncorrectInputAlert();
       return;
     }
     const alreadyFollowingEvent = events.find((event) => event.code === +eventInput);
     if (alreadyFollowingEvent) {
+      spawnAlreadyFollowingAlert();
       setShowEventInput(false);
       return;
     }
@@ -68,14 +70,47 @@ export default function TabOneScreen() {
     const q = query(c, where('code', '==', +eventInput));
     getDocs(q)
     .then((querySnapshot) => {
+      if (querySnapshot.empty) {
+        spawnEventNotFoundAlert();
+        setInputEventLoading(false);
+        return;
+      }
       querySnapshot.forEach((doc) => {
         if (!doc.exists()) {
+          spawnEventNotFoundAlert();
+          setInputEventLoading(false);
           return;
         }
         addEventToUser(doc.id);
       });
+    })
+    .catch(() => {
+      spawnEventNotFoundAlert();
+      setInputEventLoading(false);
     });
   };
+
+  const spawnEventNotFoundAlert = () => {
+    if (Platform.OS === 'web') {
+      window.alert('No hem trobat un esdeveniment amb aquest codi');
+      return;
+    }
+    Alert.alert('No hi ha resultats', 'No hem trobat un esdeveniment amb aquest codi');
+  }
+  const spawnIncorrectInputAlert = () => {
+    if (Platform.OS === 'web') {
+      window.alert('Codi incorrecte');
+      return;
+    }
+    Alert.alert('Codi incorrecte', 'Introdueix un codi correcte');
+  }
+  const spawnAlreadyFollowingAlert = () => {
+    if (Platform.OS === 'web') {
+      window.alert('Ja segueixes aquest esdeveniment');
+      return;
+    }
+    Alert.alert('Esdeveniment seguit', 'Ja segueixes aquest esdeveniment');
+  }
 
   const addEventToUser = (eventId: string) => {
     if (!eventId || !user || user.eventIdsFollowing.includes(eventId as string)) {

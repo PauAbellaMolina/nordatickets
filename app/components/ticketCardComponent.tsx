@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { Ticket } from '../types';
 import Colors from '../../constants/Colors';
 import { Text, View } from '../../components/Themed';
@@ -51,16 +51,8 @@ export default function TicketCardComponent({ eventSelling, quantityInCart, onRe
               <Pressable onPress={onAdd}>
                 <FeatherIcon name="plus-circle" size={30} color={Colors[theme].text} />
               </Pressable>
-              {/* TODO PAU info next snippet hides add button when reached 5 tickets of the same type added to cart  */}
-              {/* { !quantityInCart || quantityInCart < 5 ?
-                <Pressable onPress={onAdd}>
-                  <FeatherIcon name="plus-circle" size={30} color={Colors['light'].text} />
-                </Pressable>
-              :
-                <View style={{width: 30}} />
-              } */}
             </> :
-              <Text style={styles.notAvailable}>Not available</Text>
+              <Text style={styles.notAvailable}>No disponible</Text>
             }
           </> :
             <></>
@@ -68,32 +60,6 @@ export default function TicketCardComponent({ eventSelling, quantityInCart, onRe
         </View>
       </View>
     </View>
-
-      // <View style={styles.ticketActions}>
-      // { quantityInCart > 0 ?
-      //   <Pressable onPress={onRemove}>
-      //     <FeatherIcon name="minus-circle" size={30} color={Colors['light'].text} />
-      //   </Pressable>
-      //   // <Button title='Remove' onPress={onRemove} />
-      // :
-      //   <></>
-      // }
-      // <Text style={styles.quantityInCart}>{quantityInCart}</Text>
-      // { ticket.selling ?
-      //   <>
-      //     { !quantityInCart || quantityInCart < 5 ?
-      //       <Pressable onPress={onAdd}>
-      //         <FeatherIcon name="plus-circle" size={30} color={Colors['light'].text} />
-      //       </Pressable>
-      //       // <Button title='Add' onPress={onAdd} />
-      //     :
-      //       <View style={{width: 30}} />
-      //     }
-      //   </>
-      // :
-      //   <Button disabled title='Not available' />
-      // }
-      // </View>
   );
 }
 
