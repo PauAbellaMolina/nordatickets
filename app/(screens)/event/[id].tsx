@@ -20,6 +20,7 @@ export default function EventDetailScreen() {
   const { cart, setCart, walletTicketGroups, setWalletTicketGroups } = useWallet();
   const { user, setUser } = useAuth();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
+  const [eventBackgroundColorIndex, setEventBackgroundColorIndex] = useState<number>(0);
   const [event, setEvent] = useState<Event>();
   const [cardTotalPrice, setCardTotalPrice] = useState<number>(0);
   const [cardTotalQuantity, setCardTotalQuantity] = useState<number>(0);
@@ -31,6 +32,7 @@ export default function EventDetailScreen() {
   const chooseRandomColor = (): string => {
     const colors = Colors.eventBackgroundColorsArray[theme]
     const randomIndex = Math.floor(Math.random() * colors.length);
+    setEventBackgroundColorIndex(randomIndex);
     return colors[randomIndex];
   };
 
@@ -67,7 +69,7 @@ export default function EventDetailScreen() {
     return () => setCart(null);
   }, []);
 
-  // useEffect(() => { //TODO PAU info this adds event to user's event following list. Idea is to make a qr to go to this page (event/id) and that will add it to user's event list.
+  // useEffect(() => { //TODO PAU info this adds event to user's event following list. Idea is to make a qr to go to this page (event/id) and that will add it to user's event list. Latest Info: Deep linking on web should work for this feature to be implemented.
   //   if (!event || !user || user.eventIdsFollowing.includes(id as string)) {
   //     return;
   //   }
@@ -147,6 +149,7 @@ export default function EventDetailScreen() {
           getPaymentFormInfo(); //Redsys
           setTimeout(() => {
             setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
+            setCart(null);
             listenToUserChanges();
           }, 5000);
         }
@@ -156,6 +159,7 @@ export default function EventDetailScreen() {
       getPaymentFormInfo(); //Redsys
       setTimeout(() => {
         setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
+        setCart(null);
         listenToUserChanges();
       }, 5000);
     }
@@ -219,7 +223,7 @@ export default function EventDetailScreen() {
 
       addPendingTicketsToUser(data.orderId);
 
-      router.push(`/event/paymentModal/${event?.id}/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
+      router.push(`/event/paymentModal/${event?.id}/${eventBackgroundColorIndex}/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
       setLoading(false);
     })
     .catch((err) => {
@@ -234,17 +238,18 @@ export default function EventDetailScreen() {
     }
     const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
     const userDocSubscription = onSnapshot(userDocRef, (doc) => {
-      if (doc.exists()) {
-        const docUser = doc.data();
-        if (docUser?.redsysToken && docUser?.cardNumber && docUser?.expiryDate) {
-          setUser({
-            ...user,
-            redsysToken: docUser.redsysToken,
-            cardNumber: docUser.cardNumber,
-            expiryDate: docUser.expiryDate
-          });
-          userDocSubscription();
-        }
+      if (!doc.exists()) {
+        return;
+      }
+      const docUser = doc.data();
+      if (docUser?.redsysToken && docUser?.cardNumber && docUser?.expiryDate) {
+        setUser({
+          ...user,
+          redsysToken: docUser.redsysToken,
+          cardNumber: docUser.cardNumber,
+          expiryDate: docUser.expiryDate
+        });
+        userDocSubscription();
       }
     });
   };
@@ -337,7 +342,7 @@ export default function EventDetailScreen() {
                         : null }
                       <Pressable style={styles.buyButton} onPress={onBuyCart}>
                       { loading ?
-                        <ActivityIndicator style={{marginVertical: 3.2}} size="small" />
+                        <ActivityIndicator style={{marginVertical: 1.5}} size="small" />
                       :
                         <Text style={styles.buyButtonText}>{cardTotalPrice + (event?.ticketFee ? event.ticketFee * cardTotalQuantity / 100 : 0) + '€  ·   Buy now'}</Text>
                       }
@@ -368,7 +373,8 @@ const styles = StyleSheet.create({
     height: '100%'
   },
   eventInfoContainer: {
-    paddingTop: 100,
+    height: 180,
+    justifyContent: 'flex-end',
     paddingBottom: 30,
     paddingHorizontal: 20,
     borderTopLeftRadius: 0,

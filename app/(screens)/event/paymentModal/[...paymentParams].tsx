@@ -2,7 +2,7 @@ import { Button, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { View, Text } from '../../../../components/Themed';
+import { View } from '../../../../components/Themed';
 import GoBackArrow from '../../../components/goBackArrow';
 import { FeatherIcon } from '../../../components/icons';
 import Colors from '../../../../constants/Colors';
@@ -11,20 +11,25 @@ export default function PaymentModalScreen() {
   const theme = useColorScheme() ?? 'light';
   const { paymentParams } = useLocalSearchParams();
   const eventId = paymentParams[0];
-  const formUrl = paymentParams[1].replace(/%2F/g, '/');
-  const Ds_MerchantParameters = paymentParams[2].replace(/%2F/g, '/');
-  const Ds_Signature = paymentParams[3].replace(/%2F/g, '/');
-  const Ds_SignatureVersion = paymentParams[4].replace(/%2F/g, '/');
+  const eventBackgroundColorIndex = +paymentParams[1];
+  const formUrl = paymentParams[2].replace(/%2F/g, '/');
+  const Ds_MerchantParameters = paymentParams[3].replace(/%2F/g, '/');
+  const Ds_Signature = paymentParams[4].replace(/%2F/g, '/');
+  const Ds_SignatureVersion = paymentParams[5].replace(/%2F/g, '/');
   
   return (
-    <View style={[styles.container, Platform.OS !== 'web' ? {marginTop: 50} : {}]}>
+    <View style={[styles.container, Platform.OS !== 'web' ? {marginTop: 50} : {paddingHorizontal: 15, paddingVertical: 20}]}>
       { Platform.OS === 'web' ? <>
-        <Pressable onPress={() => router.push(`/event/${eventId}`)} style={{marginVertical: 10, display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 5}}>
-          <FeatherIcon name="x" size={20} color={Colors[theme].text} />
-          <Text>Tancar</Text>
+        <View style={styles.fakeBackground}>
+          <View style={[styles.eventInfoContainer, {backgroundColor: Colors.eventBackgroundColorsArray[theme][eventBackgroundColorIndex]}]}>
+            <GoBackArrow />
+          </View>
+        </View>
+        <Pressable onPress={() => router.push(`/event/${eventId}`)} style={styles.closeBttnWeb}>
+          <FeatherIcon name="x" size={30} color={Colors[theme].text} />
         </Pressable>
         <iframe 
-            style={{ width: '100%', height: '100%', border: '25px 25px 0 0' }}
+            style={styles.iframe}
             srcDoc={`
               <html>
                 <body onload='document.forms[0].submit();'>
@@ -51,7 +56,8 @@ export default function PaymentModalScreen() {
                     text-align: center;
                   }
                   .submitBtn {
-                    margin-top: 2.2dvh;
+                    margin-top: 2.5dvh;
+                    font-size: .85rem;
                   }
                 </style>
               </html>
@@ -86,6 +92,7 @@ export default function PaymentModalScreen() {
               }
               .submitBtn {
                 margin-top: 2.2dvh;
+                font-size: .85rem;
               }
             </style>
           ` }}
@@ -97,17 +104,49 @@ export default function PaymentModalScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    // padding: 25,
-    // paddingBottom: 40
+    justifyContent: 'flex-start'
   },
   containerStyle: {
     width: '100%',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25
+  },
+  closeBttnWeb: {
+    marginBottom: 5,
+    display: 'flex',
+    flexDirection: 'row',
+    alignSelf: 'flex-end',
+    alignItems: 'center',
+    gap: 5
+  },
+  iframe: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 25,
+    borderWidth: 0
+  },
+  fakeBackground: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    zIndex: -1,
+    top: 0,
+    filter: 'blur(3px)'
+  },
+  eventInfoContainer: {
+    height: 180,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderRadius: 35,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.10,
+    shadowRadius: 2.5,
+    elevation: 10
   }
 });
