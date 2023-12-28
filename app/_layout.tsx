@@ -4,7 +4,6 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack, router } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { StripeProvider } from '@stripe/stripe-react-native';
 import { AuthProvider } from "../context/AuthProvider";
 import { WalletProvider } from '../context/WalletProvider';
 import Colors from '../constants/Colors';
@@ -52,22 +51,18 @@ function RootLayoutNav() {
   return (
     <AuthProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <StripeProvider
-          publishableKey="pk_test_51NwRmwEYo7DYpOLZtsO6zQN9tEaBXAtmXlXUflacKeBu5TgUgzTxtx4q06S6iNbx4SUGtvY2voPp3dnEBN6arB5i00m7Ntbs9M"
-          // urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
-          // merchantIdentifier="merchant.com.{{YOUR_APP_NAME}}" // required for Apple Pay
-        >
-          <WalletProvider>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="(screens)/loadingApp" options={{ headerShown: false }} />
-              <Stack.Screen name="(auth)/login" options={{ title: 'Log In' }} />
-              <Stack.Screen name="(screens)/event/[id]" options={{ title: 'Event details' }} />
-              <Stack.Screen name="(screens)/wallet/addFunds" options={{ title: 'Add funds' }} />
-              <Stack.Screen name="(screens)/wallet/activateTicket/[...activateTicketParams]" options={{ presentation: 'modal', title: 'Activate ticket', headerRight: () => <CancelButton onPress={() => router.back()} /> }} />
-            </Stack>
-          </WalletProvider>
-        </StripeProvider>
+        <WalletProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)/login" options={{ title: 'Log In', headerShown: false }} />
+            <Stack.Screen name="(auth)/signup" options={{ title: 'Sign Up', headerShown: false }} />
+            <Stack.Screen name="(screens)/loadingApp" options={{ headerShown: false }} />
+            <Stack.Screen name="(screens)/event/[id]" options={{ title: 'Event details', headerShown: false }} />
+            <Stack.Screen name="(screens)/event/paymentModal/[...paymentParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Pay', headerShown: false }} />
+            <Stack.Screen name="(screens)/wallet/activateTicket/[...activateTicketParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Activate ticket', headerShown: false }} />
+            {/* , headerRight: () => <CancelButton onPress={() => router.back()} /> */}
+          </Stack>
+        </WalletProvider>
       </ThemeProvider>
     </AuthProvider>
   );

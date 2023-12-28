@@ -12,6 +12,7 @@ export default function LoadingApp() {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: 'transparent',
     marginBottom: 80,
     paddingTop: 30,
     paddingHorizontal: 15,

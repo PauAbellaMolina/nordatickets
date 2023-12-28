@@ -26,7 +26,7 @@ function useProtectedRoute(loaded: boolean, user: any) {
     if (loaded) {
       if (!user && !inAuthGroup) { // If the user is not signed in and the initial segment is not anything in the auth group.
         // Redirect to the sign-in page.
-        router.replace("/login");
+        router.replace("/signup");
       } else if (user && (inAuthGroup || inLoadingScreen)) {
         // Redirect to the main page.
         router.replace("/");
@@ -43,31 +43,37 @@ export function AuthProvider({ children }: { children: JSX.Element }): JSX.Eleme
 
     useEffect(() => FIREBASE_AUTH.onAuthStateChanged(value => {
       if (value) {
-        console.log("User is signed in");
+        console.log("User is signed in. Is email verified? ", FIREBASE_AUTH.currentUser?.emailVerified);
         const userDocRef = doc(FIRESTORE_DB, 'users', value.uid);
         getDoc(userDocRef)
         .then((doc) => {
           if (!doc.exists()) {
             setDoc(userDocRef, {
-              phone: value.providerData[0].phoneNumber ?? '',
-              walletFunds: 0,
+              email: value.email ?? '',
               walletTicketGroups: [], //this will be an array of { eventId: string, tickets: string[] }
-              eventIdsFollowing: []
+              eventIdsFollowing: [],
+              redsysToken: '',
+              cardNumber: '',
+              expiryDate: ''
             });
             setUser({
               id: value.uid,
-              phone: value.providerData[0].phoneNumber ?? '',
-              walletFunds: 0,
+              email: value.email ?? '',
               walletTicketGroups: [],
-              eventIdsFollowing: []
+              eventIdsFollowing: [],
+              redsysToken: '',
+              cardNumber: '',
+              expiryDate: ''
             });
           } else {
             setUser({
               id: value.uid,
-              phone: value.providerData[0].phoneNumber ?? '',
-              walletFunds: doc.data().walletFunds,
+              email: value.email ?? '',
               walletTicketGroups: doc.data().walletTicketGroups,
-              eventIdsFollowing: doc.data().eventIdsFollowing
+              eventIdsFollowing: doc.data().eventIdsFollowing,
+              redsysToken: doc.data().redsysToken,
+              cardNumber: doc.data().cardNumber,
+              expiryDate: doc.data().expiryDate
             });
           }
         })
@@ -78,8 +84,8 @@ export function AuthProvider({ children }: { children: JSX.Element }): JSX.Eleme
           setLoaded(true);
         });
       } else {
-       console.log("User is signed out");
-       setLoaded(true);
+        console.log("User is signed out");
+        setLoaded(true);
       }
     }), [])
 
