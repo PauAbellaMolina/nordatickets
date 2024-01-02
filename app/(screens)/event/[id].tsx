@@ -97,7 +97,6 @@ export default function EventDetailScreen() {
   }, [cart]);
 
   const onAddTicketHandler = (ticket: Ticket) => {
-    // console.log('PAU LOG-> ticket to add: ', cart, ticket);
     if (!cart) {
       setCart([{ticket: ticket, quantity: 1}]);
       return;
@@ -242,9 +241,10 @@ export default function EventDetailScreen() {
         return;
       }
       const docUser = doc.data();
-      if (docUser?.redsysToken && docUser?.cardNumber && docUser?.expiryDate) {
+      if (docUser?.redsysToken && docUser?.cardNumber && docUser?.expiryDate && (docUser.redsysToken !== user?.redsysToken || docUser.cardNumber !== user?.cardNumber || docUser.expiryDate !== user?.expiryDate)) {
         setUser({
           ...user,
+          walletTicketGroups: docUser.walletTicketGroups,
           redsysToken: docUser.redsysToken,
           cardNumber: docUser.cardNumber,
           expiryDate: docUser.expiryDate

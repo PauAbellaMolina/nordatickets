@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Button, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router } from 'expo-router';
-import { doc, getDoc } from 'firebase/firestore';
+import {  doc, getDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../firebaseConfig';
 import { Event, Ticket, WalletTicketGroup } from '../types';
 import Colors from '../../constants/Colors';
@@ -13,6 +13,7 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
   const [event, setEvent] = useState<Event>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
   const [orderStatusAdded, setOrderStatusAdded] = useState<boolean>(false);
+  const [refreshCooldown, setRefreshCooldown] = useState<boolean>(false);
   const [refreshingEvent, setRefreshingEvent] = useState<boolean>(false);
   const [lastRefresed, setLastRefresed] = useState<Date>(new Date());
 
@@ -29,7 +30,6 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
     getDoc(eventDocRef)
     .then((doc) => {
       if (!doc.exists()) {
-        console.log('No event doc found with id: ', walletTicket.eventId);
         return;
       }
       const event = doc.data() as Event;
@@ -41,7 +41,7 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
       setEvent(event);
     });
   }, []);
-
+  
   const addTicketsPaymentStatus = () => {
     for (let i = 0; i < walletTicket.tickets.length; i++) {
       const ticket = walletTicket.tickets[i];
@@ -51,11 +51,10 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
       const orderIdDocRef = doc(FIRESTORE_DB, 'redsys_orders', ticket.orderId);
       getDoc(orderIdDocRef)
       .then((doc) => {
-        if (doc.exists()) {
-          ticket.orderStatus = doc.data().status;
-        } else {
-          console.log('No order doc found with id: ', ticket.orderId);
+        if (!doc.exists()) {
+          return;
         }
+        ticket.orderStatus = doc.data().status;
       })
       .finally(() => {
         if (i === walletTicket.tickets.length - 1) {
@@ -69,6 +68,7 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
     if (refreshingEvent || (new Date().getTime() - lastRefresed.getTime()) < 5000) { //TODO PAU info 5 seconds between refresh calls
       return;
     }
+    setRefreshCooldown(true);
     setRefreshingEvent(true);
     setLastRefresed(new Date());
     for (let i = 0; i < walletTicket.tickets.length; i++) {
@@ -80,7 +80,6 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
       getDoc(orderIdDocRef)
       .then((doc) => {
         if (!doc.exists()) {
-          console.log('No order doc found with id: ', ticket.orderId);
           return;
         }
         ticket.orderStatus = doc.data().status;
@@ -88,6 +87,9 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
       .finally(() => {
         if (i === walletTicket.tickets.length - 1) {
           setRefreshingEvent(false);
+          setTimeout(() => {
+            setRefreshCooldown(false);
+          }, 5000);
         }
       });
     }
@@ -125,8 +127,8 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
           <View style={styles.eventHeaderContainer}>
             <Text style={[styles.eventName, {color: Colors['light'].text}]}>{event.name}</Text>
             <Pressable style={{flexDirection: 'row', gap: 5, alignItems: 'center'}} onPress={() => onRefreshEvent()}>
-              <FontAwesomeIcon name="refresh" size={12} color={'#007AFF'} />
-              <Text style={{color: '#007AFF', fontWeight: '600', fontSize: 12}}>Refresca</Text>
+              <FontAwesomeIcon name="refresh" size={12} color={refreshCooldown ? '#007AFF80' : '#007AFF'} />
+              <Text style={{color: refreshCooldown ? '#007AFF80' : '#007AFF', fontWeight: '600', fontSize: 12}}>Refresca</Text>
             </Pressable>
           </View>
           { refreshingEvent ?

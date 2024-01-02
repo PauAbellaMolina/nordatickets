@@ -28,13 +28,14 @@ export function WalletProvider({ children }: { children: JSX.Element }): JSX.Ele
   const { user, setUser } = useAuth();
 
   useEffect(() => {
-    if (user && user.walletTicketGroups) {
-      setWalletTicketGroups(user.walletTicketGroups);
-    } else {
-      setWalletTicketGroups(null);
-    }
     if (!user) {
       setCart(null);
+      setWalletTicketGroups(null);
+      return;
+    }
+    if (user.walletTicketGroups) {
+      setWalletTicketGroups(user.walletTicketGroups);
+    } else {
       setWalletTicketGroups(null);
     }
   }, [user]);
