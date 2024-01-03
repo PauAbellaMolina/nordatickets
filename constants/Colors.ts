@@ -25,7 +25,7 @@ export default {
     // background: '#f2f2f2',
     background: '#ffffff',
     backgroundHalfOpacity: '#ffffff40',
-    // background: '#EFEFEF', //TODO PAU info react default background color
+    // background: '#EFEFEF', //PAU info react default background color
     backgroundContrast: '#f2f2f2',
     tabBarBackground: '#613AC5', //#161311
     tint: '#ff7f50',

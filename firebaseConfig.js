@@ -26,7 +26,7 @@ export const FIREBASE_CONFIG = {
 export const FIREBASE_APP = initializeApp(FIREBASE_CONFIG);
 export const FIRESTORE_DB = getFirestore(FIREBASE_APP);
 export const FIREBASE_CF = getFunctions(FIREBASE_APP, 'europe-west1');
-// connectFunctionsEmulator(FIREBASE_CF, "127.0.0.1", 5001); //TODO PAU JUST FOR DEVING
+// connectFunctionsEmulator(FIREBASE_CF, "127.0.0.1", 5001); //PAU INFO JUST FOR DEVING
 
 let persistence;
 if (Platform.OS === 'web') {

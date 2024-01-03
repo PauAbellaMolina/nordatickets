@@ -9,6 +9,8 @@ import { doc, updateDoc } from 'firebase/firestore';
 export default function TabThreeScreen() {
   const { setUser, user } = useAuth();
   const [emailVerified, setEmailVerified] = useState<boolean>(FIREBASE_AUTH.currentUser?.emailVerified ?? false);
+  const [resendCooldown, setResendCooldown] = useState<boolean>(false);
+  const [lastSent, setLastSent] = useState<Date>();
 
   useEffect(() => {
     if (!FIREBASE_AUTH.currentUser?.emailVerified) {
@@ -31,13 +33,19 @@ export default function TabThreeScreen() {
   };
 
   const onResendVerificationEmail = () => {
+    if (lastSent && (new Date().getTime() - lastSent.getTime()) < 60000) { //PAU info 60 seconds between resend calls
+      return;
+    }
     if (FIREBASE_AUTH.currentUser) {
-      sendEmailVerification(FIREBASE_AUTH.currentUser) //TODO PAU REALLY IMPORTANT: we should set a threshold here to prevent spamming
+      sendEmailVerification(FIREBASE_AUTH.currentUser)
       .then(() => {
-        console.log('PAU LOG-> Email sent');
+        setResendCooldown(true);
+        setTimeout(() => {
+          setResendCooldown(false);
+        }, 60000);
+        setLastSent(new Date());
       })
       .catch((err) => {
-        console.log('PAU LOG-> err sending email: ', err);
         alert(err);
       });
     }
@@ -66,15 +74,12 @@ export default function TabThreeScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Perfil</Text>
       <View style={styles.wrapper}>
-        <View style={{backgroundColor: 'transparent', flexDirection: 'row'}}><Text>{user?.email}  ·  </Text><Text style={{color: emailVerified ? '#3fde7a' : '#ff3737'}}>{emailVerified ? 'Verified' : 'Not verified'}</Text></View>
+        <View style={{backgroundColor: 'transparent', flexDirection: 'row'}}><Text>{user?.email}  ·  </Text><Text style={{color: emailVerified ? '#3fde7a' : '#ff3737'}}>{emailVerified ? 'Verificat' : 'No verificat'}</Text></View>
         { !emailVerified ?
-          <Button
-            title={'Resend verification email'}
-            onPress={onResendVerificationEmail}
-          />
+          <Pressable onPress={onResendVerificationEmail}><Text style={{color: resendCooldown ? '#007AFF80' : '#007AFF'}}>Reenviar correu de verificació</Text></Pressable>
         : null }
         { user && user.cardNumber ?
-          <View style={{backgroundColor: 'transparent', flexDirection: 'row'}}><Text>Saved credit card: {user.cardNumber.slice(9, user.cardNumber.length)}  ·  </Text><Pressable onPress={onDeleteUserCard}><Text style={{color: '#ff3737'}}>Delete</Text></Pressable></View>
+          <View style={{backgroundColor: 'transparent', flexDirection: 'row'}}><Text>Tarjeta de crèdit guardada: {user.cardNumber.slice(9, user.cardNumber.length)}  ·  </Text><Pressable onPress={onDeleteUserCard}><Text style={{color: '#ff3737'}}>Eliminar</Text></Pressable></View>
         : null }
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
         <Pressable onPress={onLogOut}><Text style={{color: '#007aff'}}>Log out</Text></Pressable>

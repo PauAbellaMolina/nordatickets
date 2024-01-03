@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Button, Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { arrayUnion, doc, updateDoc } from 'firebase/firestore';
+import { collection, doc, setDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../../../firebaseConfig';
 import { useAuth } from '../../../../context/AuthProvider';
 import { useWallet } from '../../../../context/WalletProvider';
@@ -22,10 +22,11 @@ export default function ActivateTicketScreen() {
   const eventId = activateTicketParams[0];
   const eventName = activateTicketParams[1];
   const ticketUniqueId = activateTicketParams[2];
-  const ticketId = activateTicketParams[3];
+  const eventTicketId = activateTicketParams[3];
   const ticketName = activateTicketParams[4];
   const ticketPrice = activateTicketParams[5];
-  const usedTicketBucketId = activateTicketParams[6];
+  const orderId = activateTicketParams[6];
+  const usedTicketBucketId = activateTicketParams[7];
 
   const chooseRandomColor = (): string => {
     const colors = Colors.eventBackgroundColorsArray[theme]
@@ -75,23 +76,24 @@ export default function ActivateTicketScreen() {
     }
 
     setLoading(true);
-    const ticketToActivate = {
+    const ticketToDeactivate = {
       id: ticketUniqueId,
-      ticketId: ticketId,
+      eventTicketId: eventTicketId,
       name: ticketName,
-      price: ticketPrice,
+      price: +ticketPrice,
       userId: user.id,
+      orderId: orderId
     };
 
     const usedTicketBucketRef = doc(FIRESTORE_DB, 'usedTicketBuckets', usedTicketBucketId);
-    updateDoc(usedTicketBucketRef, {
-      tickets: arrayUnion(ticketToActivate)
-    }).then(() => {
+    const walletTicketsRef = collection(usedTicketBucketRef, 'walletTickets');
+    setDoc(doc(walletTicketsRef, ticketUniqueId), ticketToDeactivate)
+    .then(() => {
       setTicketActive(false);
       const existingWalletTicketGroup = walletTicketGroups?.find((walletTicketGroup) => walletTicketGroup.eventId === eventId);
       if (existingWalletTicketGroup) {
-        existingWalletTicketGroup.tickets = existingWalletTicketGroup.tickets.filter((ticket) => ticket.id !== ticketToActivate.id);
-        if (existingWalletTicketGroup.tickets.length === 0) {
+        existingWalletTicketGroup.walletTickets = existingWalletTicketGroup.walletTickets.filter((ticket) => ticket.id !== ticketToDeactivate.id);
+        if (existingWalletTicketGroup.walletTickets.length === 0) {
           setWalletTicketGroups([]);
         } else {
           setWalletTicketGroups([...walletTicketGroups ?? []]);

@@ -4,7 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { FIREBASE_AUTH, FIREBASE_CF, FIRESTORE_DB } from '../../../firebaseConfig';
 import { firestoreAutoId } from '../../../utils/firestoreAutoId';
-import { Event, Ticket, WalletTicketGroup, WalletTicketGroups } from '../../types';
+import { Event, EventTicket, WalletTicket, WalletTicketGroup, WalletTicketGroups } from '../../types';
 import { useAuth } from '../../../context/AuthProvider';
 import { useWallet } from '../../../context/WalletProvider';
 import { Text, View } from '../../../components/Themed';
@@ -46,30 +46,15 @@ export default function EventDetailScreen() {
         console.log('No doc found with id: ', id);
         return;
       }
-      const docEvent = doc.data() as Event;
+      const docEvent = new Event(doc.data());
       docEvent.id = doc.id;
-      delete (docEvent as any).ticketBucketRef;
-      const ticketBucketRef = doc.data().ticketBucketRef;
-      if (!ticketBucketRef) {
-        setEvent(docEvent);
-        return;
-      }
-      getDoc(ticketBucketRef)
-      .then((doc) => {
-        if (!doc.exists()) {
-          console.log('No references doc found');
-          return;
-        }
-        docEvent.tickets = doc.data() as { tickets: Ticket[] };
-        setEvent(docEvent);
-        // console.log('PAU LOG-> event: ', event);
-      });
+      setEvent(docEvent);
     });
 
     return () => setCart(null);
   }, []);
 
-  // useEffect(() => { //TODO PAU info this adds event to user's event following list. Idea is to make a qr to go to this page (event/id) and that will add it to user's event list. Latest Info: Deep linking on web should work for this feature to be implemented.
+  // useEffect(() => { //PAU info this adds event to user's event following list. Idea is to make a qr to go to this page (event/id) and that will add it to user's event list. Latest Info: Deep linking on web should work for this feature to be implemented.
   //   if (!event || !user || user.eventIdsFollowing.includes(id as string)) {
   //     return;
   //   }
@@ -90,37 +75,36 @@ export default function EventDetailScreen() {
       setCardTotalQuantity(0);
       return;
     }
-    const totalPrice = cart.reduce((acc, cartItem) => acc + cartItem.ticket.price * cartItem.quantity, 0);
+    const totalPrice = cart.reduce((acc, cartItem) => acc + cartItem.eventTicket.price * cartItem.quantity, 0);
     setCardTotalPrice(totalPrice);
     const totalQuantity = cart.reduce((acc, cartItem) => acc + cartItem.quantity, 0);
     setCardTotalQuantity(totalQuantity);
   }, [cart]);
 
-  const onAddTicketHandler = (ticket: Ticket) => {
+  const onAddTicketHandler = (ticket: EventTicket) => {
     if (!cart) {
-      setCart([{ticket: ticket, quantity: 1}]);
+      setCart([{eventTicket: ticket, quantity: 1}]);
       return;
     }
-    const existingCartItem = cart.find((cartItem) => cartItem.ticket.ticketId === ticket.ticketId);
+    const existingCartItem = cart.find((cartItem) => cartItem.eventTicket.eventTicketId === ticket.eventTicketId);
     if (existingCartItem) {
       existingCartItem.quantity++;
       setCart([...cart]);
     } else {
-      setCart([...cart, {ticket: ticket, quantity: 1}]);
+      setCart([...cart, {eventTicket: ticket, quantity: 1}]);
     }
   };
-  const onRemoveTicketHandler = (ticket: Ticket) => {
-    // console.log('PAU LOG-> ticket to remove: ', ticket);
+  const onRemoveTicketHandler = (ticket: EventTicket) => {
     if (!cart) {
       return;
     }
-    const existingCartItem = cart.find((cartItem) => cartItem.ticket.ticketId === ticket.ticketId);
+    const existingCartItem = cart.find((cartItem) => cartItem.eventTicket.eventTicketId === ticket.eventTicketId);
     if (!existingCartItem) {
       return;
     }
     existingCartItem.quantity--;
     if (existingCartItem.quantity === 0) {
-      const newCart = cart.filter((cartTicket) => cartTicket.ticket.ticketId !== ticket.ticketId);
+      const newCart = cart.filter((cartTicket) => cartTicket.eventTicket.eventTicketId !== ticket.eventTicketId);
       setCart(newCart);
     } else {
       setCart([...cart]);
@@ -128,7 +112,7 @@ export default function EventDetailScreen() {
   };
   
   const onBuyCart = () => {
-    if (loading || lastBuyAttempt && (new Date().getTime() - lastBuyAttempt.getTime()) < 20000) { //TODO PAU info 20 seconds between buy attempts
+    if (loading || lastBuyAttempt && (new Date().getTime() - lastBuyAttempt.getTime()) < 20000) { //PAU info 20 seconds between buy attempts
       return;
     }
     setLoading(true);
@@ -165,11 +149,11 @@ export default function EventDetailScreen() {
   };
 
   const getPaymentFormInfo = () => {
-    const finalAmount = cardTotalPrice + ((event?.ticketFee ? event.ticketFee * cardTotalQuantity : 0)/100); //TODO PAU info (this is in euros (49.99));
+    const finalAmount = cardTotalPrice + ((event?.ticketFee ? event.ticketFee * cardTotalQuantity : 0)/100); //PAU info (this is in euros (49.99));
 
     const userRedsysToken = user?.redsysToken ? user.redsysToken : undefined;
     
-    //TODO PAU info old fetch way
+    //PAU info old fetch way
     // fetch('https://getforminfo-estcwhnvtq-ew.a.run.app', {
     //   method: 'POST',
     //   headers: {
@@ -202,7 +186,7 @@ export default function EventDetailScreen() {
     //   setLoading(false);
     // });
 
-    //TODO PAU info new firebase cloud functions firebase sdk way
+    //PAU info new firebase cloud functions firebase sdk way
     const getFormInfoCF = httpsCallable(FIREBASE_CF, 'getFormInfo');
     getFormInfoCF({
       totalAmount: finalAmount,
@@ -259,25 +243,22 @@ export default function EventDetailScreen() {
       return;
     }
 
-    const newTickets: Array<Ticket> = [];
+    const newTickets: WalletTicket[] = [];
     cart.forEach((cartItem) => {
       for (let i = 0; i < cartItem.quantity; i++) {
-        const ticketToPush = {...cartItem.ticket};
-        ticketToPush.id = firestoreAutoId();
-        ticketToPush.orderId = orderId;
-        delete ticketToPush.selling;
+        const ticketToPush: WalletTicket = { id: firestoreAutoId(), eventTicketId: cartItem.eventTicket.eventTicketId, name: cartItem.eventTicket.name, price: cartItem.eventTicket.price, orderId: orderId };
         newTickets.push(ticketToPush);
       }
     });
 
     const existingWalletTicketGroup = walletTicketGroups?.find((walletTicketGroup) => walletTicketGroup.eventId === event?.id);
     if (existingWalletTicketGroup) {
-      existingWalletTicketGroup.tickets = [...existingWalletTicketGroup.tickets, ...newTickets];
+      existingWalletTicketGroup.walletTickets = [...existingWalletTicketGroup.walletTickets, ...newTickets];
       setWalletTicketGroups([...walletTicketGroups ?? []]);
     } else {
       const newWalletTicketGroup: WalletTicketGroup = {
         eventId: event?.id ?? '',
-        tickets: newTickets
+        walletTickets: newTickets
       };
       const newWalletTicketGroups: WalletTicketGroups = [newWalletTicketGroup];
       setWalletTicketGroups([...walletTicketGroups ?? [], ...newWalletTicketGroups]);
@@ -298,7 +279,7 @@ export default function EventDetailScreen() {
             <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
             <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}</Text>
           </View>
-          { event.tickets ?
+          { event.eventTickets ?
             <>
               <View style={styles.ticketsContainer}>
                 <View style={styles.sellingStatusContainer}>
@@ -308,8 +289,8 @@ export default function EventDetailScreen() {
                 <Text style={styles.subtitle}>Tickets:</Text>
                 <FlatList
                   style={styles.ticketsList}
-                  data={event.tickets.tickets}
-                  renderItem={({ item }) => <TicketCardComponent eventSelling={event.selling} quantityInCart={cart?.find((cartItem) => cartItem.ticket.ticketId === item.ticketId)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />}
+                  data={event.eventTickets}
+                  renderItem={({ item }) => <TicketCardComponent eventSelling={event.selling} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.eventTicketId === item.eventTicketId)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />}
                 />
               </View>
               { orderConfirmed ?
@@ -325,7 +306,7 @@ export default function EventDetailScreen() {
                       <FlatList
                         style={styles.cartList}
                         data={cart}
-                        renderItem={({ item }) => <Text style={styles.cartItemsList}>{item.quantity}  -  {item.ticket.name} · {item.ticket.price}€</Text>}
+                        renderItem={({ item }) => <Text style={styles.cartItemsList}>{item.quantity}  -  {item.eventTicket.name} · {item.eventTicket.price}€</Text>}
                         ItemSeparatorComponent={() => <View style={{backgroundColor: 'transparent', height: 3}} />}
                       />
                       { event.ticketFee ?

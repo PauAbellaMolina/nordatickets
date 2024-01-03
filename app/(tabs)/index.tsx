@@ -12,30 +12,36 @@ import Colors from '../../constants/Colors';
 export default function TabOneScreen() {
   const theme = useColorScheme() ?? 'light';
   const { user, setUser } = useAuth();
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<Event[]>();
   const [eventInput, setEventInput] = useState<string>('');
   const [showEventInput, setShowEventInput] = useState<boolean>(false);
   const [inputEventLoading, setInputEventLoading] = useState<boolean>(false);
 
-  useEffect(() => { //TODO PAU info useMemo could also be used here, although useEffect does the same (and since this screen is only rendered once, it's not a problem) and it takes up cache memory.
-    setEvents([]);
+  useEffect(() => { //PAU info useMemo could also be used here, although useEffect does the same (and since this screen is only rendered once, it's not a problem) and it takes up cache memory.
     if (!user?.eventIdsFollowing) {
       return;
     }
-    user?.eventIdsFollowing?.forEach((eventId) => {
+    const allFollowingEvents: Event[] = [];
+    for (let i = 0; i < user.eventIdsFollowing.length; i++) {
+      const eventId = user.eventIdsFollowing[i];
       const docRef = doc(FIRESTORE_DB, 'events', eventId);
       getDoc(docRef)
       .then((doc) => {
         if (!doc.exists()) {
           return;
         }
-        const event = doc.data() as Event;
-        event.id = doc.id;
-        setEvents((prevEvents) => [...prevEvents, event]);
+        const docEvent = new Event(doc.data());
+        docEvent.id = doc.id;
+        allFollowingEvents.push(docEvent);
       });
-    });
+      if (i === user.eventIdsFollowing.length - 1) {
+        setTimeout(() => {
+          setEvents(allFollowingEvents);
+        }, 250);
+      }
+    }
 
-    //TODO PAU info following code is for retrieving all events and not just the ones the user is following
+    //PAU info following code is for retrieving all events and not just the ones the user is following
     // const colRef = collection(FIRESTORE_DB, 'events');
     // getDocs(colRef)
     // .then((querySnapshot) => {
@@ -59,7 +65,7 @@ export default function TabOneScreen() {
       spawnIncorrectInputAlert();
       return;
     }
-    const alreadyFollowingEvent = events.find((event) => event.code === +eventInput);
+    const alreadyFollowingEvent = events && events.find((event) => event.code === +eventInput);
     if (alreadyFollowingEvent) {
       spawnAlreadyFollowingAlert();
       setShowEventInput(false);
@@ -157,12 +163,18 @@ export default function TabOneScreen() {
           }
         </View>
       </> : null }
-      <FlatList
-        style={styles.eventList}
-        data={events}
-        renderItem={({ item }) => <EventCardComponent {...item} />}
-        ItemSeparatorComponent={() => <View style={{height: 10, backgroundColor: 'transparent'}} />}
-      />
+      { user?.eventIdsFollowing?.length ? <>
+        { !events ?
+          <ActivityIndicator style={{marginTop: '25%'}} size="large" />
+          :
+          <FlatList
+            style={styles.eventList}
+            data={events}
+            renderItem={({ item }) => <EventCardComponent {...item} />}
+            ItemSeparatorComponent={() => <View style={{height: 10, backgroundColor: 'transparent'}} />}
+          />
+        }
+      </> : null }
     </View>
   );
 }

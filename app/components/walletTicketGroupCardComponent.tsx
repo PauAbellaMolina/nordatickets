@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Button, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router } from 'expo-router';
 import {  doc, getDoc } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../firebaseConfig';
-import { Event, Ticket, WalletTicketGroup } from '../types';
+import { Event, WalletTicket, WalletTicketGroup } from '../types';
 import Colors from '../../constants/Colors';
 import { Text, View } from '../../components/Themed';
 import { FontAwesomeIcon } from './icons';
@@ -32,19 +32,16 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
       if (!doc.exists()) {
         return;
       }
-      const event = doc.data() as Event;
-      event.id = doc.id;
-      event.usedTicketBucketId = doc.data().usedTicketBucketRef.id;
-      delete (event as any).ticketBucketRef;
-      delete (event as any).usedTicketBucketRef;
+      const docEvent = new Event(doc.data());
+      docEvent.id = doc.id;
+      setEvent(docEvent);
       addTicketsPaymentStatus();
-      setEvent(event);
     });
   }, []);
   
   const addTicketsPaymentStatus = () => {
-    for (let i = 0; i < walletTicket.tickets.length; i++) {
-      const ticket = walletTicket.tickets[i];
+    for (let i = 0; i < walletTicket.walletTickets.length; i++) {
+      const ticket = walletTicket.walletTickets[i];
       if (!ticket.orderId) {
         continue;
       }
@@ -57,7 +54,7 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
         ticket.orderStatus = doc.data().status;
       })
       .finally(() => {
-        if (i === walletTicket.tickets.length - 1) {
+        if (i === walletTicket.walletTickets.length - 1) {
           setOrderStatusAdded(true);
         }
       });
@@ -65,14 +62,14 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
   };
 
   const onRefreshEvent = () => {
-    if (refreshingEvent || (new Date().getTime() - lastRefresed.getTime()) < 5000) { //TODO PAU info 5 seconds between refresh calls
+    if (refreshingEvent || (new Date().getTime() - lastRefresed.getTime()) < 5000) { //PAU info 5 seconds between refresh calls
       return;
     }
     setRefreshCooldown(true);
     setRefreshingEvent(true);
     setLastRefresed(new Date());
-    for (let i = 0; i < walletTicket.tickets.length; i++) {
-      const ticket = walletTicket.tickets[i];
+    for (let i = 0; i < walletTicket.walletTickets.length; i++) {
+      const ticket = walletTicket.walletTickets[i];
       if (!ticket.orderId) {
         continue;
       }
@@ -85,7 +82,7 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
         ticket.orderStatus = doc.data().status;
       })
       .finally(() => {
-        if (i === walletTicket.tickets.length - 1) {
+        if (i === walletTicket.walletTickets.length - 1) {
           setRefreshingEvent(false);
           setTimeout(() => {
             setRefreshCooldown(false);
@@ -95,22 +92,22 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
     }
   };
 
-  const SingleTicketComponent = (ticket: Ticket) => {
+  const SingleTicketComponent = (walletTicket: WalletTicket) => {
     const onActivateTicket = () => {
-      if (ticket.orderStatus !== 'PAYMENT_SUCCEDED') {
+      if (walletTicket.orderStatus !== 'PAYMENT_SUCCEDED') {
         return;
       }
-      router.push(`/wallet/activateTicket/${event?.id}/${event?.name}/${ticket.id}/${ticket.ticketId}/${ticket.name}/${ticket.price}/${event?.usedTicketBucketId}`);
+      router.push(`/wallet/activateTicket/${event?.id}/${event?.name}/${walletTicket.id}/${walletTicket.eventTicketId}/${walletTicket.name}/${walletTicket.price}/${walletTicket.orderId}/${event?.usedTicketBucketRef.id}`);
     };
   
     return (
-      <>{ ticket.orderStatus === 'PAYMENT_SUCCEDED' ?
+      <>{ walletTicket.orderStatus === 'PAYMENT_SUCCEDED' ?
         <Pressable style={[styles.singleTicketContainer, {backgroundColor: Colors[theme].backgroundHalfOpacity}]} onPress={onActivateTicket}>
           <View style={styles.ticketIconWrapper}>
             <FontAwesomeIcon name="ticket" size={30} color={Colors['light'].text} />
           </View>
           <View style={styles.ticketNameWrapper}>
-            <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{ticket.name}</Text>
+            <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.name}</Text>
             <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>Activable</Text>
           </View>
         </Pressable>
@@ -138,7 +135,7 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
               columnWrapperStyle={{flexWrap: 'wrap', gap: 10}}
               numColumns={2}
               style={styles.ticketsList}
-              data={walletTicket.tickets}
+              data={walletTicket.walletTickets}
               renderItem={({ item }) => <SingleTicketComponent {...item} />}
             />
           }
