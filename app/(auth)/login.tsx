@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, TextInput, useColorScheme, ActivityIndicator, Pressable } from "react-native";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { StyleSheet, TextInput, useColorScheme, ActivityIndicator, Pressable, Platform, Alert } from "react-native";
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import { router } from "expo-router";
 import { FIREBASE_AUTH } from '../../firebaseConfig';
 import Colors from "../../constants/Colors";
@@ -45,21 +45,63 @@ export default function Login() {
     });
   }
 
+  const onForgotPassword = async () => {
+    if (Platform.OS === 'web') {
+      if (!window.confirm("Correu de restabliment de la contrasenya: " + email + ". Enviar?")) {
+        return;
+      }
+    } else {
+      const AsyncAlert = async () => new Promise<boolean>((resolve) => {
+        Alert.prompt(
+          "Restablir contrasenya",
+          "Correu de restabliment de la contrasenya: " + email + ". Enviar?",
+          [
+            {
+              text: "No",
+              onPress: () => {
+                resolve(true);
+              },
+              style: "cancel"
+            },
+            {
+              text: "Sí, desactivar",
+              onPress: () => {
+                resolve(false);
+              }
+            }
+          ],
+          "default"
+        );
+      });
+      if (await AsyncAlert()) {
+        return;
+      };
+    }
+
+    sendPasswordResetEmail(FIREBASE_AUTH, email)
+    .then(() => {
+      alert('Correu enviat, segueix les instruccions per restablir la contrasenya.');
+    })
+    .catch((err) => {
+      alert(err);
+    });
+  }
+
   const onGoToSignUp = () => {
     router.push('/signup');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tickets MVP</Text>
-      <Text style={styles.subtitle}>Log In</Text>
+      <Text style={styles.title}>ElsTeusTickets</Text>
+      <Text style={styles.subtitle}>Iniciar sessió</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={[styles.input, {color: Colors[theme].text, borderColor: passwordErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
           textContentType="emailAddress"
           autoComplete="email"
           keyboardType={'email-address'}
-          placeholder="Your email"
+          placeholder="Correu electrònic"
           onChangeText={setEmail}
         />
         <TextInput
@@ -68,7 +110,7 @@ export default function Login() {
           secureTextEntry={true}
           autoComplete="password"
           keyboardType={'visible-password'}
-          placeholder="Your password"
+          placeholder="Contrasenya"
           onChangeText={setPassword}
         />
         <Text style={{color: '#ff3737', height: 20}}>{passwordErrorMessage}</Text>
@@ -79,17 +121,23 @@ export default function Login() {
             <Pressable
               disabled={!email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined}
               onPress={onEmailLogIn}
-              style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 5}}
+              style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5}}
             >
-              <Text style={{fontSize: 20, color: '#007aff', textAlign: 'center'}}>Log in</Text>
+              <Text style={{fontSize: 20, color: '#007aff', textAlign: 'center'}}>Entrar</Text>
               <FeatherIcon name="arrow-right" size={20} color={'#007aff'} />
             </Pressable>
           }
+          { passwordErrorMessage === 'Wrong email or password' ?
+          <View style={{marginTop: 40}}>
+            <Text style={{textAlign: 'center'}}>Has oblidat la contrasenya?</Text>
+            <Pressable onPress={onForgotPassword}><Text style={{color: '#007aff', textAlign: 'center', marginTop: 6}}>Restablir contrasenya</Text></Pressable>
+          </View> 
+        : null }
         </View>
       </View>
       <View style={{position: 'absolute', bottom: 0, backgroundColor: 'transparent'}}>
-        <Text>Don't have an account?</Text>
-        <Pressable onPress={onGoToSignUp}><Text style={{color: '#007aff', textAlign: 'center', marginTop: 6}}>Sign up</Text></Pressable>
+        <Text style={{textAlign: 'center'}}>No tens un compte?</Text>
+        <Pressable onPress={onGoToSignUp}><Text style={{color: '#007aff', textAlign: 'center', marginTop: 6}}>Registra't</Text></Pressable>
       </View>
     </View>
   );

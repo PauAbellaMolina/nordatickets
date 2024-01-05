@@ -67,15 +67,15 @@ export default function Signup() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tickets MVP</Text>
-      <Text style={styles.subtitle}>Sign Up</Text>
+      <Text style={styles.title}>ElsTeusTickets</Text>
+      <Text style={styles.subtitle}>Creació del compte</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
           textContentType="emailAddress"
           autoComplete="email"
           keyboardType={'email-address'}
-          placeholder="Your email"
+          placeholder="Correu electrònic"
           onChangeText={setEmail}
         />
         <TextInput
@@ -84,7 +84,7 @@ export default function Signup() {
           secureTextEntry={true}
           autoComplete="password"
           keyboardType={'visible-password'}
-          placeholder="Your password"
+          placeholder="Contrasenya"
           onChangeText={setPassword}
         />
         <TextInput
@@ -93,7 +93,7 @@ export default function Signup() {
           secureTextEntry={true}
           autoComplete="password"
           keyboardType={'visible-password'}
-          placeholder="Repeat password"
+          placeholder="Repetir contrasenya"
           onChangeText={setPasswordRepeated}
         />
         <Text style={{color: '#ff3737', height: 20}}>{emailErrorMessage}{passwordErrorMessage}</Text>
@@ -106,15 +106,15 @@ export default function Signup() {
               onPress={onEmailSignUp}
               style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 5}}
             >
-              <Text style={{fontSize: 20, color: '#007aff', textAlign: 'center'}}>Sign up</Text>
+              <Text style={{fontSize: 20, color: '#007aff', textAlign: 'center'}}>Registra'm</Text>
               <FeatherIcon name="arrow-right" size={20} color={'#007aff'} />
             </Pressable>
           }
         </View>
       </View>
       <View style={{position: 'absolute', bottom: 0, backgroundColor: 'transparent'}}>
-        <Text>Already have an account?</Text>
-        <Pressable onPress={onGoToLogIn}><Text style={{color: '#007aff', textAlign: 'center', marginTop: 6}}>Log in</Text></Pressable>
+        <Text>Ja tens un compte?</Text>
+        <Pressable onPress={onGoToLogIn}><Text style={{color: '#007aff', textAlign: 'center', marginTop: 6}}>Iniciar sessió</Text></Pressable>
       </View>
     </View>
   );
