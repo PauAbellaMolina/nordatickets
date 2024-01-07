@@ -36,6 +36,9 @@ export default function Root({ children }: { children: React.ReactNode }) {
 }
 
 const responsiveBackground = `
+html {
+  overscroll-behavior: none;
+}
 body {
   background-color: #fff;
 }

@@ -128,11 +128,11 @@ export default function Login() {
             </Pressable>
           }
           { passwordErrorMessage === 'Wrong email or password' ?
-          <View style={{marginTop: 40}}>
-            <Text style={{textAlign: 'center'}}>Has oblidat la contrasenya?</Text>
-            <Pressable onPress={onForgotPassword}><Text style={{color: '#007aff', textAlign: 'center', marginTop: 6}}>Restablir contrasenya</Text></Pressable>
-          </View> 
-        : null }
+            <View style={{marginTop: 40}}>
+              <Text style={{textAlign: 'center'}}>Has oblidat la contrasenya?</Text>
+              <Pressable onPress={onForgotPassword}><Text style={{color: '#007aff', textAlign: 'center', marginTop: 6}}>Restablir contrasenya</Text></Pressable>
+            </View> 
+          : null }
         </View>
       </View>
       <View style={{position: 'absolute', bottom: 0, backgroundColor: 'transparent'}}>
