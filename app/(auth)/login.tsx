@@ -33,13 +33,13 @@ export default function Login() {
       setLoading(false);
       switch (err.code) {
         case 'auth/invalid-email':
-          setPasswordErrorMessage('Invalid email');
+          setPasswordErrorMessage('Correu electrònic invàlid');
           break;
         case 'auth/invalid-login-credentials':
-          setPasswordErrorMessage('Wrong email or password');
+          setPasswordErrorMessage('Correu o contrasenya incorrectes');
           break;
         default:
-          setPasswordErrorMessage('Try again');
+          setPasswordErrorMessage('Torna-ho a intentar');
           break;
       }
     });
@@ -47,14 +47,14 @@ export default function Login() {
 
   const onForgotPassword = async () => {
     if (Platform.OS === 'web') {
-      if (!window.confirm("Correu de restabliment de la contrasenya: " + email + ". Enviar?")) {
+      if (!window.confirm("Correu de restabliment de la contrasenya: " + email + " \nEnviar correu?")) {
         return;
       }
     } else {
       const AsyncAlert = async () => new Promise<boolean>((resolve) => {
         Alert.prompt(
           "Restablir contrasenya",
-          "Correu de restabliment de la contrasenya: " + email + ". Enviar?",
+          "Correu de restabliment de la contrasenya: " + email + " Enviar correu?",
           [
             {
               text: "No",
@@ -64,7 +64,7 @@ export default function Login() {
               style: "cancel"
             },
             {
-              text: "Sí, desactivar",
+              text: "Sí, enviar",
               onPress: () => {
                 resolve(false);
               }
@@ -127,17 +127,17 @@ export default function Login() {
               <FeatherIcon name="arrow-right" size={20} color={'#007aff'} />
             </Pressable>
           }
-          { passwordErrorMessage === 'Wrong email or password' ?
+          { passwordErrorMessage === 'Correu o contrasenya incorrectes' ?
             <View style={{marginTop: 40}}>
-              <Text style={{textAlign: 'center'}}>Has oblidat la contrasenya?</Text>
-              <Pressable onPress={onForgotPassword}><Text style={{color: '#007aff', textAlign: 'center', marginTop: 6}}>Restablir contrasenya</Text></Pressable>
+              <Text style={{textAlign: 'center', fontSize: 18}}>Has oblidat la contrasenya?</Text>
+              <Pressable onPress={onForgotPassword}><Text style={{fontSize: 16,color: '#007aff', textAlign: 'center', marginTop: 6}}>Restablir contrasenya</Text></Pressable>
             </View> 
           : null }
         </View>
       </View>
       <View style={{position: 'absolute', bottom: 0, backgroundColor: 'transparent'}}>
-        <Text style={{textAlign: 'center'}}>No tens un compte?</Text>
-        <Pressable onPress={onGoToSignUp}><Text style={{color: '#007aff', textAlign: 'center', marginTop: 6}}>Registra't</Text></Pressable>
+        <Text style={{textAlign: 'center', fontSize: 18}}>No tens un compte?</Text>
+        <Pressable onPress={onGoToSignUp}><Text style={{fontSize: 16,color: '#007aff', textAlign: 'center', marginTop: 6}}>Registra't</Text></Pressable>
       </View>
     </View>
   );

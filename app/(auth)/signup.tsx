@@ -42,21 +42,14 @@ export default function Signup() {
     setLoading(true);
     createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
     .then((result: UserCredential) => {
-      // console.log('PAU LOG-> result: ', result);
       const user = result.user;
       sendEmailVerification(user)
-      .then(() => {
-        console.log('PAU LOG-> Email sent');
-      })
       .catch((err) => {
-        console.log('PAU LOG-> err sending email: ', err);
-        // alert(err);
+        alert(err);
       });
     })
     .catch((err) => {
-      console.log('PAU LOG-> err creating user: ', err);
-      // alert(err);
-      setEmailErrorMessage('Invalid credentials, try again');
+      setEmailErrorMessage('Credencials invàlides, torna-ho a intentar');
       setLoading(false);
     });
   }
@@ -113,8 +106,8 @@ export default function Signup() {
         </View>
       </View>
       <View style={{position: 'absolute', bottom: 0, backgroundColor: 'transparent'}}>
-        <Text>Ja tens un compte?</Text>
-        <Pressable onPress={onGoToLogIn}><Text style={{color: '#007aff', textAlign: 'center', marginTop: 6}}>Iniciar sessió</Text></Pressable>
+        <Text style={{fontSize: 18}}>Ja tens un compte?</Text>
+        <Pressable onPress={onGoToLogIn}><Text style={{fontSize: 16, color: '#007aff', textAlign: 'center', marginTop: 6}}>Iniciar sessió</Text></Pressable>
       </View>
     </View>
   );

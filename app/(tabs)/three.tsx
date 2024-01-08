@@ -84,6 +84,7 @@ export default function TabThreeScreen() {
         : null }
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
         <Pressable style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 5}} onPress={onLogOut}><FeatherIcon name="log-out" size={18} color={'#007aff'} /><Text style={{color: '#007aff', fontSize: 16}}>Tancar sessió</Text></Pressable>
+        {/* TODO PAU add terms & conditions link to page and get in contact/support email */}
       </View>
     </View>
   );
