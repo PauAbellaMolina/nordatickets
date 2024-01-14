@@ -60,11 +60,10 @@ export default function Signup() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>ElsTeusTickets</Text>
-      <Text style={styles.subtitle}>Creació del compte</Text>
+      <Text style={styles.title}>Creació del compte</Text>
       <View style={styles.inputContainer}>
         <TextInput
-          style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
+          style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
           textContentType="emailAddress"
           autoComplete="email"
           keyboardType={'email-address'}
@@ -72,7 +71,7 @@ export default function Signup() {
           onChangeText={setEmail}
         />
         <TextInput
-          style={[styles.inputPassword, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined && passwordErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
+          style={[styles.input, styles.inputPassword, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined && passwordErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
           textContentType="password"
           secureTextEntry={true}
           autoComplete="password"
@@ -81,7 +80,7 @@ export default function Signup() {
           onChangeText={setPassword}
         />
         <TextInput
-          style={[styles.inputPassword, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined && passwordErrorMessage === undefined ? 'transparent' : '#ff3737'}]}
+          style={[styles.input, styles.inputPassword, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined && passwordErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
           textContentType="password"
           secureTextEntry={true}
           autoComplete="password"
@@ -89,7 +88,7 @@ export default function Signup() {
           placeholder="Repetir contrasenya"
           onChangeText={setPasswordRepeated}
         />
-        <Text style={{color: '#ff3737', height: 20}}>{emailErrorMessage}{passwordErrorMessage}</Text>
+        <Text style={styles.inputErrorMessage}>{emailErrorMessage}{passwordErrorMessage}</Text>
         <View style={{marginTop: 20, backgroundColor: 'transparent'}}>
           { loading ?
             <ActivityIndicator style={{marginTop: 12}} size="small" />
@@ -97,17 +96,16 @@ export default function Signup() {
             <Pressable
               disabled={!email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined}
               onPress={onEmailSignUp}
-              style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 5}}
+              style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined ? 0.5 : 1}]}
             >
-              <Text style={{fontSize: 20, color: '#007aff', textAlign: 'center'}}>Registra'm</Text>
-              <FeatherIcon name="arrow-right" size={20} color={'#007aff'} />
+              <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>Registra'm</Text>
             </Pressable>
           }
         </View>
       </View>
-      <View style={{position: 'absolute', bottom: 0, backgroundColor: 'transparent'}}>
-        <Text style={{fontSize: 18}}>Ja tens un compte?</Text>
-        <Pressable onPress={onGoToLogIn}><Text style={{fontSize: 16, color: '#007aff', textAlign: 'center', marginTop: 6}}>Iniciar sessió</Text></Pressable>
+      <View style={styles.bottomActionContainer}>
+        <Text style={styles.bottomActionTitle}>Ja tens un compte?</Text>
+        <Pressable onPress={onGoToLogIn}><Text style={styles.bottomActionLink}>Iniciar sessió</Text></Pressable>
       </View>
     </View>
   );
@@ -124,38 +122,59 @@ const styles = StyleSheet.create({
     gap: 20
   },
   title: {
-    fontSize: 30,
+    fontSize: 25,
     fontWeight: 'bold'
-  },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: '500'
   },
   inputContainer: {
     backgroundColor: 'transparent',
     marginTop: 100,
-    alignItems: 'center'
+    alignItems: 'center',
+    paddingHorizontal: 25
   },
   input: {
     pointerEvents: 'box-only',
-    marginBottom: 15,
-    borderRadius: 10,
+    marginBottom: 25,
+    borderRadius: 15,
     borderWidth: 1,
-    paddingHorizontal: 10,
-    fontSize: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    fontSize: 20,
     textAlign: 'center',
     width: '100%',
-    maxWidth: 400
+    maxWidth: 300
   },
   inputPassword: {
-    pointerEvents: 'box-only',
-    marginBottom: 15,
-    borderRadius: 10,
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    fontSize: 26,
-    textAlign: 'center',
+    paddingVertical: 8,
+    marginBottom: 18
+  },
+  inputErrorMessage: {
+    color: '#ff3737',
+    height: 20
+  },
+  button: {
+    borderRadius: 15,
+    paddingVertical: 11,
+    paddingHorizontal: 25,
     width: '100%',
-    maxWidth: 400
+    maxWidth: 300
+  },
+  buttonText: {
+    fontWeight: '500',
+    fontSize: 18,
+    textAlign: 'center'
+  },
+  bottomActionContainer: {
+    position: 'absolute',
+    bottom: 0,
+    backgroundColor: 'transparent'
+  },
+  bottomActionTitle: {
+    fontSize: 16
+  },
+  bottomActionLink: {
+    fontSize: 14,
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+    marginTop: 6
   }
 });

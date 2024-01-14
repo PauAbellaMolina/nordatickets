@@ -22,7 +22,7 @@ export default {
   light: {
     // text: '#000000',
     text: '#202228',
-    // background: '#f2f2f2',
+    oppositeThemeText: '#FCFCFC',
     background: '#ffffff',
     backgroundHalfOpacity: '#ffffff40',
     // background: '#EFEFEF', //PAU info react default background color
@@ -38,6 +38,7 @@ export default {
   dark: {
     // text: '#ffffff',
     text: '#FCFCFC',
+    oppositeThemeText: '#202228',
     background: '#000000',
     backgroundHalfOpacity: '#00000040',
     backgroundContrast: '#1a1a1a',

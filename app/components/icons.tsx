@@ -12,14 +12,16 @@ export function FontAwesomeIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
   size: number;
+  opacity?: number;
 }) {
-  return <FontAwesome {...props} />;
+  return <FontAwesome {...props} style={{ opacity: props.opacity ?? 1 }} />;
 }
 
 export function FeatherIcon(props: {
   name: React.ComponentProps<typeof Feather>['name'];
   color: string;
   size: number;
+  opacity?: number;
 }) {
-  return <Feather {...props} />;
+  return <Feather {...props} style={{ opacity: props.opacity ?? 1 }} />;
 }

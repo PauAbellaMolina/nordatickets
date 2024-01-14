@@ -1,4 +1,4 @@
-import { Button, Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { sendEmailVerification, signOut } from 'firebase/auth';
 import { FIREBASE_AUTH, FIRESTORE_DB } from '../../firebaseConfig';
 import { useAuth } from '../../context/AuthProvider';
@@ -6,8 +6,10 @@ import { Text, View } from '../../components/Themed';
 import { useEffect, useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { FeatherIcon } from '../components/icons';
+import Colors from '../../constants/Colors';
 
 export default function TabThreeScreen() {
+  const theme = useColorScheme() ?? 'light';
   const { setUser, user } = useAuth();
   const [emailVerified, setEmailVerified] = useState<boolean>(FIREBASE_AUTH.currentUser?.emailVerified ?? false);
   const [resendCooldown, setResendCooldown] = useState<boolean>(false);
@@ -75,15 +77,15 @@ export default function TabThreeScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Perfil</Text>
       <View style={styles.wrapper}>
-        <View style={{backgroundColor: 'transparent', flexDirection: 'row'}}><Text>{user?.email}  ·  </Text><Text style={{color: emailVerified ? '#3fde7a' : '#ff3737'}}>{emailVerified ? 'Verificat' : 'No verificat'}</Text></View>
+        <View style={styles.singleLineContainer}><Text>{user?.email}  ·  </Text><Text style={{color: emailVerified ? '#3fde7a' : '#ff3737'}}>{emailVerified ? 'Verificat' : 'No verificat'}</Text></View>
         { !emailVerified ?
           <Pressable onPress={onResendVerificationEmail}><Text style={{color: resendCooldown ? '#007AFF80' : '#007AFF'}}>Reenviar correu de verificació</Text></Pressable>
         : null }
         { user && user.cardNumber ?
-          <View style={{backgroundColor: 'transparent', flexDirection: 'row'}}><Text>Tarjeta de crèdit guardada: {user.cardNumber.slice(9, user.cardNumber.length)}  ·  </Text><Pressable onPress={onDeleteUserCard}><Text style={{color: '#ff3737'}}>Eliminar</Text></Pressable></View>
+          <View style={styles.singleLineContainer}><Text>Tarjeta de crèdit guardada: {user.cardNumber.slice(9, user.cardNumber.length)}  ·  </Text><Pressable onPress={onDeleteUserCard}><Text style={{color: '#ff3737'}}>Eliminar</Text></Pressable></View>
         : null }
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-        <Pressable style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 5}} onPress={onLogOut}><FeatherIcon name="log-out" size={18} color={'#007aff'} /><Text style={{color: '#007aff', fontSize: 16}}>Tancar sessió</Text></Pressable>
+        <Pressable style={styles.logOutButton} onPress={onLogOut}><FeatherIcon name="log-out" size={18} color={Colors[theme].text} /><Text style={styles.logOutText}>Tancar sessió</Text></Pressable>
         {/* TODO PAU add terms & conditions link to page and get in contact/support email */}
       </View>
     </View>
@@ -113,5 +115,19 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     height: 1,
     width: '80%'
+  },
+  singleLineContainer: {
+    backgroundColor: 'transparent',
+    flexDirection: 'row'
+  },
+  logOutButton: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5
+  },
+  logOutText: {
+    textDecorationLine: 'underline',
+    fontSize: 16
   }
 });

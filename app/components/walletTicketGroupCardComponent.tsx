@@ -124,8 +124,8 @@ export default function WalletTicketGroupCardComponent(walletTicket: WalletTicke
           <View style={styles.eventHeaderContainer}>
             <Text style={[styles.eventName, {color: Colors['light'].text}]}>{event.name}</Text>
             <Pressable style={{flexDirection: 'row', gap: 5, alignItems: 'center'}} onPress={() => onRefreshEvent()}>
-              <FontAwesomeIcon name="refresh" size={12} color={refreshCooldown ? '#007AFF80' : '#007AFF'} />
-              <Text style={{color: refreshCooldown ? '#007AFF80' : '#007AFF', fontWeight: '600', fontSize: 12}}>Refresca</Text>
+              <FontAwesomeIcon name="refresh" size={12} color={Colors['light'].text} opacity={refreshCooldown ? .5 : 1} />
+              <Text style={{color: Colors['light'].text, textDecorationLine: 'underline', opacity: refreshCooldown ? .5 : 1, fontWeight: '600', fontSize: 12}}>Refresca</Text>
             </Pressable>
           </View>
           { refreshingEvent ?
