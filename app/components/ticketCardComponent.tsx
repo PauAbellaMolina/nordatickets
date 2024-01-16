@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, useColorScheme } from 'react-native';
-import { Ticket } from '../types';
+import { EventTicket } from '../types';
 import Colors from '../../constants/Colors';
 import { Text, View } from '../../components/Themed';
-import { FeatherIcon } from './icons';
+import { FeatherIcon, FontAwesomeIcon } from './icons';
 
 export interface TicketCardComponentProps {
   eventSelling: boolean,
   quantityInCart: number,
-  onRemoveTicket: (ticket: Ticket) => void,
-  onAddTicket: (ticket: Ticket) => void,
-  ticket: Ticket
+  onRemoveTicket: (ticket: EventTicket) => void,
+  onAddTicket: (ticket: EventTicket) => void,
+  ticket: EventTicket
 }
 
 export default function TicketCardComponent({ eventSelling, quantityInCart, onRemoveTicket, onAddTicket, ticket}: TicketCardComponentProps) {
@@ -40,16 +40,19 @@ export default function TicketCardComponent({ eventSelling, quantityInCart, onRe
   return (
     <View style={styles.ticketCard}>
       <View style={styles.ticketContents}>
-        <Text style={styles.eventTitle}>{ticket.name} · {ticket.price}€</Text>
+        <View style={{flexDirection: 'row', gap: 10}}>
+          <FontAwesomeIcon name="ticket" size={23} color={Colors[theme].text} />
+          <Text style={styles.eventTitle}>{ticket.name} · {ticket.price}€</Text>
+        </View>
         <View style={styles.ticketActions}>
           { eventSelling ? <>
             { ticket.selling ? <>
               <Pressable onPress={onRemove}>
-                <FeatherIcon name="minus-circle" size={30} color={Colors[theme].text} />
+                <FeatherIcon name="minus-circle" size={28} color={Colors[theme].text} />
               </Pressable>
               <Text style={styles.quantityInCart}>{quantityInCart}</Text>
               <Pressable onPress={onAdd}>
-                <FeatherIcon name="plus-circle" size={30} color={Colors[theme].text} />
+                <FeatherIcon name="plus-circle" size={28} color={Colors[theme].text} />
               </Pressable>
             </> :
               <Text style={styles.notAvailable}>No disponible</Text>

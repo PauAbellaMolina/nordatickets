@@ -32,8 +32,9 @@ export default {
     tabIconInactive: '#CDC2EE',
     tabIconActive: '#ffffff',
     tabIconActiveBackground: '#7958CE', // #57D8AB
-    cardContainerBackground: '#D4C5FD',
-    cardContainerBackgroundContrast: '#7761C4'
+    cartContainerBackground: '#D4C5FD',
+    cartContainerBackgroundContrast: '#7761C4',
+    cartContainerButtonBackground: '#613AC5'
   },
   dark: {
     // text: '#ffffff',
@@ -47,8 +48,9 @@ export default {
     tabIconInactive: '#CDC2EE',
     tabIconActive: '#ffffff',
     tabIconActiveBackground: '#7958CE', // #57D8AB
-    cardContainerBackground: '#251847',
-    cardContainerBackgroundContrast: '#CDC2EE'
+    cartContainerBackground: '#251847',
+    cartContainerBackgroundContrast: '#CDC2EE',
+    cartContainerButtonBackground: '#613AC5'
   },
   // eventCardBackgroundColorsArray: ['#C8F2CA', '#ABE1F4', '#EEF0A2', '#79D6F4', '#A9E8F3', '#F3F7BF', '#CEFDAC', '#CCF0F3', '#F4F9C0', '#D5F8F2', '#E2F5F0', '#FFF7CC']
   eventBackgroundColorsArray: {

@@ -294,13 +294,13 @@ export default function EventDetailScreen() {
                 />
               </View>
               { orderConfirmed ?
-                <Pressable style={[styles.orderConfirmedContainer, {backgroundColor: Colors[theme].cardContainerBackground}]} onPress={onGoToWallet}>
+                <Pressable style={[styles.orderConfirmedContainer, {backgroundColor: Colors[theme].cartContainerBackground}]} onPress={onGoToWallet}>
                   <FeatherIcon name="check-circle" size={40} color={Colors[theme].text} />
-                  <View style={{backgroundColor: 'transparent', flexDirection: 'row', alignItems: 'center', gap: 5}}><Text style={styles.orderConfirmedSubtitle}>Tickets added to your wallet</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
+                  <View style={styles.orderConfirmedTextContainer}><Text style={styles.orderConfirmedSubtitle}>Tickets afegits a la wallet</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
                 </Pressable>
               :
-                <View style={[styles.cartContainer, {backgroundColor: Colors[theme].cardContainerBackground}]}>
-                  <View style={{backgroundColor: 'transparent', flexDirection: 'row', alignItems: 'center', gap: 5}}><Text style={styles.subtitle}>Cart</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
+                <View style={[styles.cartContainer, {backgroundColor: Colors[theme].cartContainerBackground}]}>
+                  <View style={styles.cartTitleRowContainer}><Text style={styles.subtitle}>Cistella</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
                   { cart?.length ?
                     <>
                       <FlatList
@@ -311,26 +311,26 @@ export default function EventDetailScreen() {
                       />
                       { event.ticketFee ?
                         <View style={{backgroundColor: 'transparent', marginHorizontal: 8, flexDirection: 'row', alignItems: 'flex-end'}}>
-                          <Text style={[styles.transactionFeePrice, {color: Colors[theme].cardContainerBackgroundContrast}]}>+ {event.ticketFee * cardTotalQuantity / 100}€ </Text>
-                          <Text style={[styles.transactionFeeText, {color: Colors[theme].cardContainerBackgroundContrast}]}>transaction fee</Text>
+                          <Text style={[styles.transactionFeePrice, {color: Colors[theme].cartContainerBackgroundContrast}]}>+ {event.ticketFee * cardTotalQuantity / 100}€ </Text>
+                          <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>comissió de servei</Text>
                         </View>
                       : null }
                         { user && user.cardNumber ?
-                          <View style={{backgroundColor: 'transparent', marginHorizontal: 8, marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 5}}>
-                            <FeatherIcon name="info" size={15} color={Colors[theme].cardContainerBackgroundContrast} />
-                            <Text style={[styles.transactionFeeText, {color: Colors[theme].cardContainerBackgroundContrast}]}>Using {user.cardNumber.slice(-7)} credit card</Text>
+                          <View style={styles.usingCreditCardContainer}>
+                            <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
+                            <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>Utilitzant la tarjeta {user.cardNumber.slice(-7)}</Text>
                           </View>
                         : null }
-                      <Pressable style={styles.buyButton} onPress={onBuyCart}>
+                      <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground}]} onPress={onBuyCart}>
                       { loading ?
                         <ActivityIndicator style={{marginVertical: 1.5}} size="small" />
                       :
-                        <Text style={styles.buyButtonText}>{cardTotalPrice + (event?.ticketFee ? event.ticketFee * cardTotalQuantity / 100 : 0) + '€  ·   Buy now'}</Text>
+                        <Text style={styles.buyButtonText}>{cardTotalPrice + (event?.ticketFee ? event.ticketFee * cardTotalQuantity / 100 : 0) + '€  ·  Comprar'}</Text>
                       }
                       </Pressable>
                     </>
                   :
-                    <Text style={[styles.emptyCard, {color: Colors[theme].cardContainerBackgroundContrast}]}>No tickets added to cart</Text>
+                    <Text style={[styles.emptyCard, {color: Colors[theme].cartContainerBackgroundContrast}]}>No hi ha tickets a la cistella</Text>
                   }
                 </View>
               }
@@ -435,6 +435,12 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 10
   },
+  orderConfirmedTextContainer: {
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5
+  },
   orderConfirmedSubtitle: {
     fontSize: 20,
     fontWeight: '800'
@@ -458,10 +464,10 @@ const styles = StyleSheet.create({
     elevation: 10
   },
   cartTitleRowContainer: {
+    backgroundColor: 'transparent',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'transparent'
+    gap: 5
   },
   cartList: {
     marginVertical: 8,
@@ -469,6 +475,14 @@ const styles = StyleSheet.create({
   },
   cartItemsList: {
     fontSize: 18
+  },
+  usingCreditCardContainer: {
+    backgroundColor: 'transparent',
+    marginHorizontal: 8,
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5
   },
   transactionFeePrice: {
     fontSize: 16
@@ -479,7 +493,6 @@ const styles = StyleSheet.create({
   buyButton: {
     width: '100%',
     marginTop: 10,
-    backgroundColor: '#613AC5',
     paddingVertical: 10,
     borderRadius: 10
   },
