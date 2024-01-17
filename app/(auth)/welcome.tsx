@@ -2,6 +2,8 @@ import { StyleSheet, useColorScheme, Pressable } from "react-native";
 import { router } from "expo-router";
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
+import TiktDark from '../../assets/svgs/tiktdark.svg';
+import TiktLight from '../../assets/svgs/tiktlight.svg';
 
 export default function Welcome() {
   const theme = useColorScheme() ?? 'light';
@@ -15,7 +17,8 @@ export default function Welcome() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>ElsTeusTickets</Text>
+      {/* <Text style={styles.title}>ElsTeusTickets</Text> */}
+      { theme === 'dark' ? <TiktDark width={175} height={175} /> : <TiktLight width={175} height={175} /> }
       <View style={styles.buttonsContainer}>
         <Pressable onPress={onGoToSignUp} style={[styles.button, {backgroundColor: Colors[theme].text}]}>
           <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>Crear compte</Text>

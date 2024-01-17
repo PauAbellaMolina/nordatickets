@@ -6,6 +6,16 @@ const defaultConfig = getDefaultConfig(__dirname, {
   // [Web-only]: Enables CSS support in Metro.
   isCSSEnabled: true,  
 });
+const { transformer, resolver } = defaultConfig;
 defaultConfig.resolver.sourceExts.push('cjs');
+defaultConfig.transformer = {
+  ...transformer,
+  babelTransformerPath: require.resolve("react-native-svg-transformer")
+};
+defaultConfig.resolver = {
+  ...resolver,
+  assetExts: resolver.assetExts.filter((ext) => ext !== "svg"),
+  sourceExts: [...resolver.sourceExts, "svg"]
+};
 
 module.exports = defaultConfig;
