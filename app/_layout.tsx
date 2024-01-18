@@ -52,7 +52,7 @@ function RootLayoutNav() {
         <WalletProvider>
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)/welcome" options={{ title: 'ElsTeusTickets', headerShown: false }} />
+            <Stack.Screen name="(auth)/welcome" options={{ title: 'ElTeuTikt', headerShown: false }} />
             <Stack.Screen name="(auth)/login" options={{ title: 'Log In', headerShown: false }} />
             <Stack.Screen name="(auth)/signup" options={{ title: 'Sign Up', headerShown: false }} />
             <Stack.Screen name="(screens)/loadingApp" options={{ headerShown: false }} />

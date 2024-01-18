@@ -42,10 +42,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     gap: 20
   },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold'
-  },
+  // title: {
+  //   fontSize: 30,
+  //   fontWeight: 'bold'
+  // },
   buttonsContainer: {
     backgroundColor: 'transparent',
     width: '100%',
