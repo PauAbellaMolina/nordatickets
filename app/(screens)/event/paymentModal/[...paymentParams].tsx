@@ -3,8 +3,8 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { View } from '../../../../components/Themed';
-import GoBackArrow from '../../../components/goBackArrow';
-import { FeatherIcon } from '../../../components/icons';
+import GoBackArrow from '../../../../components/GoBackArrow';
+import { FeatherIcon } from '../../../../components/CustomIcons';
 import Colors from '../../../../constants/Colors';
 
 export default function PaymentModalScreen() {

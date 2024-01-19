@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthProvider';
 import { Text, View } from '../../components/Themed';
 import { useEffect, useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
-import { FeatherIcon } from '../components/icons';
+import { FeatherIcon } from '../../components/CustomIcons';
 import Colors from '../../constants/Colors';
 
 export default function TabThreeScreen() {

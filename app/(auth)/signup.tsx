@@ -5,7 +5,6 @@ import { router } from "expo-router";
 import { FIREBASE_AUTH } from '../../firebaseConfig';
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
-import { FeatherIcon } from "../components/icons";
 
 export default function Signup() {
   const theme = useColorScheme() ?? 'light';

@@ -2,7 +2,7 @@ import { useState } from "react";
 import React, { createContext, useContext, useEffect } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { FIRESTORE_DB } from "../firebaseConfig";
-import { Cart, WalletTicketGroups } from "../app/types";
+import { Cart, WalletTicketGroups } from "../types";
 import { useAuth } from "./AuthProvider";
 
 type WalletContextType = {

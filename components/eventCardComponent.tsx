@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router } from 'expo-router';
 import { Event } from '../types';
-import Colors from '../../constants/Colors';
-import { Text, View } from '../../components/Themed';
-import { FeatherIcon } from './icons';
+import Colors from '../constants/Colors';
+import { Text, View } from './Themed';
+import { FeatherIcon } from './CustomIcons';
 
 export default function EventCardComponent(event: Event ) {
   const theme = useColorScheme() ?? 'light';

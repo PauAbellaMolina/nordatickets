@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useSegments, useRouter } from "expo-router";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { FIREBASE_AUTH, FIRESTORE_DB } from "../firebaseConfig";
-import { User } from "../app/types";
+import { User } from "../types";
 
 type AuthType = {
   user: User | null;

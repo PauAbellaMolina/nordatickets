@@ -1,6 +1,6 @@
 import { Platform, View, StyleSheet, Pressable } from "react-native";
-import { FeatherIcon } from "./icons";
-import Colors from '../../constants/Colors';
+import { FeatherIcon } from "./CustomIcons";
+import Colors from '../constants/Colors';
 import { router } from "expo-router";
 
 export default function GoBackArrow() {

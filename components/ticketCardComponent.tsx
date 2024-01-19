@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { EventTicket } from '../types';
-import Colors from '../../constants/Colors';
-import { Text, View } from '../../components/Themed';
-import { FeatherIcon, FontAwesomeIcon } from './icons';
+import Colors from '../constants/Colors';
+import { Text, View } from './Themed';
+import { FeatherIcon, FontAwesomeIcon } from './CustomIcons';
 
 export interface TicketCardComponentProps {
   eventSelling: boolean,

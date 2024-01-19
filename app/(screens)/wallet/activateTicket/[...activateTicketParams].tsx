@@ -8,7 +8,7 @@ import { useAuth } from '../../../../context/AuthProvider';
 import { useWallet } from '../../../../context/WalletProvider';
 import Colors from '../../../../constants/Colors';
 import { Text, View } from '../../../../components/Themed';
-import { FeatherIcon } from '../../../components/icons';
+import { FeatherIcon } from '../../../../components/CustomIcons';
 
 export default function ActivateTicketScreen() {
   const theme = useColorScheme() ?? 'light';

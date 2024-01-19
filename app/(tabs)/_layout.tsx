@@ -1,7 +1,7 @@
 import { useColorScheme } from 'react-native';
 import { Tabs } from 'expo-router';
 import Colors from '../../constants/Colors';
-import TabBarIcon from '../components/icons';
+import TabBarIcon from '../../components/CustomIcons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();

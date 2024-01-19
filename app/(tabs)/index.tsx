@@ -3,10 +3,10 @@ import { ActivityIndicator, Alert, FlatList, Platform, Pressable, StyleSheet, Te
 import { collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { FIRESTORE_DB } from '../../firebaseConfig';
 import { useAuth } from '../../context/AuthProvider';
-import { Event } from '../types';
+import { Event } from '../../types';
 import { Text, View } from '../../components/Themed';
-import EventCardComponent from '../components/eventCardComponent';
-import { FeatherIcon } from '../components/icons';
+import EventCardComponent from '../../components/EventCardComponent';
+import { FeatherIcon } from '../../components/CustomIcons';
 import Colors from '../../constants/Colors';
 
 export default function TabOneScreen() {

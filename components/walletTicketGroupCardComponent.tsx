@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router } from 'expo-router';
 import {  doc, getDoc } from 'firebase/firestore';
-import { FIRESTORE_DB } from '../../firebaseConfig';
+import { FIRESTORE_DB } from '../firebaseConfig';
 import { Event, WalletTicket, WalletTicketGroup } from '../types';
-import Colors from '../../constants/Colors';
-import { Text, View } from '../../components/Themed';
-import { FontAwesomeIcon } from './icons';
+import Colors from '../constants/Colors';
+import { Text, View } from './Themed';
+import { FontAwesomeIcon } from './CustomIcons';
 
 export default function WalletTicketGroupCardComponent(walletTicket: WalletTicketGroup) {
   const theme = useColorScheme() ?? 'light';
