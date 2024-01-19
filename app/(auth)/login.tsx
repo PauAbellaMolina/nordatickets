@@ -1,88 +1,33 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, TextInput, useColorScheme, ActivityIndicator, Pressable, Platform, Alert } from "react-native";
-import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
+import { StyleSheet, TextInput, useColorScheme, ActivityIndicator, Pressable } from "react-native";
 import { router } from "expo-router";
-import { FIREBASE_AUTH } from '../../firebaseConfig';
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
+import { useSupabase } from "../../context/SupabaseProvider";
 
 export default function Login() {
   const theme = useColorScheme() ?? 'light';
 
+  const { signInWithLink } = useSupabase();
+
   const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [passwordErrorMessage, setPasswordErrorMessage] = useState<string | undefined>(undefined);
+  const [emailErrorMessage, setEmailErrorMessage] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (passwordErrorMessage !== undefined) {
-      setPasswordErrorMessage(undefined);
+    if (emailErrorMessage !== undefined) {
+      setEmailErrorMessage(undefined);
     }
-  }, [email, password]);
+  }, [email]);
 
   const onEmailLogIn = () => {
     setLoading(true);
-    signInWithEmailAndPassword(FIREBASE_AUTH, email, password)
-    // .then((result: UserCredential) => {
-    //   console.log('PAU LOG-> result: ', result);
-    // })
-    .catch((err) => {
-      console.log('PAU LOG-> err login in: ', err);
-      // alert(err);
-      setLoading(false);
-      switch (err.code) {
-        case 'auth/invalid-email':
-          setPasswordErrorMessage('Correu electrònic invàlid');
-          break;
-        case 'auth/invalid-login-credentials':
-          setPasswordErrorMessage('Correu o contrasenya incorrectes');
-          break;
-        default:
-          setPasswordErrorMessage('Torna-ho a intentar');
-          break;
-      }
-    });
-  }
-
-  const onForgotPassword = async () => {
-    if (Platform.OS === 'web') {
-      if (!window.confirm("Correu de restabliment de la contrasenya: " + email + " \nEnviar correu?")) {
-        return;
-      }
-    } else {
-      const AsyncAlert = async () => new Promise<boolean>((resolve) => {
-        Alert.prompt(
-          "Restablir contrasenya",
-          "Correu de restabliment de la contrasenya: " + email + " Enviar correu?",
-          [
-            {
-              text: "No",
-              onPress: () => {
-                resolve(true);
-              },
-              style: "cancel"
-            },
-            {
-              text: "Sí, enviar",
-              onPress: () => {
-                resolve(false);
-              }
-            }
-          ],
-          "default"
-        );
-      });
-      if (await AsyncAlert()) {
-        return;
-      };
-    }
-
-    sendPasswordResetEmail(FIREBASE_AUTH, email)
-    .then(() => {
-      alert('Correu enviat, segueix les instruccions per restablir la contrasenya.');
+    signInWithLink(email)
+    .catch(() => {
+      setEmailErrorMessage('Torna-ho a intentar');
     })
-    .catch((err) => {
-      alert(err);
+    .finally(() => {
+      setLoading(false);
     });
   }
 
@@ -95,41 +40,26 @@ export default function Login() {
       <Text style={styles.title}>Iniciar sessió</Text>
       <View style={styles.inputContainer}>
         <TextInput
-          style={[styles.input, {color: Colors[theme].text, borderColor: passwordErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
+          style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
           textContentType="emailAddress"
           autoComplete="email"
           keyboardType={'email-address'}
           placeholder="Correu electrònic"
           onChangeText={setEmail}
         />
-        <TextInput
-          style={[styles.input, styles.inputPassword, {color: Colors[theme].text, borderColor: passwordErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
-          textContentType="password"
-          secureTextEntry={true}
-          autoComplete="password"
-          keyboardType={'visible-password'}
-          placeholder="Contrasenya"
-          onChangeText={setPassword}
-        />
-        <Text style={styles.inputErrorMessage}>{passwordErrorMessage}</Text>
+        <Text style={styles.inputErrorMessage}>{emailErrorMessage}</Text>
         <View style={{marginTop: 20, backgroundColor: 'transparent'}}>
           { loading ?
             <ActivityIndicator style={{marginTop: 12}} size="small" />
           : 
             <Pressable
-              disabled={!email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined}
+              disabled={!email.includes('@')}
               onPress={onEmailLogIn}
-              style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined ? 0.5 : 1}]}
+              style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') ? 0.5 : 1}]}
             >
               <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>Entrar</Text>
             </Pressable>
           }
-          { passwordErrorMessage === 'Correu o contrasenya incorrectes' ?
-            <View style={styles.forgotPasswordContainer}>
-              <Text style={styles.forgotPasswordTitle}>Has oblidat la contrasenya?</Text>
-              <Pressable onPress={onForgotPassword}><Text style={styles.forgotPasswordLink}>Restablir contrasenya</Text></Pressable>
-            </View> 
-          : null }
         </View>
       </View>
       <View style={styles.bottomActionContainer}>
@@ -172,26 +102,9 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 300
   },
-  inputPassword: {
-    paddingVertical: 8,
-    marginBottom: 18
-  },
   inputErrorMessage: {
     color: '#ff3737',
     height: 20
-  },
-  forgotPasswordContainer: {
-    marginTop: 40
-  },
-  forgotPasswordTitle: {
-    fontSize: 16,
-    textAlign: 'center'
-  },
-  forgotPasswordLink: {
-    fontSize: 14,
-    textDecorationLine: 'underline',
-    textAlign: 'center',
-    marginTop: 6
   },
   button: {
     borderRadius: 15,

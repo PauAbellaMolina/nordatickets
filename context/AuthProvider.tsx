@@ -32,7 +32,7 @@ function useProtectedRoute(loaded: boolean, user: any) {
         router.replace("/");
       }
     } else {
-      router.replace("/loadingApp");
+      router.replace("/loadingApp"); //TODO PAU IMPORTANT i discovered (dumb i didnt see it sooner) that this prevents you to go into .com/something and is what makes you get redirected to the loading screen and / later. If we don't use this, I can implement the follow events using qr!!!!
     }
   }, [loaded, user, segments]);
 }

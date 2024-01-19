@@ -7,9 +7,13 @@ import { useEffect, useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { FeatherIcon } from '../../components/CustomIcons';
 import Colors from '../../constants/Colors';
+import { useSupabase } from '../../context/SupabaseProvider';
 
 export default function TabThreeScreen() {
   const theme = useColorScheme() ?? 'light';
+
+  const { signOut } = useSupabase();
+
   const { setUser, user } = useAuth();
   const [emailVerified, setEmailVerified] = useState<boolean>(FIREBASE_AUTH.currentUser?.emailVerified ?? false);
   const [resendCooldown, setResendCooldown] = useState<boolean>(false);
@@ -28,11 +32,7 @@ export default function TabThreeScreen() {
   }, []);
 
   const onLogOut = () => {
-    signOut(FIREBASE_AUTH).then(() => {
-      setUser(null);
-    }).catch((err: any) => {
-      console.log('PAU LOG-> error: ', err);
-    });
+    signOut();
   };
 
   const onResendVerificationEmail = () => {

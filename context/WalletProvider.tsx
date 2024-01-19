@@ -46,7 +46,7 @@ export function WalletProvider({ children }: { children: JSX.Element }): JSX.Ele
       updateDoc(userDocRef, {
         walletTicketGroups: walletTicketGroups
       }).then(() => {
-        setUser({
+        setUser({ //TODO PAU doesnt this cause an unnecessary kinda loop? like calling useEffent above which triggers this useEffect which triggers the useEffect, which wont continue becuase user.walletTicketGroups === walletTicketGroups, but still, it's a bit weird
           ...user,
           walletTicketGroups: walletTicketGroups
         });

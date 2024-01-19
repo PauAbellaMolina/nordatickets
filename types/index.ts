@@ -61,7 +61,7 @@ export type WalletTicket = {
   price?: number;
   selling?: boolean;
   orderId?: string;
-  orderStatus?: string;
+  orderStatus?: string; //TODO PAU remove and look at redsys_orders orderId order to know if it's paid or not
   // activable?: boolean; //for the future, definetly not needed for the MVP
 };
 

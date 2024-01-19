@@ -1,35 +1,18 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, TextInput, useColorScheme, ActivityIndicator, Pressable } from "react-native";
-import { UserCredential, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { router } from "expo-router";
-import { FIREBASE_AUTH } from '../../firebaseConfig';
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
+import { useSupabase } from "../../context/SupabaseProvider";
 
 export default function Signup() {
   const theme = useColorScheme() ?? 'light';
 
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [passwordRepeated, setPasswordRepeated] = useState<string>('');
-  const [emailErrorMessage, setEmailErrorMessage] = useState<string | undefined>(undefined);
-  const [passwordErrorMessage, setPasswordErrorMessage] = useState<string | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
+  const { signInWithLink } = useSupabase();
 
-  useEffect(() => {
-    if (emailErrorMessage !== undefined) {
-      setEmailErrorMessage(undefined);
-    }
-    if (password.length > 0 && password.length < 8) {
-      setPasswordErrorMessage('Password must be at least 8 characters long');
-    }
-    else if (password.length > 0 && password !== passwordRepeated) {
-      setPasswordErrorMessage('Passwords do not match');
-    }
-    else {
-      setPasswordErrorMessage(undefined);
-    }
-  }, [password, passwordRepeated]);
+  const [email, setEmail] = useState<string>('');
+  const [emailErrorMessage, setEmailErrorMessage] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
   
   useEffect(() => {
     if (emailErrorMessage !== undefined) {
@@ -39,16 +22,11 @@ export default function Signup() {
 
   const onEmailSignUp = () => {
     setLoading(true);
-    createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
-    .then((result: UserCredential) => {
-      const user = result.user;
-      sendEmailVerification(user)
-      .catch((err) => {
-        alert(err);
-      });
+    signInWithLink(email)
+    .catch(() => {
+      setEmailErrorMessage('Torna-ho a intentar');
     })
-    .catch((err) => {
-      setEmailErrorMessage('Credencials invàlides, torna-ho a intentar');
+    .finally(() => {
       setLoading(false);
     });
   }
@@ -69,33 +47,15 @@ export default function Signup() {
           placeholder="Correu electrònic"
           onChangeText={setEmail}
         />
-        <TextInput
-          style={[styles.input, styles.inputPassword, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined && passwordErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
-          textContentType="password"
-          secureTextEntry={true}
-          autoComplete="password"
-          keyboardType={'visible-password'}
-          placeholder="Contrasenya"
-          onChangeText={setPassword}
-        />
-        <TextInput
-          style={[styles.input, styles.inputPassword, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined && passwordErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
-          textContentType="password"
-          secureTextEntry={true}
-          autoComplete="password"
-          keyboardType={'visible-password'}
-          placeholder="Repetir contrasenya"
-          onChangeText={setPasswordRepeated}
-        />
-        <Text style={styles.inputErrorMessage}>{emailErrorMessage}{passwordErrorMessage}</Text>
+        <Text style={styles.inputErrorMessage}>{emailErrorMessage}</Text>
         <View style={{marginTop: 20, backgroundColor: 'transparent'}}>
           { loading ?
             <ActivityIndicator style={{marginTop: 12}} size="small" />
           :
             <Pressable
-              disabled={!email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined}
+              disabled={!email.includes('@')}
               onPress={onEmailSignUp}
-              style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined ? 0.5 : 1}]}
+              style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') ? 0.5 : 1}]}
             >
               <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>Registra'm</Text>
             </Pressable>
@@ -141,10 +101,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: '100%',
     maxWidth: 300
-  },
-  inputPassword: {
-    paddingVertical: 8,
-    marginBottom: 18
   },
   inputErrorMessage: {
     color: '#ff3737',
