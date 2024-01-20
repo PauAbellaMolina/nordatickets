@@ -56,16 +56,21 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session ? session.user : null)
-      setInitialized(true)
-    });
-
     const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
       setUser(session ? session.user : null);
       setInitialized(true);
+
+      //if user not in db users table (not auth.users!) then insert it
+      if (event === "SIGNED_IN" && session && session.user) {
+        supabase.from('users').select().eq('id', session.user.id)
+        .then(({ data: users, error }) => {
+          if (error || users.length > 0) return;
+          supabase.from('users').insert({
+            id: session.user.id
+          });
+        });
+      }
     });
     return () => {
       data.subscription.unsubscribe();
@@ -77,9 +82,11 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 
     if (!session && segments !== "(auth)") {
       router.replace("/welcome");
-    } else if (session && segments !== "(app)") {
-      // router.replace("/"); //TODO PAU this should be commented out so that we can go to /something (/event/:id) and not be redirected to / (tab 1 index)
     }
+    //this should be commented out so that we can go to /something (/event/:id) and not be redirected to / (tab 1 index)
+    // else if (session && segments !== "(app)") {
+    //   router.replace("/");
+    // }
   }, [initialized, session, segments]);
 
   return (

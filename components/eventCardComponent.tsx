@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router } from 'expo-router';
-import { Event } from '../types';
+import { Event } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { FeatherIcon } from './CustomIcons';
 
-export default function EventCardComponent(event: Event ) {
+export default function EventCardComponent(event: Event) {
   const theme = useColorScheme() ?? 'light';
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
 
@@ -27,7 +27,6 @@ export default function EventCardComponent(event: Event ) {
   return (
     <Pressable onPress={goToEventDetail}>
       <View style={[styles.eventCard, {backgroundColor: eventBackgroundColor}]}>
-        {/* <View style={styles.roundedSquare} /> */}
         <View style={styles.eventInfoContainer}>
           <Text style={[styles.eventTitle, {color: Colors['light'].text}]}>{event.name}</Text>
           <Text ellipsizeMode='tail' numberOfLines={6} style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}</Text>
@@ -60,12 +59,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.10,
     shadowRadius: 1.5,
     elevation: 10
-  },
-  roundedSquare: {
-    backgroundColor: '#ff7f50',
-    borderRadius: 10,
-    width: 90,
-    height: 90
   },
   eventInfoContainer: {
     width: '84%',
