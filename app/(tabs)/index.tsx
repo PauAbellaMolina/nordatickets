@@ -15,7 +15,7 @@ export default function TabOneScreen() {
     if (!user) return;
     supabase.from('users').select().eq('id', user?.id)
     .then(({ data: users, error }) => {
-      if (error) return;
+      if (error || !users.length) return;
       const userEventIdsFollowing = users[0].event_ids_following;
       setUserEventIdsFollowing(userEventIdsFollowing);
       supabase.from('events').select().in('id', userEventIdsFollowing)

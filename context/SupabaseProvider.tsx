@@ -96,7 +96,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
         session,
         initialized,
         signInWithLink,
-        signOut,
+        signOut
       }}
     >
       {children}
