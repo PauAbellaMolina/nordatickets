@@ -182,6 +182,7 @@ export interface Database {
       wallet_tickets: {
         Row: {
           created_at: string
+          event_id: number | null
           event_tickets_id: number | null
           id: number
           order_id: string | null
@@ -191,6 +192,7 @@ export interface Database {
         }
         Insert: {
           created_at?: string
+          event_id?: number | null
           event_tickets_id?: number | null
           id?: number
           order_id?: string | null
@@ -200,6 +202,7 @@ export interface Database {
         }
         Update: {
           created_at?: string
+          event_id?: number | null
           event_tickets_id?: number | null
           id?: number
           order_id?: string | null
@@ -208,6 +211,13 @@ export interface Database {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "wallet_tickets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "wallet_tickets_event_tickets_id_fkey"
             columns: ["event_tickets_id"]

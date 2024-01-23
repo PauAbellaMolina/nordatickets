@@ -1,41 +1,48 @@
 import { FlatList, StyleSheet } from 'react-native';
-import { useWallet } from '../../context/WalletProvider';
+// import { useWallet } from '../../context/WalletProvider';
 import { Text, View } from '../../components/Themed';
-import WalletTicketGroupCardComponent from '../../components/walletTicketGroupCardComponent';
-import { useEffect } from 'react';
+import EventWalletTicketsCardComponent from '../../components/EventWalletTicketsCardComponent';
+import { useEffect, useState } from 'react';
 import { supabase } from "../../supabase";
 import { useSupabase } from '../../context/SupabaseProvider';
+import { WalletTickets } from '../../types/supabaseplain';
 
 export default function TabTwoScreen() {
-  const { walletTicketGroups } = useWallet();
+  // const { walletTicketGroups } = useWallet();
   const { user } = useSupabase();
+
+  const [eventGroupedWalletTickets, setEventGroupedWalletTickets] = useState<WalletTickets[][]>([]);
 
   useEffect(() => {
     if (!user) return;
-    supabase.from('wallet_tickets').select().eq('user_id', user?.id)
+    supabase.from('wallet_tickets').select().eq('user_id', user.id).eq('used', false) //TODO PAU make this realtime so that when a ticket is used it disappears from wallet (the bug on EventWalletTicketsCardComponent is accomplishing this fyi). and also probably to make tickets appear when order status is succeeded.
     .then(({ data: wallet_tickets, error }) => {
       if (error) return;
-      console.log("tab 2: ", wallet_tickets);
-      // const userEventIdsFollowing = users[0].event_ids_following;
-      // setUserEventIdsFollowing(userEventIdsFollowing);
-      // supabase.from('events').select().in('id', userEventIdsFollowing)
-      // .then(({ data: events, error }) => {
-      //   if (error) return;
-      //   setEvents(events);
-      // });
+      const eventGroupedWalletTickets: WalletTickets[][] = 
+      Object.values(
+        wallet_tickets.reduce((groups, ticket) => {
+          const { event_id } = ticket;
+          if (!groups[event_id]) {
+            groups[event_id] = [];
+          }
+          groups[event_id].push(ticket);
+          return groups;
+        }, {})
+      );
+      setEventGroupedWalletTickets(eventGroupedWalletTickets);
     });
-  }, []);
+  }, [user]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Wallet</Text>
       <View style={styles.ticketsContainer}>
         <Text style={styles.ticketsTitle}>Tickets</Text>
-        { walletTicketGroups?.length ?
+        { eventGroupedWalletTickets?.length ?
           <FlatList
             style={styles.walletTicketList}
-            data={walletTicketGroups}
-            renderItem={({ item }) => <WalletTicketGroupCardComponent {...item} />}
+            data={eventGroupedWalletTickets}
+            renderItem={({ item }) => <EventWalletTicketsCardComponent {...item} />}
             ItemSeparatorComponent={() => <View style={{height: 10}} />}
           />
         :
