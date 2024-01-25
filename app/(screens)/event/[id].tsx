@@ -4,26 +4,34 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { FIREBASE_AUTH, FIREBASE_CF, FIRESTORE_DB } from '../../../firebaseConfig';
 import { firestoreAutoId } from '../../../utils/firestoreAutoId';
-import { Event, EventTicket, WalletTicket, WalletTicketGroup, WalletTicketGroups } from '../../../types';
+import { WalletTicketGroup, WalletTicketGroups } from '../../../types';
 import { useAuth } from '../../../context/AuthProvider';
 import { useWallet } from '../../../context/WalletProvider';
 import { Text, View } from '../../../components/Themed';
-import TicketCardComponent from '../../../components/ticketCardComponent';
+import EventTicketCardComponent from '../../../components/EventTicketCardComponent';
 import Colors from '../../../constants/Colors';
 import { FeatherIcon } from '../../../components/CustomIcons';
 import { httpsCallable } from 'firebase/functions';
-import GoBackArrow from '../../../components/goBackArrow';
+import GoBackArrow from '../../../components/GoBackArrow';
+import { supabase } from "../../../supabase";
+import { Event, WalletTicket, EventTicket } from '../../../types/supabaseplain';
+import { useSupabase } from '../../../context/SupabaseProvider';
 
 export default function EventDetailScreen() {
   const theme = useColorScheme() ?? 'light';
   const { id } = useLocalSearchParams();
-  const { cart, setCart, walletTicketGroups, setWalletTicketGroups } = useWallet();
-  const { user, setUser } = useAuth();
+  // const { cart, setCart, walletTicketGroups, setWalletTicketGroups } = useWallet();
+  // const { user, setUser } = useAuth();
+  const { user } = useSupabase();
+  const [cardNumber, setCardNumber] = useState<string>();
+  const [redsysToken, setRedsysToken] = useState<string>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
   const [eventBackgroundColorIndex, setEventBackgroundColorIndex] = useState<number>(0);
   const [event, setEvent] = useState<Event>();
-  const [cardTotalPrice, setCardTotalPrice] = useState<number>(0);
-  const [cardTotalQuantity, setCardTotalQuantity] = useState<number>(0);
+  const [eventTickets, setEventTickets] = useState<EventTicket[]>();
+  const [cart, setCart] = useState<{ eventTicket: EventTicket, quantity: number }[]>();//TODO PAU update Cart type
+  const [cartTotalPrice, setCartTotalPrice] = useState<number>(0);
+  const [cartTotalQuantity, setCartTotalQuantity] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [emailVerified, setEmailVerified] = useState<boolean>(FIREBASE_AUTH.currentUser?.emailVerified ?? false);
@@ -39,20 +47,32 @@ export default function EventDetailScreen() {
   useEffect(() => {
     setEventBackgroundColor(chooseRandomColor);
 
-    const eventDocRef = doc(FIRESTORE_DB, 'events', id as string);
-    getDoc(eventDocRef)
-    .then((doc) => {
-      if (!doc.exists()) {
-        console.log('No doc found with id: ', id);
-        return;
-      }
-      const docEvent = new Event(doc.data());
-      docEvent.id = doc.id;
-      setEvent(docEvent);
+    supabase.from('events').select().eq('id', id as string)
+    .then(({ data: events, error }) => {
+      if (error || !events.length) return;
+      setEvent(events[0]);
     });
 
     return () => setCart(null);
   }, []);
+
+  useEffect(() => {
+    supabase.from('event_tickets').select().eq('event_id', id as string)
+    .then(({ data: event_tickets, error }) => {
+      if (error || !event_tickets.length) return;
+      setEventTickets(event_tickets);
+    });
+  }, [event]);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('users').select().eq('id', user?.id)
+    .then(({ data: users, error }) => {
+      if (error || !users.length) return;
+      setCardNumber(users[0].card_number);
+      setRedsysToken(users[0].redsys_token);
+    });
+  }, [user]);
 
   // useEffect(() => { //PAU info this adds event to user's event following list. Idea is to make a qr to go to this page (event/id) and that will add it to user's event list. Latest Info: Deep linking on web should work for this feature to be implemented.
   //   if (!event || !user || user.eventIdsFollowing.includes(id as string)) {
@@ -71,14 +91,14 @@ export default function EventDetailScreen() {
 
   useEffect(() => {
     if (!cart) {
-      setCardTotalPrice(0);
-      setCardTotalQuantity(0);
+      setCartTotalPrice(0);
+      setCartTotalQuantity(0);
       return;
     }
-    const totalPrice = cart.reduce((acc, cartItem) => acc + cartItem.eventTicket.price * cartItem.quantity, 0);
-    setCardTotalPrice(totalPrice);
+    const totalPrice = cart.reduce((acc, cartItem) => acc + cartItem.eventTicket.price * cartItem.quantity, 0)/100;
+    setCartTotalPrice(totalPrice);
     const totalQuantity = cart.reduce((acc, cartItem) => acc + cartItem.quantity, 0);
-    setCardTotalQuantity(totalQuantity);
+    setCartTotalQuantity(totalQuantity);
   }, [cart]);
 
   const onAddTicketHandler = (ticket: EventTicket) => {
@@ -86,7 +106,7 @@ export default function EventDetailScreen() {
       setCart([{eventTicket: ticket, quantity: 1}]);
       return;
     }
-    const existingCartItem = cart.find((cartItem) => cartItem.eventTicket.eventTicketId === ticket.eventTicketId);
+    const existingCartItem = cart.find((cartItem) => cartItem.eventTicket.id === ticket.id);
     if (existingCartItem) {
       existingCartItem.quantity++;
       setCart([...cart]);
@@ -98,13 +118,13 @@ export default function EventDetailScreen() {
     if (!cart) {
       return;
     }
-    const existingCartItem = cart.find((cartItem) => cartItem.eventTicket.eventTicketId === ticket.eventTicketId);
+    const existingCartItem = cart.find((cartItem) => cartItem.eventTicket.id === ticket.id);
     if (!existingCartItem) {
       return;
     }
     existingCartItem.quantity--;
     if (existingCartItem.quantity === 0) {
-      const newCart = cart.filter((cartTicket) => cartTicket.eventTicket.eventTicketId !== ticket.eventTicketId);
+      const newCart = cart.filter((cartTicket) => cartTicket.eventTicket.id !== ticket.id);
       setCart(newCart);
     } else {
       setCart([...cart]);
@@ -112,65 +132,98 @@ export default function EventDetailScreen() {
   };
   
   const onBuyCart = () => {
-    if (loading || lastBuyAttempt && (new Date().getTime() - lastBuyAttempt.getTime()) < 20000) { //PAU info 20 seconds between buy attempts
-      return;
-    }
-    setLoading(true);
-    setLastBuyAttempt(new Date());
-    if (!emailVerified) {
-      FIREBASE_AUTH.currentUser?.reload()
-      .then(() => {
-        if (!FIREBASE_AUTH.currentUser?.emailVerified) {
-          if (Platform.OS === 'web') {
-            window.confirm('Email not verified. Please verify your email to continue');
-          } else {
-            Alert.alert('Email not verified', 'Please verify your email to continue');
-          }
-          setLoading(false);
-        } else {
-          setEmailVerified(true);
-          getPaymentFormInfo(); //Redsys
-          setTimeout(() => {
-            setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
-            setCart(null);
-            listenToUserChanges();
-          }, 5000);
-        }
-      });
-      return;
-    } else {
-      getPaymentFormInfo(); //Redsys
-      setTimeout(() => {
-        setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
-        setCart(null);
-        listenToUserChanges();
-      }, 5000);
-    }
+    getPaymentFormInfo();
+
+    // if (loading || lastBuyAttempt && (new Date().getTime() - lastBuyAttempt.getTime()) < 20000) { //PAU info 20 seconds between buy attempts
+    //   return;
+    // }
+    // setLoading(true);
+    // setLastBuyAttempt(new Date());
+    // if (!emailVerified) {
+    //   FIREBASE_AUTH.currentUser?.reload()
+    //   .then(() => {
+    //     if (!FIREBASE_AUTH.currentUser?.emailVerified) {
+    //       if (Platform.OS === 'web') {
+    //         window.confirm('Email not verified. Please verify your email to continue');
+    //       } else {
+    //         Alert.alert('Email not verified', 'Please verify your email to continue');
+    //       }
+    //       setLoading(false);
+    //     } else {
+    //       setEmailVerified(true);
+    //       getPaymentFormInfo(); //Redsys
+    //       setTimeout(() => {
+    //         setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
+    //         setCart(null);
+    //         listenToUserChanges();
+    //       }, 5000);
+    //     }
+    //   });
+    //   return;
+    // } else {
+    //   getPaymentFormInfo(); //Redsys
+    //   setTimeout(() => {
+    //     setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
+    //     setCart(null);
+    //     listenToUserChanges();
+    //   }, 5000);
+    // }
   };
 
   const getPaymentFormInfo = () => {
-    const finalAmount = cardTotalPrice + ((event?.ticketFee ? event.ticketFee * cardTotalQuantity : 0)/100); //PAU info (this is in euros (49.99));
+    //PAU for deving
+    const random3Numbers = Math.floor(Math.random() * 1000);
+    addPendingTicketsToUser(random3Numbers.toString());
 
-    const userRedsysToken = user?.redsysToken ? user.redsysToken : undefined;
+    // const finalAmount = cartTotalPrice + ((event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)/100); //PAU info (this is in euros (49.99));
+
+    // const userRedsysToken = user?.redsysToken ? user.redsysToken : undefined;
     
-    //PAU info old fetch way
-    // fetch('https://getforminfo-estcwhnvtq-ew.a.run.app', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify({
-    //     'totalAmount': finalAmount,
-    //     'userId': user?.id,
-    //     'userRedsysToken': userRedsysToken
-    //   })
+    // //PAU info old fetch way
+    // // fetch('https://getforminfo-estcwhnvtq-ew.a.run.app', {
+    // //   method: 'POST',
+    // //   headers: {
+    // //     'Content-Type': 'application/json'
+    // //   },
+    // //   body: JSON.stringify({
+    // //     'totalAmount': finalAmount,
+    // //     'userId': user?.id,
+    // //     'userRedsysToken': userRedsysToken
+    // //   })
+    // // })
+    // // .then((response) => response.json())
+    // // .then((data) => {
+    // //   console.log('PAU LOG-> getFormInfo response: ', data);
+    // //   if (!data) {
+    // //     return;
+    // //   }
+    // //   const formUrl = data.formUrl.replace(/\//g, '%2F');
+    // //   const Ds_MerchantParameters = data.Ds_MerchantParameters.replace(/\//g, '%2F');
+    // //   const Ds_Signature = data.Ds_Signature.replace(/\//g, '%2F');
+    // //   const Ds_SignatureVersion = data.Ds_SignatureVersion.replace(/\//g, '%2F');
+
+    // //   addPendingTicketsToUser(data.orderId);
+
+    // //   router.push(`/event/paymentModal/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
+    // //   setLoading(false);
+    // // })
+    // // .catch((err) => {
+    // //   console.log('PAU LOG-> getFormInfo error: ', err);
+    // //   setLoading(false);
+    // // });
+
+    // //PAU info new firebase cloud functions firebase sdk way
+    // const getFormInfoCF = httpsCallable(FIREBASE_CF, 'getFormInfo'); //TODO PAU to continue: refactor using supabase edge functions
+    // getFormInfoCF({
+    //   totalAmount: finalAmount,
+    //   userId: user?.id,
+    //   userRedsysToken: userRedsysToken
     // })
-    // .then((response) => response.json())
-    // .then((data) => {
-    //   console.log('PAU LOG-> getFormInfo response: ', data);
-    //   if (!data) {
+    // .then((result) => {
+    //   if (!result || !result.data) {
     //     return;
     //   }
+    //   const data = result.data as any;
     //   const formUrl = data.formUrl.replace(/\//g, '%2F');
     //   const Ds_MerchantParameters = data.Ds_MerchantParameters.replace(/\//g, '%2F');
     //   const Ds_Signature = data.Ds_Signature.replace(/\//g, '%2F');
@@ -178,91 +231,78 @@ export default function EventDetailScreen() {
 
     //   addPendingTicketsToUser(data.orderId);
 
-    //   router.push(`/event/paymentModal/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
+    //   router.push(`/event/paymentModal/${event?.id}/${eventBackgroundColorIndex}/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
     //   setLoading(false);
     // })
     // .catch((err) => {
-    //   console.log('PAU LOG-> getFormInfo error: ', err);
+    //   console.log('PAU LOG-> getFormInfoCF error: ', err?.code, err?.message, err?.details);
     //   setLoading(false);
     // });
-
-    //PAU info new firebase cloud functions firebase sdk way
-    const getFormInfoCF = httpsCallable(FIREBASE_CF, 'getFormInfo');
-    getFormInfoCF({
-      totalAmount: finalAmount,
-      userId: user?.id,
-      userRedsysToken: userRedsysToken
-    })
-    .then((result) => {
-      // console.log('PAU LOG-> getFormInfoCF result: ', result);
-      if (!result || !result.data) {
-        return;
-      }
-      const data = result.data as any;
-      const formUrl = data.formUrl.replace(/\//g, '%2F');
-      const Ds_MerchantParameters = data.Ds_MerchantParameters.replace(/\//g, '%2F');
-      const Ds_Signature = data.Ds_Signature.replace(/\//g, '%2F');
-      const Ds_SignatureVersion = data.Ds_SignatureVersion.replace(/\//g, '%2F');
-
-      addPendingTicketsToUser(data.orderId);
-
-      router.push(`/event/paymentModal/${event?.id}/${eventBackgroundColorIndex}/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.log('PAU LOG-> getFormInfoCF error: ', err?.code, err?.message, err?.details);
-      setLoading(false);
-    });
   }
 
-  const listenToUserChanges = () => {
+  const listenToUserChanges = () => { //TODO PAU this is useless with the new stuff i think
     if (!user) {
       return;
     }
-    const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
-    const userDocSubscription = onSnapshot(userDocRef, (doc) => {
-      if (!doc.exists()) {
-        return;
-      }
-      const docUser = doc.data();
-      if (docUser?.redsysToken && docUser?.cardNumber && docUser?.expiryDate && (docUser.redsysToken !== user?.redsysToken || docUser.cardNumber !== user?.cardNumber || docUser.expiryDate !== user?.expiryDate)) {
-        setUser({
-          ...user,
-          walletTicketGroups: docUser.walletTicketGroups,
-          redsysToken: docUser.redsysToken,
-          cardNumber: docUser.cardNumber,
-          expiryDate: docUser.expiryDate
-        });
-        userDocSubscription();
-      }
-    });
+    // const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
+    // const userDocSubscription = onSnapshot(userDocRef, (doc) => {
+    //   if (!doc.exists()) {
+    //     return;
+    //   }
+    //   const docUser = doc.data();
+    //   if (docUser?.redsysToken && docUser?.cardNumber && docUser?.expiryDate && (docUser.redsysToken !== user?.redsysToken || docUser.cardNumber !== user?.cardNumber || docUser.expiryDate !== user?.expiryDate)) {
+    //     setUser({
+    //       ...user,
+    //       walletTicketGroups: docUser.walletTicketGroups,
+    //       redsysToken: docUser.redsysToken,
+    //       cardNumber: docUser.cardNumber,
+    //       expiryDate: docUser.expiryDate
+    //     });
+    //     userDocSubscription();
+    //   }
+    // });
   };
 
   const addPendingTicketsToUser = (orderId: string) => {
-    if (!cart?.length || !cardTotalPrice || !event || !user) {
+    if (!cart?.length || !cartTotalPrice || !event || !user) {
       return;
     }
 
-    const newTickets: WalletTicket[] = [];
+    type NewWalletTicket = { //PAU maybe this is overkill type safety??
+      event_id: WalletTicket['event_id'];
+      event_tickets_id: WalletTicket['event_tickets_id'];
+      order_id: WalletTicket['order_id'];
+      price: WalletTicket['price'];
+      used: WalletTicket['used'];
+      user_id: WalletTicket['user_id'];
+    };
+
     cart.forEach((cartItem) => {
       for (let i = 0; i < cartItem.quantity; i++) {
-        const ticketToPush: WalletTicket = { id: firestoreAutoId(), eventTicketId: cartItem.eventTicket.eventTicketId, name: cartItem.eventTicket.name, price: cartItem.eventTicket.price, orderId: orderId };
-        newTickets.push(ticketToPush);
+        const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, order_id: orderId, price: cartItem.eventTicket.price, used: false, user_id: user.id };
+        supabase.from('wallet_tickets').insert(ticketToInsert).select()
+        .then(({ data: wallet_tickets, error }) => {
+          if (error) {
+            console.log('PAU LOG-> addPendingTicketsToUser error: ', error);
+            return;
+          }
+          console.log('PAU LOG-> addPendingTicketsToUser success: ', wallet_tickets);
+        });
       }
     });
 
-    const existingWalletTicketGroup = walletTicketGroups?.find((walletTicketGroup) => walletTicketGroup.eventId === event?.id);
-    if (existingWalletTicketGroup) {
-      existingWalletTicketGroup.walletTickets = [...existingWalletTicketGroup.walletTickets, ...newTickets];
-      setWalletTicketGroups([...walletTicketGroups ?? []]);
-    } else {
-      const newWalletTicketGroup: WalletTicketGroup = {
-        eventId: event?.id ?? '',
-        walletTickets: newTickets
-      };
-      const newWalletTicketGroups: WalletTicketGroups = [newWalletTicketGroup];
-      setWalletTicketGroups([...walletTicketGroups ?? [], ...newWalletTicketGroups]);
-    }
+    // const existingWalletTicketGroup = walletTicketGroups?.find((walletTicketGroup) => walletTicketGroup.eventId === event?.id);
+    // if (existingWalletTicketGroup) {
+    //   existingWalletTicketGroup.walletTickets = [...existingWalletTicketGroup.walletTickets, ...newTickets];
+    //   setWalletTicketGroups([...walletTicketGroups ?? []]);
+    // } else {
+    //   const newWalletTicketGroup: WalletTicketGroup = {
+    //     eventId: event?.id ?? '',
+    //     walletTickets: newTickets
+    //   };
+    //   const newWalletTicketGroups: WalletTicketGroups = [newWalletTicketGroup];
+    //   setWalletTicketGroups([...walletTicketGroups ?? [], ...newWalletTicketGroups]);
+    // }
   };
 
   const onGoToWallet = () => {
@@ -279,7 +319,7 @@ export default function EventDetailScreen() {
             <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
             <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}</Text>
           </View>
-          { event.eventTickets ?
+          { eventTickets ?
             <>
               <View style={styles.ticketsContainer}>
                 <View style={styles.sellingStatusContainer}>
@@ -289,8 +329,8 @@ export default function EventDetailScreen() {
                 <Text style={styles.subtitle}>Tickets:</Text>
                 <FlatList
                   style={styles.ticketsList}
-                  data={event.eventTickets}
-                  renderItem={({ item }) => <TicketCardComponent eventSelling={event.selling} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.eventTicketId === item.eventTicketId)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />}
+                  data={eventTickets}
+                  renderItem={({ item }) => <EventTicketCardComponent eventSelling={event.selling} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />}
                 />
               </View>
               { orderConfirmed ?
@@ -306,26 +346,26 @@ export default function EventDetailScreen() {
                       <FlatList
                         style={styles.cartList}
                         data={cart}
-                        renderItem={({ item }) => <Text style={styles.cartItemsList}>{item.quantity}  -  {item.eventTicket.name} · {item.eventTicket.price}€</Text>}
+                        renderItem={({ item }) => <Text style={styles.cartItemsList}>{item.quantity}  -  {item.eventTicket.name} · {item.eventTicket.price/100}€</Text>}
                         ItemSeparatorComponent={() => <View style={{backgroundColor: 'transparent', height: 3}} />}
                       />
-                      { event.ticketFee ?
+                      { event.ticket_fee ?
                         <View style={{backgroundColor: 'transparent', marginHorizontal: 8, flexDirection: 'row', alignItems: 'flex-end'}}>
-                          <Text style={[styles.transactionFeePrice, {color: Colors[theme].cartContainerBackgroundContrast}]}>+ {event.ticketFee * cardTotalQuantity / 100}€ </Text>
+                          <Text style={[styles.transactionFeePrice, {color: Colors[theme].cartContainerBackgroundContrast}]}>+ {event.ticket_fee * cartTotalQuantity / 100}€ </Text>
                           <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>comissió de servei</Text>
                         </View>
                       : null }
-                        { user && user.cardNumber ?
+                        { cardNumber ?
                           <View style={styles.usingCreditCardContainer}>
                             <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
-                            <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>Utilitzant la tarjeta {user.cardNumber.slice(-7)}</Text>
+                            <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>Utilitzant la tarjeta {cardNumber.slice(-7)}</Text>
                           </View>
                         : null }
                       <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground}]} onPress={onBuyCart}>
                       { loading ?
                         <ActivityIndicator style={{marginVertical: 1.5}} size="small" />
                       :
-                        <Text style={styles.buyButtonText}>{cardTotalPrice + (event?.ticketFee ? event.ticketFee * cardTotalQuantity / 100 : 0) + '€  ·  Comprar'}</Text>
+                        <Text style={styles.buyButtonText}>{cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity / 100 : 0) + '€  ·  Comprar'}</Text>
                       }
                       </Pressable>
                     </>

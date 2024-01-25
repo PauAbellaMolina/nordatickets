@@ -5,20 +5,20 @@ import EventWalletTicketsCardComponent from '../../components/EventWalletTickets
 import { useEffect, useState } from 'react';
 import { supabase } from "../../supabase";
 import { useSupabase } from '../../context/SupabaseProvider';
-import { WalletTickets } from '../../types/supabaseplain';
+import { WalletTicket } from '../../types/supabaseplain';
 
 export default function TabTwoScreen() {
   // const { walletTicketGroups } = useWallet();
   const { user } = useSupabase();
 
-  const [eventGroupedWalletTickets, setEventGroupedWalletTickets] = useState<WalletTickets[][]>([]);
+  const [eventGroupedWalletTickets, setEventGroupedWalletTickets] = useState<WalletTicket[][]>([]);
 
   useEffect(() => {
     if (!user) return;
     supabase.from('wallet_tickets').select().eq('user_id', user.id).eq('used', false) //TODO PAU make this realtime so that when a ticket is used it disappears from wallet (the bug on EventWalletTicketsCardComponent is accomplishing this fyi). and also probably to make tickets appear when order status is succeeded.
     .then(({ data: wallet_tickets, error }) => {
       if (error) return;
-      const eventGroupedWalletTickets: WalletTickets[][] = 
+      const eventGroupedWalletTickets: WalletTicket[][] = 
       Object.values(
         wallet_tickets.reduce((groups, ticket) => {
           const { event_id } = ticket;

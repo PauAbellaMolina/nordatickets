@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router } from 'expo-router';
-// import {  doc, getDoc } from 'firebase/firestore';
-// import { FIRESTORE_DB } from '../firebaseConfig';
-// import { WalletTicket, WalletTicketGroup } from '../types';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { FontAwesomeIcon } from './CustomIcons';
 import { supabase } from "../supabase";
-import { Event, WalletTickets } from '../types/supabaseplain';
+import { Event, WalletTicket } from '../types/supabaseplain';
 
-export default function EventWalletTicketsCardComponent(eventWalletTickets: WalletTickets[]) {
+export default function EventWalletTicketsCardComponent(eventWalletTickets: WalletTicket[]) {
   const theme = useColorScheme() ?? 'light';
   const [event, setEvent] = useState<Event>();
-  const [eventWalletTicketsArray] = useState<WalletTickets[]>(Object.values(eventWalletTickets));
+  const [eventWalletTicketsArray] = useState<WalletTicket[]>(Object.values(eventWalletTickets));
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
   // const [orderStatusAdded, setOrderStatusAdded] = useState<boolean>(false);
   // const [refreshCooldown, setRefreshCooldown] = useState<boolean>(false);
@@ -68,12 +65,12 @@ export default function EventWalletTicketsCardComponent(eventWalletTickets: Wall
     // }
   };
 
-  const SingleTicketComponent = (walletTicket: WalletTickets) => {
+  const SingleTicketComponent = (walletTicket: WalletTicket) => {
     const [eventTicketName, setEventTicketName] = useState<string>();
     const [eventTicketOrderStatus, setEventTicketOrderStatus] = useState<string>();
     const [eventTicketUsed, setEventTicketUsed] = useState<boolean>();
 
-    useEffect(() => { //TODO PAU This is called multiple times, even when navigating to another tab. Maybe its useful to have the latest used bool and order status, but it should be called only when rendering and not again when navigating to another tab.
+    useEffect(() => { //TODO PAU This is called multiple times, even when navigating to another tab. Maybe its useful to have the latest used bool and order status (since reads on supabase are free), but it should be called only when rendering and not again when navigating to another tab.
       if (!walletTicket) return;
       supabase.from('event_tickets').select().eq('id', walletTicket.event_tickets_id)
       .then(({ data: eventsTickets, error }) => {
@@ -98,7 +95,6 @@ export default function EventWalletTicketsCardComponent(eventWalletTickets: Wall
       if (eventTicketOrderStatus !== 'PAYMENT_SUCCEDED') {
         return;
       }
-      // router.push(`/wallet/activateTicket/${event?.id}/${event?.name}/${walletTicket.id}/${walletTicket.event_tickets_id}/${eventTicketName}/${walletTicket.price}/${walletTicket.order_id}/${event?.usedTicketBucketRef.id}`);
       router.push(`/wallet/activateTicket/${walletTicket.id}/${eventTicketName}/${walletTicket.event_id}`);
     };
   

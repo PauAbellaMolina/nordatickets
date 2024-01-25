@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Button, Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-// import { collection, doc, setDoc } from 'firebase/firestore';
-// import { FIRESTORE_DB } from '../../../../firebaseConfig';
-// import { useAuth } from '../../../../context/AuthProvider';
-// import { useWallet } from '../../../../context/WalletProvider';
 import Colors from '../../../../constants/Colors';
 import { Text, View } from '../../../../components/Themed';
 import { FeatherIcon } from '../../../../components/CustomIcons';
@@ -13,8 +9,6 @@ import { supabase } from "../../../../supabase";
 
 export default function ActivateTicketScreen() {
   const theme = useColorScheme() ?? 'light';
-  // const { user } = useAuth();
-  // const { walletTicketGroups, setWalletTicketGroups } = useWallet();
   const [loading, setLoading] = useState<boolean>(false);
   const [ticketActive, setTicketActive] = useState<boolean>(true);
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
@@ -24,14 +18,6 @@ export default function ActivateTicketScreen() {
   const ticketId = activateTicketParams[0];
   const ticketName = activateTicketParams[1];
   const eventId = activateTicketParams[2];
-  // const eventId = activateTicketParams[0];
-  // const eventName = activateTicketParams[1];
-  // const ticketUniqueId = activateTicketParams[2];
-  // const eventTicketId = activateTicketParams[3];
-  // const ticketName = activateTicketParams[4];
-  // const ticketPrice = activateTicketParams[5];
-  // const orderId = activateTicketParams[6];
-  // const usedTicketBucketId = activateTicketParams[7];
 
   const chooseRandomColor = (): string => {
     const colors = Colors.eventBackgroundColorsArray[theme]
@@ -57,7 +43,6 @@ export default function ActivateTicketScreen() {
   }, []);
 
   const deactivateTicket = async () => {
-    // if (!user || loading) {
     if (loading) {
       return;
     }
@@ -95,41 +80,12 @@ export default function ActivateTicketScreen() {
     }
 
     setLoading(true);
-    // supabase update walletTicket.id row to used = false
     supabase.from('wallet_tickets').update({ used: true }).eq('id', ticketId).select()
     .then(({ data: wallet_tickets, error }) => {
       if (error || !wallet_tickets.length) return;
       setTicketActive(!wallet_tickets[0].used);
       setLoading(false);
     });
-
-    // const ticketToDeactivate = {
-    //   id: ticketUniqueId,
-    //   eventTicketId: eventTicketId,
-    //   name: ticketName,
-    //   price: +ticketPrice,
-    //   userId: user.id,
-    //   orderId: orderId
-    // };
-
-    // const usedTicketBucketRef = doc(FIRESTORE_DB, 'usedTicketBuckets', usedTicketBucketId);
-    // const walletTicketsRef = collection(usedTicketBucketRef, 'walletTickets');
-    // setDoc(doc(walletTicketsRef, ticketUniqueId), ticketToDeactivate)
-    // .then(() => {
-    //   setTicketActive(false);
-    //   const existingWalletTicketGroup = walletTicketGroups?.find((walletTicketGroup) => walletTicketGroup.eventId === eventId);
-    //   if (existingWalletTicketGroup) {
-    //     existingWalletTicketGroup.walletTickets = existingWalletTicketGroup.walletTickets.filter((ticket) => ticket.id !== ticketToDeactivate.id);
-    //     if (existingWalletTicketGroup.walletTickets.length === 0) {
-    //       setWalletTicketGroups([]);
-    //     } else {
-    //       setWalletTicketGroups([...walletTicketGroups ?? []]);
-    //     }
-    //   }
-    // })
-    // .finally(() => {
-    //   setLoading(false);
-    // });
   };
   
   return (
