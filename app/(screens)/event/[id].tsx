@@ -175,6 +175,19 @@ export default function EventDetailScreen() {
     const random3Numbers = Math.floor(Math.random() * 1000);
     addPendingTicketsToUser(random3Numbers.toString());
 
+    supabase.functions.invoke('get-form-info', {
+      body: { name: 'Pau' },
+    }).then(({ data, error }) => {
+      if (error) {
+        console.log('PAU LOG-> getFormInfo error: ', error);
+        return;
+      }
+      console.log('PAU LOG-> getFormInfo success: ', data);
+    })
+    .catch((err) => {
+      console.log('PAU LOG-> getFormInfo catch error: ', err);
+    });
+
     // const finalAmount = cartTotalPrice + ((event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)/100); //PAU info (this is in euros (49.99));
 
     // const userRedsysToken = user?.redsysToken ? user.redsysToken : undefined;
