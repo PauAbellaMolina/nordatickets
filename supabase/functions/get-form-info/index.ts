@@ -1,5 +1,5 @@
 import { corsHeaders } from "../_shared/cors.ts";
-import { createClient } from "supabase-js"
+import { createClient } from "supabase-js";
 import {
   createRedsysAPI,
   TRANSACTION_TYPES,
@@ -7,21 +7,6 @@ import {
   SANDBOX_URLS,
   CURRENCIES
 } from "redsys-easy";
-
-const { createRedirectForm } = createRedsysAPI({
-  urls: SANDBOX_URLS,
-  secretKey: 'sq7HjrUOBfKmC576ILgskD5srU870gJ7'
-});
-const merchantInfo = {
-  DS_MERCHANT_MERCHANTCODE: '999008881',
-  DS_MERCHANT_TERMINAL: '1'
-};
-
-const supabase = createClient(
-  Deno.env.get("SUPABASE_PUBLIC_API_URL") ?? "",
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-  { global: { headers: { Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}` } } }
-);
 
 console.log("Hello from get-form-info function!");
 
@@ -31,9 +16,24 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const { createRedirectForm } = createRedsysAPI({
+      urls: SANDBOX_URLS,
+      secretKey: 'sq7HjrUOBfKmC576ILgskD5srU870gJ7'
+    });
+    
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { global: { headers: { Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}` } } }
+    );
+
     const { amount, userId, userRedsysToken, eventId } = await req.json();
     const currency = 'EUR';
     const orderId = randomTransactionId();
+    const merchantInfo = {
+      DS_MERCHANT_MERCHANTCODE: '999008881',
+      DS_MERCHANT_TERMINAL: '1'
+    };
 
     supabase.from('redsys_orders').insert({
       order_id: orderId,
@@ -45,10 +45,10 @@ Deno.serve(async (req) => {
     });
 
     const currencyInfo = CURRENCIES[currency];
-    const redsysAmount = amount.toFixed(0); // Convert 49.99€ -> 4999
+    const redsysAmount = amount.toFixed(0);
     const redsysCurrency = currencyInfo.num; // Convert EUR -> 978
   
-    const form = createRedirectForm({
+    const form = createRedirectForm({ //TODO PAU when this is executed it throws the error "Cannot read properties of undefined (reading 'from')"
       ...merchantInfo,
       DS_MERCHANT_MERCHANTCODE: '999008881',
       DS_MERCHANT_TERMINAL: '1',
@@ -58,10 +58,10 @@ Deno.serve(async (req) => {
       DS_MERCHANT_AMOUNT: redsysAmount,
       DS_MERCHANT_CURRENCY: redsysCurrency,
       DS_MERCHANT_MERCHANTNAME: 'ElTeuTikt',
-      DS_MERCHANT_MERCHANTURL: `https://notification-estcwhnvtq-ew.a.run.app`, //TODO PAU replace url to supabase url when deployed
+      DS_MERCHANT_MERCHANTURL: `https://waniuunkeiqwqatzunof.supabase.co/functions/v1/notification`,
       DS_MERCHANT_IDENTIFIER: userRedsysToken ?? 'REQUIRED',
-      DS_MERCHANT_URLOK: `https://success-estcwhnvtq-ew.a.run.app`, //TODO PAU replace url to supabase url when deployed
-      DS_MERCHANT_URLKO: `https://error-estcwhnvtq-ew.a.run.app` //TODO PAU replace url to supabase url when deployed
+      DS_MERCHANT_URLOK: `https://waniuunkeiqwqatzunof.supabase.co/functions/v1/success`,
+      DS_MERCHANT_URLKO: `https://waniuunkeiqwqatzunof.supabase.co/functions/v1/error`
     });
 
     const output = {

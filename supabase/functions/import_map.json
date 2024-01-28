@@ -1,6 +1,45 @@
 {
   "imports": {
-    "redsys-easy": "https://esm.sh/redsys-easy@5.2.2",
-    "supabase-js": "https://esm.sh/@supabase/supabase-js@2.39.3"
+    "supabase-js": "https://esm.sh/@supabase/supabase-js@2.39.3",
+    "redsys-easy": "https://ga.jspm.io/npm:redsys-easy@5.2.2/lib/index.esm.js"
+  },
+  "scopes": {
+    "https://ga.jspm.io/": {
+      "@fastify/busboy": "https://ga.jspm.io/npm:@fastify/busboy@2.1.0/lib/main.js",
+      "assert": "node:assert",
+      "async_hooks": "node:async_hooks",
+      "base64url": "https://ga.jspm.io/npm:base64url@3.0.1/index.js",
+      "buffer": "node:buffer",
+      "console": "node:console",
+      "crypto": "node:crypto",
+      "dayjs": "https://ga.jspm.io/npm:dayjs@1.11.10/dayjs.min.js",
+      "dayjs/plugin/timezone": "https://ga.jspm.io/npm:dayjs@1.11.10/plugin/timezone.js",
+      "dayjs/plugin/utc": "https://ga.jspm.io/npm:dayjs@1.11.10/plugin/utc.js",
+      "decimal.js": "https://ga.jspm.io/npm:decimal.js@10.4.3/decimal.mjs",
+      "diagnostics_channel": "node:diagnostics_channel",
+      "events": "node:events",
+      "fast-xml-parser": "https://ga.jspm.io/npm:fast-xml-parser@4.3.3/src/fxp.js",
+      "http": "node:http",
+      "http2": "node:http2",
+      "net": "node:net",
+      "node:crypto": "node:crypto",
+      "node:events": "node:events",
+      "node:stream": "node:stream",
+      "node:timers/promises": "node:timers/promises",
+      "node:util": "node:util",
+      "perf_hooks": "node:perf_hooks",
+      "process": "node:process",
+      "querystring": "node:querystring",
+      "stream": "node:stream",
+      "string_decoder": "node:string_decoder",
+      "strnum": "https://ga.jspm.io/npm:strnum@1.0.5/strnum.js",
+      "tls": "node:tls",
+      "undici": "https://ga.jspm.io/npm:undici@6.5.0/index.js",
+      "url": "node:url",
+      "util": "node:util",
+      "util/types": "node:util/types",
+      "worker_threads": "node:worker_threads",
+      "zlib": "node:zlib"
+    }
   }
 }

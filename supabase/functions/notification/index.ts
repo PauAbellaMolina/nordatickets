@@ -1,21 +1,10 @@
 import { corsHeaders } from "../_shared/cors.ts";
-import { createClient } from "supabase-js"
+import { createClient } from "supabase-js";
 import {
   createRedsysAPI,
   SANDBOX_URLS,
   isResponseCodeOk
 } from "redsys-easy";
-
-const { processRestNotification } = createRedsysAPI({
-  urls: SANDBOX_URLS,
-  secretKey: 'sq7HjrUOBfKmC576ILgskD5srU870gJ7'
-});
-
-const supabase = createClient(
-  Deno.env.get("SUPABASE_PUBLIC_API_URL") ?? "",
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-  { global: { headers: { Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}` } } }
-);
 
 console.log("Hello from notification function!");
 
@@ -25,6 +14,17 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const { processRestNotification } = createRedsysAPI({
+      urls: SANDBOX_URLS,
+      secretKey: 'sq7HjrUOBfKmC576ILgskD5srU870gJ7'
+    });
+    
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { global: { headers: { Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}` } } }
+    );
+    
     const { notificationBody } = await req.json();
     const params = processRestNotification(notificationBody); // Always validate a notification
     const orderId = params.Ds_Order;

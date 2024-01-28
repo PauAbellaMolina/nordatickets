@@ -95,7 +95,7 @@ export default function EventDetailScreen() {
       setCartTotalQuantity(0);
       return;
     }
-    const totalPrice = cart.reduce((acc, cartItem) => acc + cartItem.eventTicket.price * cartItem.quantity, 0)/100;
+    const totalPrice = cart.reduce((acc, cartItem) => acc + cartItem.eventTicket.price * cartItem.quantity, 0);
     setCartTotalPrice(totalPrice);
     const totalQuantity = cart.reduce((acc, cartItem) => acc + cartItem.quantity, 0);
     setCartTotalQuantity(totalQuantity);
@@ -172,11 +172,18 @@ export default function EventDetailScreen() {
 
   const getPaymentFormInfo = () => {
     //PAU for deving
-    const random3Numbers = Math.floor(Math.random() * 1000);
-    addPendingTicketsToUser(random3Numbers.toString());
+    // const random3Numbers = Math.floor(Math.random() * 1000);
+    // addPendingTicketsToUser(random3Numbers.toString());
+
+    const finalAmount = cartTotalPrice + ((event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0));
 
     supabase.functions.invoke('get-form-info', {
-      body: { name: 'Pau' },
+      body: {
+        amount: finalAmount,
+        userId: user.id,
+        userRedsysToken: redsysToken,
+        eventId: event.id
+      }
     }).then(({ data, error }) => {
       if (error) {
         console.log('PAU LOG-> getFormInfo error: ', error);
@@ -378,7 +385,7 @@ export default function EventDetailScreen() {
                       { loading ?
                         <ActivityIndicator style={{marginVertical: 1.5}} size="small" />
                       :
-                        <Text style={styles.buyButtonText}>{cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity / 100 : 0) + '€  ·  Comprar'}</Text>
+                        <Text style={styles.buyButtonText}>{(cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)) / 100 + '€  ·  Comprar'}</Text>
                       }
                       </Pressable>
                     </>
