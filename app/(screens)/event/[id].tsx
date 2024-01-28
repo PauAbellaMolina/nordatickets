@@ -293,14 +293,14 @@ export default function EventDetailScreen() {
     cart.forEach((cartItem) => {
       for (let i = 0; i < cartItem.quantity; i++) {
         const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, order_id: orderId, price: cartItem.eventTicket.price, used: false, user_id: user.id };
-        supabase.from('wallet_tickets').insert(ticketToInsert).select()
-        .then(({ data: wallet_tickets, error }) => {
-          if (error) {
-            console.log('PAU LOG-> addPendingTicketsToUser error: ', error);
-            return;
-          }
-          console.log('PAU LOG-> addPendingTicketsToUser success: ', wallet_tickets);
-        });
+        supabase.from('wallet_tickets').insert(ticketToInsert)
+        // .select().then(({ data: wallet_tickets, error }) => { //for deving
+        //   if (error) {
+        //     console.log('PAU LOG-> addPendingTicketsToUser error: ', error);
+        //     return;
+        //   }
+        //   console.log('PAU LOG-> addPendingTicketsToUser success: ', wallet_tickets);
+        // });
       }
     });
 
