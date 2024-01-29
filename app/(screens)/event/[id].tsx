@@ -22,7 +22,7 @@ export default function EventDetailScreen() {
   const { id } = useLocalSearchParams();
   // const { cart, setCart, walletTicketGroups, setWalletTicketGroups } = useWallet();
   // const { user, setUser } = useAuth();
-  const { user } = useSupabase();
+  const { user, session } = useSupabase();
   const [cardNumber, setCardNumber] = useState<string>();
   const [redsysToken, setRedsysToken] = useState<string>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
@@ -132,7 +132,16 @@ export default function EventDetailScreen() {
   };
   
   const onBuyCart = () => {
+    if (loading || lastBuyAttempt && (new Date().getTime() - lastBuyAttempt.getTime()) < 20000) { //PAU info 20 seconds between buy attempts
+      return;
+    }
+    setLoading(true);
+    setLastBuyAttempt(new Date());
     getPaymentFormInfo();
+    setTimeout(() => {
+      setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
+      setCart(null);
+    }, 5000);
 
     // if (loading || lastBuyAttempt && (new Date().getTime() - lastBuyAttempt.getTime()) < 20000) { //PAU info 20 seconds between buy attempts
     //   return;
@@ -171,69 +180,116 @@ export default function EventDetailScreen() {
   };
 
   const getPaymentFormInfo = () => {
-    //PAU for deving
-    // const random3Numbers = Math.floor(Math.random() * 1000);
-    // addPendingTicketsToUser(random3Numbers.toString());
-
     const finalAmount = cartTotalPrice + ((event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0));
 
-    supabase.functions.invoke('get-form-info', {
-      body: {
+    //PAU info new old supabase edge functions way
+    // supabase.functions.invoke('get-form-info', {
+    //   body: {
+    //     amount: finalAmount,
+    //     userId: user.id,
+    //     userRedsysToken: redsysToken,
+    //     eventId: event.id
+    //   }
+    // }).then(({ data, error }) => {
+    //   if (error) {
+    //     console.log('PAU LOG-> getFormInfo error: ', error);
+    //     return;
+    //   }
+    //   console.log('PAU LOG-> getFormInfo success: ', data);
+    // })
+    // .catch((err) => {
+    //   console.log('PAU LOG-> getFormInfo catch error: ', err);
+    // });
+
+    //PAU info definitive best way
+    
+    fetch('https://getforminfo-estcwhnvtq-ew.a.run.app', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.access_token
+      },
+      body: JSON.stringify({
         amount: finalAmount,
         userId: user.id,
         userRedsysToken: redsysToken,
         eventId: event.id
-      }
-    }).then(({ data, error }) => {
-      if (error) {
-        console.log('PAU LOG-> getFormInfo error: ', error);
+      })
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      if (!data) {
         return;
       }
-      console.log('PAU LOG-> getFormInfo success: ', data);
+      const formUrl = data.formUrl.replace(/\//g, '%2F');
+      const Ds_MerchantParameters = data.Ds_MerchantParameters.replace(/\//g, '%2F');
+      const Ds_Signature = data.Ds_Signature.replace(/\//g, '%2F');
+      const Ds_SignatureVersion = data.Ds_SignatureVersion.replace(/\//g, '%2F');
+
+      addPendingTicketsToUser(data.orderId);
+
+      router.push(`/event/paymentModal/${event?.id}/${eventBackgroundColorIndex}/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
+      setLoading(false);
     })
     .catch((err) => {
-      console.log('PAU LOG-> getFormInfo catch error: ', err);
+      console.log('PAU LOG-> getFormInfo error: ', err);
+      setLoading(false);
     });
+
+    //PAU info new old firebase oncall way
+    // const getFormInfoCF = httpsCallable(FIREBASE_CF, 'getFormInfo');
+    // getFormInfoCF({
+    //   amount: finalAmount,
+    //   userId: user.id,
+    //   userRedsysToken: redsysToken,
+    //   eventId: event.id
+    // })
+    // .then((data) => {
+    //   console.log('PAU LOG-> getFormInfo response: ', data);
+    // })
+    // .catch((err) => {
+    //   console.log('PAU LOG-> getFormInfo error: ', err);
+    // });
 
     // const finalAmount = cartTotalPrice + ((event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)/100); //PAU info (this is in euros (49.99));
 
     // const userRedsysToken = user?.redsysToken ? user.redsysToken : undefined;
     
-    // //PAU info old fetch way
-    // // fetch('https://getforminfo-estcwhnvtq-ew.a.run.app', {
-    // //   method: 'POST',
-    // //   headers: {
-    // //     'Content-Type': 'application/json'
-    // //   },
-    // //   body: JSON.stringify({
-    // //     'totalAmount': finalAmount,
-    // //     'userId': user?.id,
-    // //     'userRedsysToken': userRedsysToken
-    // //   })
-    // // })
-    // // .then((response) => response.json())
-    // // .then((data) => {
-    // //   console.log('PAU LOG-> getFormInfo response: ', data);
-    // //   if (!data) {
-    // //     return;
-    // //   }
-    // //   const formUrl = data.formUrl.replace(/\//g, '%2F');
-    // //   const Ds_MerchantParameters = data.Ds_MerchantParameters.replace(/\//g, '%2F');
-    // //   const Ds_Signature = data.Ds_Signature.replace(/\//g, '%2F');
-    // //   const Ds_SignatureVersion = data.Ds_SignatureVersion.replace(/\//g, '%2F');
+    //PAU info old old firebase fetch way
+    // fetch('https://getforminfo-estcwhnvtq-ew.a.run.app', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify({
+    //     'totalAmount': finalAmount,
+    //     'userId': user?.id,
+    //     'userRedsysToken': userRedsysToken
+    //   })
+    // })
+    // .then((response) => response.json())
+    // .then((data) => {
+    //   console.log('PAU LOG-> getFormInfo response: ', data);
+    //   if (!data) {
+    //     return;
+    //   }
+    //   const formUrl = data.formUrl.replace(/\//g, '%2F');
+    //   const Ds_MerchantParameters = data.Ds_MerchantParameters.replace(/\//g, '%2F');
+    //   const Ds_Signature = data.Ds_Signature.replace(/\//g, '%2F');
+    //   const Ds_SignatureVersion = data.Ds_SignatureVersion.replace(/\//g, '%2F');
 
-    // //   addPendingTicketsToUser(data.orderId);
+    //   addPendingTicketsToUser(data.orderId);
 
-    // //   router.push(`/event/paymentModal/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
-    // //   setLoading(false);
-    // // })
-    // // .catch((err) => {
-    // //   console.log('PAU LOG-> getFormInfo error: ', err);
-    // //   setLoading(false);
-    // // });
+    //   router.push(`/event/paymentModal/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
+    //   setLoading(false);
+    // })
+    // .catch((err) => {
+    //   console.log('PAU LOG-> getFormInfo error: ', err);
+    //   setLoading(false);
+    // });
 
-    // //PAU info new firebase cloud functions firebase sdk way
-    // const getFormInfoCF = httpsCallable(FIREBASE_CF, 'getFormInfo'); //TODO PAU to continue: refactor using supabase edge functions
+    //PAU info old old firebase oncall way
+    // const getFormInfoCF = httpsCallable(FIREBASE_CF, 'getFormInfo');
     // getFormInfoCF({
     //   totalAmount: finalAmount,
     //   userId: user?.id,
@@ -260,28 +316,28 @@ export default function EventDetailScreen() {
     // });
   }
 
-  const listenToUserChanges = () => { //TODO PAU this is useless with the new stuff i think
-    if (!user) {
-      return;
-    }
-    // const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
-    // const userDocSubscription = onSnapshot(userDocRef, (doc) => {
-    //   if (!doc.exists()) {
-    //     return;
-    //   }
-    //   const docUser = doc.data();
-    //   if (docUser?.redsysToken && docUser?.cardNumber && docUser?.expiryDate && (docUser.redsysToken !== user?.redsysToken || docUser.cardNumber !== user?.cardNumber || docUser.expiryDate !== user?.expiryDate)) {
-    //     setUser({
-    //       ...user,
-    //       walletTicketGroups: docUser.walletTicketGroups,
-    //       redsysToken: docUser.redsysToken,
-    //       cardNumber: docUser.cardNumber,
-    //       expiryDate: docUser.expiryDate
-    //     });
-    //     userDocSubscription();
-    //   }
-    // });
-  };
+  // const listenToUserChanges = () => { //TODO PAU this is useless with the new stuff i think
+  //   if (!user) {
+  //     return;
+  //   }
+  //   const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
+  //   const userDocSubscription = onSnapshot(userDocRef, (doc) => {
+  //     if (!doc.exists()) {
+  //       return;
+  //     }
+  //     const docUser = doc.data();
+  //     if (docUser?.redsysToken && docUser?.cardNumber && docUser?.expiryDate && (docUser.redsysToken !== user?.redsysToken || docUser.cardNumber !== user?.cardNumber || docUser.expiryDate !== user?.expiryDate)) {
+  //       setUser({
+  //         ...user,
+  //         walletTicketGroups: docUser.walletTicketGroups,
+  //         redsysToken: docUser.redsysToken,
+  //         cardNumber: docUser.cardNumber,
+  //         expiryDate: docUser.expiryDate
+  //       });
+  //       userDocSubscription();
+  //     }
+  //   });
+  // };
 
   const addPendingTicketsToUser = (orderId: string) => {
     if (!cart?.length || !cartTotalPrice || !event || !user) {
@@ -300,14 +356,14 @@ export default function EventDetailScreen() {
     cart.forEach((cartItem) => {
       for (let i = 0; i < cartItem.quantity; i++) {
         const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, order_id: orderId, price: cartItem.eventTicket.price, used: false, user_id: user.id };
-        supabase.from('wallet_tickets').insert(ticketToInsert)
-        // .select().then(({ data: wallet_tickets, error }) => { //for deving
-        //   if (error) {
-        //     console.log('PAU LOG-> addPendingTicketsToUser error: ', error);
-        //     return;
-        //   }
-        //   console.log('PAU LOG-> addPendingTicketsToUser success: ', wallet_tickets);
-        // });
+          supabase.from('wallet_tickets').insert(ticketToInsert)
+          .select().then(({ data: wallet_tickets, error }) => { //TODO PAU this is very strange, if i just leave the insert (or insert and select) it doesnt actually insert the rows, but if i add select and then, it does.
+            // if (error) {
+            //   console.log('PAU LOG-> addPendingTicketsToUser error: ', error);
+            //   return;
+            // }
+            // console.log('PAU LOG-> addPendingTicketsToUser success: ', wallet_tickets);
+          });
       }
     });
 

@@ -1,4 +1,4 @@
-export const firestoreAutoId = (): string => {
+export const firestoreAutoId = (): string => { //TODO PAU removable now that we are using supabase
   const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
   let autoId = ''
