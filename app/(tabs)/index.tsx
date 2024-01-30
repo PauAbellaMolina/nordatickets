@@ -5,7 +5,7 @@ import { FIRESTORE_DB } from '../../firebaseConfig';
 import { useAuth } from '../../context/AuthProvider';
 import { Event } from '../../types';
 import { Text, View } from '../../components/Themed';
-import EventCardComponent from '../../components/EventCardComponent';
+import EventCardComponent from '../../components/eventCardComponent';
 import { FeatherIcon } from '../../components/CustomIcons';
 import Colors from '../../constants/Colors';
 

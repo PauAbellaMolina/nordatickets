@@ -1,7 +1,7 @@
 import { FlatList, StyleSheet } from 'react-native';
 import { useWallet } from '../../context/WalletProvider';
 import { Text, View } from '../../components/Themed';
-import WalletTicketGroupCardComponent from '../../components/WalletTicketGroupCardComponent';
+import WalletTicketGroupCardComponent from '../../components/walletTicketGroupCardComponent';
 
 export default function TabTwoScreen() {
   const { walletTicketGroups } = useWallet();

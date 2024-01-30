@@ -8,11 +8,11 @@ import { Event, EventTicket, WalletTicket, WalletTicketGroup, WalletTicketGroups
 import { useAuth } from '../../../context/AuthProvider';
 import { useWallet } from '../../../context/WalletProvider';
 import { Text, View } from '../../../components/Themed';
-import TicketCardComponent from '../../../components/TicketCardComponent';
+import TicketCardComponent from '../../../components/ticketCardComponent';
 import Colors from '../../../constants/Colors';
 import { FeatherIcon } from '../../../components/CustomIcons';
 import { httpsCallable } from 'firebase/functions';
-import GoBackArrow from '../../../components/GoBackArrow';
+import GoBackArrow from '../../../components/goBackArrow';
 
 export default function EventDetailScreen() {
   const theme = useColorScheme() ?? 'light';
