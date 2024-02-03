@@ -1,5 +1,4 @@
 import { FlatList, StyleSheet } from 'react-native';
-// import { useWallet } from '../../context/WalletProvider';
 import { Text, View } from '../../components/Themed';
 import EventWalletTicketsCardComponent from '../../components/EventWalletTicketsCardComponent';
 import { useEffect, useState } from 'react';
@@ -8,13 +7,18 @@ import { useSupabase } from '../../context/SupabaseProvider';
 import { WalletTicket } from '../../types/supabaseplain';
 
 export default function TabTwoScreen() {
-  // const { walletTicketGroups } = useWallet();
   const { user } = useSupabase();
 
   const [eventGroupedWalletTickets, setEventGroupedWalletTickets] = useState<WalletTicket[][]>([]);
 
   useEffect(() => {
     if (!user) return;
+    fetchWalletTickets();
+    subscribeWalletTickets();
+    subscribeRedsysOrders();
+  }, [user]);
+
+  const fetchWalletTickets = () => {
     supabase.from('wallet_tickets').select().eq('user_id', user.id).eq('used', false) //TODO PAU make this realtime so that when a ticket is used it disappears from wallet (the bug on EventWalletTicketsCardComponent is accomplishing this fyi). and also probably to make tickets appear when order status is succeeded.
     .then(({ data: wallet_tickets, error }) => {
       if (error) return;
@@ -31,7 +35,35 @@ export default function TabTwoScreen() {
       );
       setEventGroupedWalletTickets(eventGroupedWalletTickets);
     });
-  }, [user]);
+  };
+
+  const subscribeWalletTickets = () => {
+    supabase
+    .channel('wallet_tickets')
+    .on('postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'wallet_tickets',
+        filter: `user_id=eq.${user.id}`
+      },
+      (payload) => fetchWalletTickets())
+    .subscribe();
+  };
+
+  const subscribeRedsysOrders = () => { //TODO PAU test throughly
+    supabase
+    .channel('redsys_orders')
+    .on('postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'redsys_orders',
+        filter: `user_id=eq.${user.id}`
+      },
+      (payload) => fetchWalletTickets())
+    .subscribe();
+  };
 
   return (
     <View style={styles.container}>

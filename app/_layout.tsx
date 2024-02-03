@@ -4,8 +4,6 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack, router } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { AuthProvider } from "../context/AuthProvider";
-import { WalletProvider } from '../context/WalletProvider';
 import { SupabaseProvider } from '../context/SupabaseProvider';
 
 export {
@@ -50,18 +48,16 @@ function RootLayoutNav() {
   return (
     <SupabaseProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <WalletProvider>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)/welcome" options={{ title: 'ElTeuTikt', headerShown: false }} />
-            <Stack.Screen name="(auth)/login" options={{ title: 'Log In', headerShown: false }} />
-            <Stack.Screen name="(auth)/signup" options={{ title: 'Sign Up', headerShown: false }} />
-            <Stack.Screen name="(screens)/loadingApp" options={{ headerShown: false }} />
-            <Stack.Screen name="(screens)/event/[id]" options={{ title: 'Event details', headerShown: false }} />
-            <Stack.Screen name="(screens)/event/paymentModal/[...paymentParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Pay', headerShown: false }} />
-            <Stack.Screen name="(screens)/wallet/activateTicket/[...activateTicketParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Activate ticket', headerShown: false }} />
-          </Stack>
-        </WalletProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)/welcome" options={{ title: 'ElTeuTikt', headerShown: false }} />
+          <Stack.Screen name="(auth)/login" options={{ title: 'Log In', headerShown: false }} />
+          <Stack.Screen name="(auth)/signup" options={{ title: 'Sign Up', headerShown: false }} />
+          <Stack.Screen name="(screens)/loadingApp" options={{ headerShown: false }} />
+          <Stack.Screen name="(screens)/event/[id]" options={{ title: 'Event details', headerShown: false }} />
+          <Stack.Screen name="(screens)/event/paymentModal/[...paymentParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Pay', headerShown: false }} />
+          <Stack.Screen name="(screens)/wallet/activateTicket/[...activateTicketParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Activate ticket', headerShown: false }} />
+        </Stack>
       </ThemeProvider>
     </SupabaseProvider>
   );
