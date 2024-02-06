@@ -51,7 +51,7 @@ export default function TabTwoScreen() {
     .subscribe();
   };
 
-  const subscribeRedsysOrders = () => { //TODO PAU test throughly
+  const subscribeRedsysOrders = () => {
     supabase
     .channel('redsys_orders')
     .on('postgres_changes',
@@ -74,7 +74,7 @@ export default function TabTwoScreen() {
           <FlatList
             style={styles.walletTicketList}
             data={eventGroupedWalletTickets}
-            renderItem={({ item }) => <EventWalletTicketsCardComponent {...item} />}
+            renderItem={({ item }) => <EventWalletTicketsCardComponent eventWalletTickets={item} />}
             ItemSeparatorComponent={() => <View style={{height: 10}} />}
           />
         :

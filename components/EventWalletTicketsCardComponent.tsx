@@ -7,10 +7,9 @@ import { FontAwesomeIcon } from './CustomIcons';
 import { supabase } from "../supabase";
 import { Event, WalletTicket } from '../types/supabaseplain';
 
-export default function EventWalletTicketsCardComponent(eventWalletTickets: WalletTicket[]) {
+export default function EventWalletTicketsCardComponent({ eventWalletTickets }: { eventWalletTickets: WalletTicket[] }) {
   const theme = useColorScheme() ?? 'light';
   const [event, setEvent] = useState<Event>();
-  const [eventWalletTicketsArray] = useState<WalletTicket[]>(Object.values(eventWalletTickets));
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
   // const [orderStatusAdded, setOrderStatusAdded] = useState<boolean>(false);
   // const [refreshCooldown, setRefreshCooldown] = useState<boolean>(false);
@@ -26,8 +25,8 @@ export default function EventWalletTicketsCardComponent(eventWalletTickets: Wall
   useEffect(() => {
     setEventBackgroundColor(chooseRandomColor);
 
-    if (!eventWalletTicketsArray.length) return;
-    supabase.from('events').select().eq('id', eventWalletTicketsArray[0].event_id)
+    if (!eventWalletTickets.length) return;
+    supabase.from('events').select().eq('id', eventWalletTickets[0].event_id)
     .then(({ data: events, error }) => {
       if (error || !events.length) return;
       setEvent(events[0]);
@@ -70,7 +69,7 @@ export default function EventWalletTicketsCardComponent(eventWalletTickets: Wall
     const [eventTicketOrderStatus, setEventTicketOrderStatus] = useState<string>();
     const [eventTicketUsed, setEventTicketUsed] = useState<boolean>();
 
-    useEffect(() => { //TODO PAU This is called multiple times, even when navigating to another tab. Maybe its useful to have the latest used bool and order status (since reads on supabase are free), but it should be called only when rendering and not again when navigating to another tab.
+    useEffect(() => { //TODO PAU IMPORTANT!! This is called multiple times, even when navigating to another tab.
       if (!walletTicket) return;
       supabase.from('event_tickets').select().eq('id', walletTicket.event_tickets_id)
       .then(({ data: eventsTickets, error }) => {
@@ -133,7 +132,7 @@ export default function EventWalletTicketsCardComponent(eventWalletTickets: Wall
               columnWrapperStyle={{flexWrap: 'wrap', gap: 10}}
               numColumns={2}
               style={styles.ticketsList}
-              data={eventWalletTicketsArray}
+              data={eventWalletTickets}
               renderItem={({ item }) => <SingleTicketComponent {...item} />}
             />
           {/* } */}

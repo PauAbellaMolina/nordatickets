@@ -28,6 +28,7 @@ export default function Login() {
     })
     .finally(() => {
       setLoading(false);
+      //TODO PAU show email sent message
     });
   }
 

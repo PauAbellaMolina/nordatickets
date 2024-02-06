@@ -1,16 +1,10 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
-import { FIREBASE_AUTH, FIREBASE_CF, FIRESTORE_DB } from '../../../firebaseConfig';
-import { firestoreAutoId } from '../../../utils/firestoreAutoId';
-import { WalletTicketGroup, WalletTicketGroups } from '../../../types';
-import { useAuth } from '../../../context/AuthProvider';
 import { Text, View } from '../../../components/Themed';
 import EventTicketCardComponent from '../../../components/EventTicketCardComponent';
 import Colors from '../../../constants/Colors';
 import { FeatherIcon } from '../../../components/CustomIcons';
-import { httpsCallable } from 'firebase/functions';
 import GoBackArrow from '../../../components/GoBackArrow';
 import { supabase } from "../../../supabase";
 import { Event, WalletTicket, EventTicket } from '../../../types/supabaseplain';
@@ -31,7 +25,6 @@ export default function EventDetailScreen() {
   const [cartTotalQuantity, setCartTotalQuantity] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
-  const [emailVerified, setEmailVerified] = useState<boolean>(FIREBASE_AUTH.currentUser?.emailVerified ?? false);
   const [lastBuyAttempt, setLastBuyAttempt] = useState<Date | null>(null);
 
   const chooseRandomColor = (): string => {

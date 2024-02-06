@@ -1,3 +1,5 @@
+ //TODO PAU everything removable now that we are using supabasew (exept Cart maybe?)
+
 import { DocumentReference } from "firebase/firestore";
 
 export type User = {
@@ -61,7 +63,7 @@ export type WalletTicket = {
   price?: number;
   selling?: boolean;
   orderId?: string;
-  orderStatus?: string; //TODO PAU remove and look at redsys_orders orderId order to know if it's paid or not
+  orderStatus?: string;
   // activable?: boolean; //for the future, definetly not needed for the MVP
 };
 

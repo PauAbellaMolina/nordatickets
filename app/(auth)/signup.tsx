@@ -28,6 +28,7 @@ export default function Signup() {
     })
     .finally(() => {
       setLoading(false);
+      //TODO PAU show email sent message
     });
   }
 
