@@ -1,4 +1,4 @@
-import { Button, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Platform } from 'react-native';
 import { WebView } from 'react-native-webview';

@@ -8,7 +8,9 @@ type SupabaseContextProps = {
   user: User | null;
   session: Session | null;
   initialized?: boolean;
-  signInWithLink: (email: string) => Promise<void>;
+  // signInWithLink: (email: string) => Promise<void>;
+  signInWithOTP: (email: string) => Promise<void>;
+  verifyOTP: (email: string, code: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -20,7 +22,9 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
   user: null,
   session: null,
   initialized: false,
-  signInWithLink: async () => {},
+  // signInWithLink: async () => {},
+  signInWithOTP: async () => {},
+  verifyOTP: async () => {},
   signOut: async () => {},
 });
 
@@ -34,19 +38,43 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   const segments = useSegments()[0];
   const router = useRouter();
 
-  const signInWithLink = async (email: string) => {
-    const redirectTo = makeRedirectUri(); //TODO PAU IMPORTANT Leave empty for development but HARDCODE elteutikt.netlify.com (or whatever the prod domain is). Also, we need to add the domain to the list of allowed domains in supabase (in the auth section>URL Configuration>Redirect URLs)
+  //Magic link
+  // const signInWithLink = async (email: string) => {
+  //   const redirectTo = makeRedirectUri(); //TODO PAU IMPORTANT Leave empty for development but HARDCODE elteutikt.netlify.com (or whatever the prod domain is). Also, we need to add the domain to the list of allowed domains in supabase (in the auth section>URL Configuration>Redirect URLs)
+  //   const { error } = await supabase.auth.signInWithOtp({
+  //     email,
+  //     options: {
+  //       shouldCreateUser: true,
+  //       emailRedirectTo: redirectTo
+  //     }
+  //   });
+  //   if (error) {
+  //     throw error;
+  //   }
+  // };
+
+  const signInWithOTP = async (email: string) => {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        shouldCreateUser: true,
-        emailRedirectTo: redirectTo
+        shouldCreateUser: true
       }
     });
     if (error) {
       throw error;
     }
   };
+
+  const verifyOTP = async (email: string, code: string) => {
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: code,
+      type: 'email'
+    });
+    if (error) {
+      throw error;
+    }
+  }
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -82,6 +110,8 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 
     if (!session && segments !== "(auth)") {
       router.replace("/welcome");
+    } else if (session && segments === "(auth)") {
+      router.replace("/");
     }
     //this should be commented out so that we can go to /something (/event/:id) and not be redirected to / (tab 1 index)
     // else if (session && segments !== "(app)") {
@@ -95,7 +125,9 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
         user,
         session,
         initialized,
-        signInWithLink,
+        // signInWithLink,
+        signInWithOTP,
+        verifyOTP,
         signOut
       }}
     >
