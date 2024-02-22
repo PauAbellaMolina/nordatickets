@@ -10,6 +10,8 @@ import { supabase } from "../../../supabase";
 import { Event, WalletTicket, EventTicket } from '../../../types/supabaseplain';
 import { useSupabase } from '../../../context/SupabaseProvider';
 
+type Cart = { eventTicket: EventTicket, quantity: number }[] | null;
+
 export default function EventDetailScreen() {
   const theme = useColorScheme() ?? 'light';
   const { id } = useLocalSearchParams();
@@ -20,7 +22,7 @@ export default function EventDetailScreen() {
   const [eventBackgroundColorIndex, setEventBackgroundColorIndex] = useState<number>(0);
   const [event, setEvent] = useState<Event>();
   const [eventTickets, setEventTickets] = useState<EventTicket[]>();
-  const [cart, setCart] = useState<{ eventTicket: EventTicket, quantity: number }[]>(); //TODO PAU update Cart type
+  const [cart, setCart] = useState<Cart>();
   const [cartTotalPrice, setCartTotalPrice] = useState<number>(0);
   const [cartTotalQuantity, setCartTotalQuantity] = useState<number>(0);
   const [loading, setLoading] = useState(false);

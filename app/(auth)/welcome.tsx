@@ -4,6 +4,10 @@ import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
 import TiktDark from '../../assets/svgs/tiktdark.svg';
 import TiktLight from '../../assets/svgs/tiktlight.svg';
+import BlueBlob from '../../assets/svgs/blobs/blue.svg';
+import RedBlob from '../../assets/svgs/blobs/red.svg';
+import OrangeBlob from '../../assets/svgs/blobs/orange.svg';
+import YellowBlob from '../../assets/svgs/blobs/yellow.svg';
 
 export default function Welcome() {
   const theme = useColorScheme() ?? 'light';
@@ -17,7 +21,10 @@ export default function Welcome() {
 
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.title}>ElsTeusTickets</Text> */}
+      <View style={[styles.blob, styles.orangeBlob]}><OrangeBlob width={185} height={185} /></View>
+      <View style={[styles.blob, styles.blueBlob]}><BlueBlob width={230} height={230} /></View>
+      <View style={[styles.blob, styles.yellowBlob]}><YellowBlob width={70} height={70} /></View>
+      <View style={[styles.blob, styles.redBlob]}><RedBlob width={400} height={400} /></View>
       { theme === 'dark' ? <TiktDark width={175} height={175} /> : <TiktLight width={175} height={175} /> }
       <View style={styles.buttonsContainer}>
         <Pressable onPress={onGoToSignUp} style={[styles.button, {backgroundColor: Colors[theme].text}]}>
@@ -33,19 +40,36 @@ export default function Welcome() {
 
 const styles = StyleSheet.create({
   container: {
-    height: '90%',
+    overflow: 'hidden',
+    height: '100%',
     backgroundColor: 'transparent',
-    marginTop: 50,
-    paddingTop: 30,
+    paddingBottom: 50,
     paddingHorizontal: 15,
     alignItems: 'center',
-    justifyContent: 'space-evenly',
-    gap: 20
+    justifyContent: 'center',
+    gap: 100
   },
-  // title: {
-  //   fontSize: 30,
-  //   fontWeight: 'bold'
-  // },
+  blob: {
+    position: 'absolute',
+    backgroundColor: 'transparent',
+    zIndex: -1
+  },
+  orangeBlob: {
+    top: -50,
+    left: -50
+  },
+  blueBlob: {
+    top: '20%',
+    right: -140
+  },
+  yellowBlob: {
+    bottom: '15%',
+    right: 30
+  },
+  redBlob: {
+    bottom: -220,
+    left: -190
+  },
   buttonsContainer: {
     backgroundColor: 'transparent',
     width: '100%',
