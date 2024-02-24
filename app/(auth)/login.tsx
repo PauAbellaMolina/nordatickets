@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
 import { useSupabase } from "../../context/SupabaseProvider";
+import BlobsBackground from "../../components/BlobsBackground";
 
 export default function Login() {
   const theme = useColorScheme() ?? 'light';
@@ -62,91 +63,107 @@ export default function Login() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Iniciar sessió</Text>
-      <View style={styles.inputContainer}>
-      { !emailSent ?
-          <TextInput
-            key="emailInput"
-            style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
-            textContentType="emailAddress"
-            autoComplete="email"
-            inputMode="email"
-            placeholder="Correu electrònic"
-            onChangeText={setEmail}
-          />
-        : <>
-          <Text style={styles.email}>{email}</Text>
-          <TextInput
-            key="oneTimeCodeInput"
-            style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
-            inputMode="numeric"
-            placeholder="Codi d'un sol ús"
-            onChangeText={setOneTimeCode}
-          />
-        </>}
-        <Text style={styles.inputErrorMessage}>{emailErrorMessage}</Text>
-        <View style={{marginTop: 20, backgroundColor: 'transparent'}}>
-          { loading ?
-            <ActivityIndicator style={{marginTop: 12}} size="small" />
-          : 
-            <>
-              { !emailSent ?
-                <Pressable
-                  disabled={!email.includes('@')}
-                  onPress={onEmailLogIn}
-                  style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') ? 0.5 : 1}]}
-                >
-                  <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>Enviar</Text>
-                </Pressable>
-              :
-                <Pressable
-                  disabled={oneTimeCode.length !== 6}
-                  onPress={onCodeSubmit}
-                  style={[styles.button, {backgroundColor: Colors[theme].text, opacity: oneTimeCode.length !== 6 ? 0.5 : 1}]}
-                >
-                  <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>Entrar</Text>
-                </Pressable>
-              }
-            </>
+    <BlobsBackground style={styles.container}>
+      <View style={[styles.wrapper, {backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity}]}>
+        <Text style={styles.title}>Iniciar sessió</Text>
+        <Text style={styles.explanation}>T'enviarem un codi de 6 dígits al correu electrònic</Text>
+        <View style={styles.inputContainer}>
+        { !emailSent ?
+            <TextInput
+              key="emailInput"
+              style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
+              textContentType="emailAddress"
+              autoComplete="email"
+              inputMode="email"
+              placeholder="Correu electrònic"
+              onChangeText={setEmail}
+            />
+          : <>
+            <Text style={styles.email}>{email}</Text>
+            <TextInput
+              key="oneTimeCodeInput"
+              style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
+              inputMode="numeric"
+              placeholder="Codi d'un sol ús"
+              onChangeText={setOneTimeCode}
+            />
+          </>}
+          { emailErrorMessage ?
+            <Text style={styles.inputErrorMessage}>{emailErrorMessage}</Text>
+          :
+            null
           }
+          <View style={{backgroundColor: 'transparent'}}>
+            { loading ?
+              <ActivityIndicator style={{marginTop: 12}} size="small" />
+            : 
+              <>
+                { !emailSent ?
+                  <Pressable
+                    disabled={!email.includes('@')}
+                    onPress={onEmailLogIn}
+                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') ? 0.5 : 1}]}
+                  >
+                    <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>Enviar</Text>
+                  </Pressable>
+                :
+                  <Pressable
+                    disabled={oneTimeCode.length !== 6}
+                    onPress={onCodeSubmit}
+                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: oneTimeCode.length !== 6 ? 0.5 : 1}]}
+                  >
+                    <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>Entrar</Text>
+                  </Pressable>
+                }
+              </>
+            }
+          </View>
         </View>
       </View>
       <View style={styles.bottomActionContainer}>
         <Text style={styles.bottomActionTitle}>No tens un compte?</Text>
         <Pressable onPress={onGoToSignUp}><Text style={styles.bottomActionLink}>Registra't</Text></Pressable>
       </View>
-    </View>
+    </BlobsBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: '90%',
-    backgroundColor: 'transparent',
-    marginTop: 50,
-    paddingTop: 30,
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  wrapper: {
+    paddingVertical: 30,
+    paddingBottom: 35,
+    paddingHorizontal: 20,
+    borderRadius: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 20
   },
   title: {
-    fontSize: 25,
+    fontSize: 30,
     fontWeight: 'bold'
+  },
+  explanation: {
+    fontSize: 18,
+    textAlign: 'center',
+    width: '70%',
   },
   email: {
     fontSize: 25,
-    marginBottom: 20
   },
   inputContainer: {
     backgroundColor: 'transparent',
-    marginTop: 100,
+    marginTop: 20,
     alignItems: 'center',
-    paddingHorizontal: 25
+    paddingHorizontal: 25,
+    gap: 15
   },
   input: {
     pointerEvents: 'box-only',
-    marginBottom: 25,
     borderRadius: 15,
     borderWidth: 1,
     paddingVertical: 10,
@@ -174,7 +191,7 @@ const styles = StyleSheet.create({
   },
   bottomActionContainer: {
     position: 'absolute',
-    bottom: 0,
+    bottom: 50,
     backgroundColor: 'transparent'
   },
   bottomActionTitle: {
