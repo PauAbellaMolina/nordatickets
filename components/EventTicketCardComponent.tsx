@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, useColorScheme } from 'react-native';
-import { EventTicket } from '../types';
+import { EventTicket } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { FeatherIcon, FontAwesomeIcon } from './CustomIcons';
@@ -13,7 +13,7 @@ export interface TicketCardComponentProps {
   ticket: EventTicket
 }
 
-export default function TicketCardComponent({ eventSelling, quantityInCart, onRemoveTicket, onAddTicket, ticket}: TicketCardComponentProps) {
+export default function EventTicketCardComponent({eventSelling, quantityInCart, onRemoveTicket, onAddTicket, ticket}: TicketCardComponentProps) {
   const theme = useColorScheme() ?? 'light';
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
 
@@ -42,7 +42,7 @@ export default function TicketCardComponent({ eventSelling, quantityInCart, onRe
       <View style={styles.ticketContents}>
         <View style={{flexDirection: 'row', gap: 10}}>
           <FontAwesomeIcon name="ticket" size={23} color={Colors[theme].text} />
-          <Text style={styles.eventTitle}>{ticket.name} · {ticket.price}€</Text>
+          <Text style={styles.eventTitle}>{ticket.name} · {ticket.price/100}€</Text>
         </View>
         <View style={styles.ticketActions}>
           { eventSelling ? <>

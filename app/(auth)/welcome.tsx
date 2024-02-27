@@ -4,6 +4,7 @@ import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
 import TiktDark from '../../assets/svgs/tiktdark.svg';
 import TiktLight from '../../assets/svgs/tiktlight.svg';
+import BlobsBackground from "../../components/BlobsBackground";
 
 export default function Welcome() {
   const theme = useColorScheme() ?? 'light';
@@ -16,8 +17,7 @@ export default function Welcome() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* <Text style={styles.title}>ElsTeusTickets</Text> */}
+    <BlobsBackground style={styles.container}>
       { theme === 'dark' ? <TiktDark width={175} height={175} /> : <TiktLight width={175} height={175} /> }
       <View style={styles.buttonsContainer}>
         <Pressable onPress={onGoToSignUp} style={[styles.button, {backgroundColor: Colors[theme].text}]}>
@@ -27,25 +27,18 @@ export default function Welcome() {
           <Text style={[styles.buttonText, {color: Colors[theme].text}]}>Iniciar sessió</Text>
         </Pressable>
       </View>
-    </View>
+    </BlobsBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: '90%',
-    backgroundColor: 'transparent',
-    marginTop: 50,
-    paddingTop: 30,
+    paddingBottom: 50,
     paddingHorizontal: 15,
     alignItems: 'center',
-    justifyContent: 'space-evenly',
-    gap: 20
+    justifyContent: 'center',
+    gap: 100
   },
-  // title: {
-  //   fontSize: 30,
-  //   fontWeight: 'bold'
-  // },
   buttonsContainer: {
     backgroundColor: 'transparent',
     width: '100%',

@@ -1,21 +1,65 @@
 import { FlatList, StyleSheet } from 'react-native';
-import { useWallet } from '../../context/WalletProvider';
 import { Text, View } from '../../components/Themed';
-import WalletTicketGroupCardComponent from '../../components/walletTicketGroupCardComponent';
+import WalletEventCardComponent from '../../components/WalletEventCardComponent';
+import { useEffect, useState } from 'react';
+import { supabase } from "../../supabase";
+import { useSupabase } from '../../context/SupabaseProvider';
+import { WalletTicket } from '../../types/supabaseplain';
 
 export default function TabTwoScreen() {
-  const { walletTicketGroups } = useWallet();
+  const { user } = useSupabase();
+
+  const [eventGroupedWalletTickets, setEventGroupedWalletTickets] = useState<WalletTicket[][]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetchWalletTickets();
+    subscribeWalletTickets();
+  }, [user]);
+
+  const fetchWalletTickets = () => {
+    supabase.from('wallet_tickets').select().eq('user_id', user.id).eq('used', false)
+    .then(({ data: wallet_tickets, error }) => {
+      if (error) return;
+      const eventGroupedWalletTickets: WalletTicket[][] = 
+      Object.values(
+        wallet_tickets.reduce((groups, ticket) => {
+          const { event_id } = ticket;
+          if (!groups[event_id]) {
+            groups[event_id] = [];
+          }
+          groups[event_id].push(ticket);
+          return groups;
+        }, {})
+      );
+      setEventGroupedWalletTickets(eventGroupedWalletTickets);
+    });
+  };
+
+  const subscribeWalletTickets = () => {
+    supabase
+    .channel('wallet_tickets')
+    .on('postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'wallet_tickets',
+        filter: `user_id=eq.${user.id}`
+      },
+      (payload) => fetchWalletTickets())
+    .subscribe();
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Wallet</Text>
       <View style={styles.ticketsContainer}>
         <Text style={styles.ticketsTitle}>Tickets</Text>
-        { walletTicketGroups?.length ?
+        { eventGroupedWalletTickets?.length ?
           <FlatList
             style={styles.walletTicketList}
-            data={walletTicketGroups}
-            renderItem={({ item }) => <WalletTicketGroupCardComponent {...item} />}
+            data={eventGroupedWalletTickets}
+            renderItem={({ item }) => <WalletEventCardComponent eventWalletTickets={item} />}
             ItemSeparatorComponent={() => <View style={{height: 10}} />}
           />
         :

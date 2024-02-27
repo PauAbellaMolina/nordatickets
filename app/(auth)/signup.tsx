@@ -1,35 +1,22 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, TextInput, useColorScheme, ActivityIndicator, Pressable } from "react-native";
-import { UserCredential, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { router } from "expo-router";
-import { FIREBASE_AUTH } from '../../firebaseConfig';
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
+import { useSupabase } from "../../context/SupabaseProvider";
+import BlobsBackground from "../../components/BlobsBackground";
+import { FeatherIcon } from "../../components/CustomIcons";
 
 export default function Signup() {
   const theme = useColorScheme() ?? 'light';
 
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [passwordRepeated, setPasswordRepeated] = useState<string>('');
-  const [emailErrorMessage, setEmailErrorMessage] = useState<string | undefined>(undefined);
-  const [passwordErrorMessage, setPasswordErrorMessage] = useState<string | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
+  const { signInWithOTP, verifyOTP } = useSupabase();
 
-  useEffect(() => {
-    if (emailErrorMessage !== undefined) {
-      setEmailErrorMessage(undefined);
-    }
-    if (password.length > 0 && password.length < 8) {
-      setPasswordErrorMessage('Password must be at least 8 characters long');
-    }
-    else if (password.length > 0 && password !== passwordRepeated) {
-      setPasswordErrorMessage('Passwords do not match');
-    }
-    else {
-      setPasswordErrorMessage(undefined);
-    }
-  }, [password, passwordRepeated]);
+  const [email, setEmail] = useState<string>('');
+  const [emailSent, setEmailSent] = useState<boolean>(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState<string | undefined>(undefined);
+  const [oneTimeCode, setOneTimeCode] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   
   useEffect(() => {
     if (emailErrorMessage !== undefined) {
@@ -38,101 +25,169 @@ export default function Signup() {
   }, [email]);
 
   const onEmailSignUp = () => {
+    setEmailErrorMessage(undefined);
     setLoading(true);
-    createUserWithEmailAndPassword(FIREBASE_AUTH, email, password)
-    .then((result: UserCredential) => {
-      const user = result.user;
-      sendEmailVerification(user)
-      .catch((err) => {
-        alert(err);
-      });
+
+    //Magic link
+    // signInWithLink(email)
+    // .catch(() => {
+    //   setEmailErrorMessage('Torna-ho a intentar');
+    // })
+    // .finally(() => {
+    //   setLoading(false);
+    // });
+
+    //One time password (OTP)
+    signInWithOTP(email)
+    .then(() => {
+      setEmailSent(true);
     })
-    .catch((err) => {
-      setEmailErrorMessage('Credencials invàlides, torna-ho a intentar');
+    .catch(() => {
+      setEmailSent(false);
+      setEmailErrorMessage('Torna-ho a intentar');
+    })
+    .finally(() => {
+      //TODO PAU show email sent message
       setLoading(false);
     });
-  }
+  };
+
+  const onCodeSubmit = () => {
+    setEmailErrorMessage(undefined);
+    setLoading(true);
+    verifyOTP(email, oneTimeCode.toString())
+    .catch(() => {
+      setEmailErrorMessage('Torna-ho a intentar');
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  };
+
+  const onChangeEmail = () => {
+    setEmailSent(false);
+    setEmailErrorMessage(undefined);
+    setLoading(false);
+  };
 
   const onGoToLogIn = () => {
     router.push('/login');
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Creació del compte</Text>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
-          textContentType="emailAddress"
-          autoComplete="email"
-          keyboardType={'email-address'}
-          placeholder="Correu electrònic"
-          onChangeText={setEmail}
-        />
-        <TextInput
-          style={[styles.input, styles.inputPassword, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined && passwordErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
-          textContentType="password"
-          secureTextEntry={true}
-          autoComplete="password"
-          keyboardType={'visible-password'}
-          placeholder="Contrasenya"
-          onChangeText={setPassword}
-        />
-        <TextInput
-          style={[styles.input, styles.inputPassword, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined && passwordErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
-          textContentType="password"
-          secureTextEntry={true}
-          autoComplete="password"
-          keyboardType={'visible-password'}
-          placeholder="Repetir contrasenya"
-          onChangeText={setPasswordRepeated}
-        />
-        <Text style={styles.inputErrorMessage}>{emailErrorMessage}{passwordErrorMessage}</Text>
-        <View style={{marginTop: 20, backgroundColor: 'transparent'}}>
-          { loading ?
-            <ActivityIndicator style={{marginTop: 12}} size="small" />
+    <BlobsBackground style={styles.container}>
+      <View style={[styles.wrapper, {backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity}]}>
+        <Text style={styles.title}>Creació del compte</Text>
+        <Text style={styles.explanation}>T'enviarem un codi de 6 dígits al correu electrònic</Text>
+        <View style={styles.inputContainer}>
+          { !emailSent ?
+            <TextInput
+              key="emailInput"
+              style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
+              textContentType="emailAddress"
+              autoComplete="email"
+              inputMode="email"
+              placeholder="Correu electrònic"
+              onChangeText={setEmail}
+            />
+          : <>
+            <View style={styles.emailSubmitted}>
+              <Text style={styles.email}>{email}</Text>
+              <Pressable onPress={onChangeEmail}>
+                <FeatherIcon name="edit-2" size={18} color={Colors[theme].text} />
+              </Pressable>
+            </View>
+            <TextInput
+              key="oneTimeCodeInput"
+              style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
+              inputMode="numeric"
+              placeholder="Codi d'un sol ús"
+              onChangeText={setOneTimeCode}
+            />
+          </>}
+          { emailErrorMessage ?
+            <Text style={styles.inputErrorMessage}>{emailErrorMessage}</Text>
           :
-            <Pressable
-              disabled={!email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined}
-              onPress={onEmailSignUp}
-              style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') || password.length === 0 || passwordErrorMessage !== undefined ? 0.5 : 1}]}
-            >
-              <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>Registra'm</Text>
-            </Pressable>
+            null
           }
+          <View style={{backgroundColor: 'transparent'}}>
+            { loading ?
+              <ActivityIndicator style={{marginTop: 12}} size="small" />
+            :
+              <>
+                { !emailSent ?
+                  <Pressable
+                    disabled={!email.includes('@')}
+                    onPress={onEmailSignUp}
+                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') ? 0.5 : 1}]}
+                  >
+                    <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>Enviar</Text>
+                  </Pressable>
+                :
+                  <Pressable
+                    disabled={oneTimeCode.length !== 6}
+                    onPress={onCodeSubmit}
+                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: oneTimeCode.length !== 6 ? 0.5 : 1}]}
+                  >
+                    <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>Registra'm</Text>
+                  </Pressable>
+                }
+              </>
+            }
+          </View>
         </View>
       </View>
       <View style={styles.bottomActionContainer}>
         <Text style={styles.bottomActionTitle}>Ja tens un compte?</Text>
         <Pressable onPress={onGoToLogIn}><Text style={styles.bottomActionLink}>Iniciar sessió</Text></Pressable>
       </View>
-    </View>
+    </BlobsBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: '90%',
-    backgroundColor: 'transparent',
-    marginTop: 50,
-    paddingTop: 30,
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  wrapper: {
+    paddingVertical: 30,
+    paddingBottom: 35,
+    paddingHorizontal: 20,
+    borderRadius: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 20
   },
   title: {
-    fontSize: 25,
+    fontSize: 30,
     fontWeight: 'bold'
+  },
+  explanation: {
+    fontSize: 18,
+    textAlign: 'center',
+    width: '70%',
+  },
+  email: {
+    fontSize: 25,
+  },
+  emailSubmitted: {
+    backgroundColor: 'transparent',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12
   },
   inputContainer: {
     backgroundColor: 'transparent',
-    marginTop: 100,
+    marginTop: 20,
     alignItems: 'center',
-    paddingHorizontal: 25
+    paddingHorizontal: 25,
+    gap: 15
   },
   input: {
     pointerEvents: 'box-only',
-    marginBottom: 25,
     borderRadius: 15,
     borderWidth: 1,
     paddingVertical: 10,
@@ -141,10 +196,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: '100%',
     maxWidth: 300
-  },
-  inputPassword: {
-    paddingVertical: 8,
-    marginBottom: 18
   },
   inputErrorMessage: {
     color: '#ff3737',
@@ -164,7 +215,7 @@ const styles = StyleSheet.create({
   },
   bottomActionContainer: {
     position: 'absolute',
-    bottom: 0,
+    bottom: 50,
     backgroundColor: 'transparent'
   },
   bottomActionTitle: {
