@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 import { Text, View } from '../../components/Themed';
-import EventCardComponent from '../../components/eventCardComponent';
+import EventCardComponent from '../../components/EventCardComponent';
 import { supabase } from "../../supabase";
 import { useSupabase } from '../../context/SupabaseProvider';
 import { Event } from '../../types/supabaseplain';
