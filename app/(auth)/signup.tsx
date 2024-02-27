@@ -5,6 +5,7 @@ import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
 import { useSupabase } from "../../context/SupabaseProvider";
 import BlobsBackground from "../../components/BlobsBackground";
+import { FeatherIcon } from "../../components/CustomIcons";
 
 export default function Signup() {
   const theme = useColorScheme() ?? 'light';
@@ -24,6 +25,7 @@ export default function Signup() {
   }, [email]);
 
   const onEmailSignUp = () => {
+    setEmailErrorMessage(undefined);
     setLoading(true);
 
     //Magic link
@@ -37,17 +39,21 @@ export default function Signup() {
 
     //One time password (OTP)
     signInWithOTP(email)
+    .then(() => {
+      setEmailSent(true);
+    })
     .catch(() => {
+      setEmailSent(false);
       setEmailErrorMessage('Torna-ho a intentar');
     })
     .finally(() => {
-      setEmailSent(true);
       //TODO PAU show email sent message
       setLoading(false);
     });
   };
 
   const onCodeSubmit = () => {
+    setEmailErrorMessage(undefined);
     setLoading(true);
     verifyOTP(email, oneTimeCode.toString())
     .catch(() => {
@@ -56,6 +62,12 @@ export default function Signup() {
     .finally(() => {
       setLoading(false);
     });
+  };
+
+  const onChangeEmail = () => {
+    setEmailSent(false);
+    setEmailErrorMessage(undefined);
+    setLoading(false);
   };
 
   const onGoToLogIn = () => {
@@ -79,12 +91,17 @@ export default function Signup() {
               onChangeText={setEmail}
             />
           : <>
-            <Text style={styles.email}>{email}</Text>
+            <View style={styles.emailSubmitted}>
+              <Text style={styles.email}>{email}</Text>
+              <Pressable onPress={onChangeEmail}>
+                <FeatherIcon name="edit-2" size={18} color={Colors[theme].text} />
+              </Pressable>
+            </View>
             <TextInput
               key="oneTimeCodeInput"
               style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
               inputMode="numeric"
-              placeholder="Codi d'un sol ú"
+              placeholder="Codi d'un sol ús"
               onChangeText={setOneTimeCode}
             />
           </>}
@@ -154,6 +171,13 @@ const styles = StyleSheet.create({
   },
   email: {
     fontSize: 25,
+  },
+  emailSubmitted: {
+    backgroundColor: 'transparent',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12
   },
   inputContainer: {
     backgroundColor: 'transparent',
