@@ -138,7 +138,7 @@ export default function EventDetailScreen() {
 
   const getPaymentFormInfo = () => {
     const finalAmount = cartTotalPrice + ((event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0));
-    fetch('https://getforminfosb-estcwhnvtq-ew.a.run.app', {
+    fetch('https://getforminfo-estcwhnvtq-ew.a.run.app', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -167,7 +167,6 @@ export default function EventDetailScreen() {
       setLoading(false);
     })
     .catch((err) => {
-      console.log('PAU LOG-> getFormInfo error: ', err);
       setLoading(false);
     });
   }

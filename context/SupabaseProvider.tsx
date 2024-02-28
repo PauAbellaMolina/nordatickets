@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { useRouter, useSegments } from "expo-router";
-import { makeRedirectUri } from 'expo-auth-session'
+// import { makeRedirectUri } from 'expo-auth-session'
 import { supabase } from "../supabase";
 
 type SupabaseContextProps = {
