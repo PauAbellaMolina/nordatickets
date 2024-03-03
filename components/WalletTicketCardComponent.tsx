@@ -1,33 +1,46 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Pressable, StyleSheet, useColorScheme } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { FontAwesomeIcon } from './CustomIcons';
 import { supabase } from "../supabase";
 import { WalletTicket } from '../types/supabaseplain';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
 export default function WalletTicketCardComponent({ walletTicket }: { walletTicket: WalletTicket}) {
   const theme = useColorScheme() ?? 'light';
-  const [eventTicketName, setEventTicketName] = useState<string>();
   const [eventTicketOrderStatus, setEventTicketOrderStatus] = useState<string>();
   const [eventTicketUsed, setEventTicketUsed] = useState<boolean>();
 
-  useEffect(() => {
-    if (!walletTicket) return;
-    fetchTicketName();
-    fetchTicketUsed();
-  }, []);
+  let insertsRedsysOrdersChannel = useRef<RealtimeChannel>();
+  let updatesRedsysOrdersChannel = useRef<RealtimeChannel>();
 
-  const fetchTicketName = () => {
-    supabase.from('event_tickets').select().eq('id', walletTicket.event_tickets_id)
-    .then(({ data: eventsTickets, error }) => {
-      if (error || !eventsTickets.length) return;
-      setEventTicketName(eventsTickets[0].name);
-    });
-  };
+  let triggerNextFocus = useRef<boolean>(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      // console.log("use focus effect");
+      if (triggerNextFocus.current) {
+        if (!walletTicket) return;
+        fetchTicketUsed();
+      }
+      return () => {
+        triggerNextFocus.current = false;
+        if (insertsRedsysOrdersChannel.current) {
+          supabase.removeChannel(insertsRedsysOrdersChannel.current);
+          insertsRedsysOrdersChannel.current = null;
+        }
+        if (updatesRedsysOrdersChannel.current) {
+          supabase.removeChannel(updatesRedsysOrdersChannel.current);
+          updatesRedsysOrdersChannel.current = null;
+        }
+      };
+    }, [])
+  );
 
   const fetchTicketUsed = () => {
+    console.log("fetchTicketUsed", walletTicket.id, walletTicket.event_tickets_name);
     supabase.from('wallet_tickets').select().eq('id', walletTicket.id)
     .then(({ data: walletTickets, error }) => {
       if (error || !walletTickets.length) return;
@@ -35,7 +48,6 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
       setEventTicketUsed(used);
       if (!used) {
         fetchTicketOrderStatus();
-        subscribeRedsysOrders();
       }
     });
   };
@@ -43,43 +55,118 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
   const fetchTicketOrderStatus = () => {
     supabase.from('redsys_orders').select().eq('order_id', walletTicket.order_id)
     .then(({ data: redsysOrders, error }) => {
-      if (error || !redsysOrders.length) return;
-      setEventTicketOrderStatus(redsysOrders[0].order_status);
+      if (error) return;
+      if (insertsRedsysOrdersChannel.current) {
+        supabase.removeChannel(insertsRedsysOrdersChannel.current);
+        insertsRedsysOrdersChannel.current = null;
+      }
+      if (!redsysOrders.length) {
+        subscribeRedsysOrdersInserts();
+        return;
+      }
+      const status = redsysOrders[0].order_status;
+      setEventTicketOrderStatus(status);
+      // console.log("4", walletTicket.id, walletTicket.event_tickets_name, redsysOrders[0].order_status);
+      if (status === 'PENDING_PAYMENT') {
+        if (updatesRedsysOrdersChannel.current) {
+          supabase.removeChannel(updatesRedsysOrdersChannel.current);
+          updatesRedsysOrdersChannel.current = null;
+        }
+        subscribeRedsysOrdersUpdates();
+      }
+      if (updatesRedsysOrdersChannel.current && (redsysOrders[0].order_status === 'PAYMENT_SUCCEDED' || redsysOrders[0].order_status === 'PAYMENT_FAILED')) {
+        supabase.removeChannel(updatesRedsysOrdersChannel.current);
+        updatesRedsysOrdersChannel.current = null;
+      }
     });
   };
 
-  const subscribeRedsysOrders = () => {
-    supabase
-    .channel('redsys_orders')
+  const subscribeRedsysOrdersInserts = () => {
+    // console.log("SUB INSERTS", walletTicket.id, walletTicket.event_tickets_name);
+    const redsysOrdersChannel = supabase
+    .channel(`redsys_orders:order_id=eq.${walletTicket.id}`)
     .on('postgres_changes',
       {
-        event: '*',
+        event: 'INSERT',
         schema: 'public',
         table: 'redsys_orders',
         filter: `order_id=eq.${walletTicket.order_id}`
       },
       (payload) => fetchTicketOrderStatus())
     .subscribe();
+
+    insertsRedsysOrdersChannel.current = redsysOrdersChannel;
+    
+    const unsubscribeInterval = setInterval(() => {
+      if (insertsRedsysOrdersChannel.current) {
+        // console.log("UNSUB INSERTS", walletTicket.id, walletTicket.event_tickets_name);
+        supabase.removeChannel(insertsRedsysOrdersChannel.current);
+        insertsRedsysOrdersChannel.current = null;
+        clearInterval(unsubscribeInterval);
+      }
+    }, 5000);
+  };
+  
+  const subscribeRedsysOrdersUpdates = () => {
+    // console.log("SUB UPDATES", walletTicket.id, walletTicket.event_tickets_name);
+    const redsysOrdersChannel = supabase
+    .channel(`redsys_orders:order_id=eq.${walletTicket.id}`)
+    .on('postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'redsys_orders',
+        filter: `order_id=eq.${walletTicket.order_id}`
+      },
+      (payload) => fetchTicketOrderStatus())
+    .subscribe();
+
+    updatesRedsysOrdersChannel.current = redsysOrdersChannel;
+
+    const unsubscribeInterval = setInterval(() => {
+      if (updatesRedsysOrdersChannel.current) {
+        // console.log("UNSUB UPDATES", walletTicket.id, walletTicket.event_tickets_name);
+        supabase.removeChannel(updatesRedsysOrdersChannel.current);
+        updatesRedsysOrdersChannel.current = null;
+        clearInterval(unsubscribeInterval);
+      }
+    }, 5000);
   };
 
   const onActivateTicket = () => {
     if (eventTicketOrderStatus !== 'PAYMENT_SUCCEDED') {
       return;
     }
-    router.push(`/wallet/activateTicket/${walletTicket.id}/${eventTicketName}/${walletTicket.event_id}`);
+    router.push(`/wallet/activateTicket/${walletTicket.id}/${walletTicket.event_tickets_name}/${walletTicket.event_id}`);
   };
 
+  const body = {
+    
+  }
+
   return (
-    <>{ !eventTicketUsed && eventTicketName && eventTicketOrderStatus === 'PAYMENT_SUCCEDED' ?
-      <Pressable style={[styles.singleTicketContainer, {backgroundColor: Colors[theme].backgroundHalfOpacity}]} onPress={onActivateTicket}>
-        <View style={styles.ticketIconWrapper}>
+    <>{ !eventTicketUsed && (eventTicketOrderStatus === 'PAYMENT_SUCCEDED' || eventTicketOrderStatus === 'PENDING_PAYMENT') ?
+      <>{ eventTicketOrderStatus === 'PENDING_PAYMENT' ?
+        <Pressable disabled style={[styles.singleTicketContainer, {opacity: .6, backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
+          <View style={styles.ticketIconWrapper}>
+            <FontAwesomeIcon name="ticket" size={30} color={Colors['light'].text} />
+          </View>
+          <View style={styles.ticketNameWrapper}>
+            <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
+            <Text style={[styles.ticketSubtitle, {fontSize: 10, color: theme === 'dark' ? 'lightgray' : 'gray'}]}>Processant pagament...</Text>
+          </View>
+        </Pressable>
+        :
+        <Pressable style={[styles.singleTicketContainer, {backgroundColor: Colors[theme].backgroundHalfOpacity}]} onPress={onActivateTicket}>
+          <View style={styles.ticketIconWrapper}>
           <FontAwesomeIcon name="ticket" size={30} color={Colors['light'].text} />
         </View>
         <View style={styles.ticketNameWrapper}>
-          <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{eventTicketName}</Text>
+          <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
           <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>Activable</Text>
         </View>
       </Pressable>
+      }</>
     :
       null
     }</>

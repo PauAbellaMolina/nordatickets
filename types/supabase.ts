@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -184,6 +184,7 @@ export interface Database {
           created_at: string
           event_id: number | null
           event_tickets_id: number | null
+          event_tickets_name: string | null
           id: number
           order_id: string | null
           price: number | null
@@ -194,6 +195,7 @@ export interface Database {
           created_at?: string
           event_id?: number | null
           event_tickets_id?: number | null
+          event_tickets_name?: string | null
           id?: number
           order_id?: string | null
           price?: number | null
@@ -204,6 +206,7 @@ export interface Database {
           created_at?: string
           event_id?: number | null
           event_tickets_id?: number | null
+          event_tickets_name?: string | null
           id?: number
           order_id?: string | null
           price?: number | null
@@ -211,6 +214,13 @@ export interface Database {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "public_wallet_tickets_event_tickets_name_fkey"
+            columns: ["event_tickets_name"]
+            isOneToOne: false
+            referencedRelation: "event_tickets"
+            referencedColumns: ["name"]
+          },
           {
             foreignKeyName: "wallet_tickets_event_id_fkey"
             columns: ["event_id"]

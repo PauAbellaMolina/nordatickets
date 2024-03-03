@@ -40,7 +40,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 
   //Magic link
   // const signInWithLink = async (email: string) => {
-  //   const redirectTo = makeRedirectUri(); //TODO PAU IMPORTANT Leave empty for development but HARDCODE elteutikt.netlify.com (or whatever the prod domain is). Also, we need to add the domain to the list of allowed domains in supabase (in the auth section>URL Configuration>Redirect URLs)
+  //   const redirectTo = makeRedirectUri(); //IMPORTANT Leave empty for development but HARDCODE elteutikt.netlify.com (or whatever the prod domain is). Also, we need to add the domain to the list of allowed domains in supabase (in the auth section>URL Configuration>Redirect URLs)
   //   const { error } = await supabase.auth.signInWithOtp({
   //     email,
   //     options: {

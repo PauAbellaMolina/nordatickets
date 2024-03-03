@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginHorizontal: 10
   },
-  walletTicketList: { //TODO PAU fix list underlapping tabs when list gets long
+  walletTicketList: {
     marginTop: 10
   },
   emptyWallet: {

@@ -26,7 +26,7 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
       if (error || !events.length) return;
       setEvent(events[0]);
     });
-  }, []);
+  }, [eventWalletTickets]);
   
   return (
     <>

@@ -176,9 +176,10 @@ export default function EventDetailScreen() {
       return;
     }
 
-    type NewWalletTicket = { //PAU maybe this is overkill type safety??
+    type NewWalletTicket = { //TODO PAU maybe this is overkill type safety??
       event_id: WalletTicket['event_id'];
       event_tickets_id: WalletTicket['event_tickets_id'];
+      event_tickets_name: WalletTicket['event_tickets_name'];
       order_id: WalletTicket['order_id'];
       price: WalletTicket['price'];
       used: WalletTicket['used'];
@@ -187,7 +188,7 @@ export default function EventDetailScreen() {
 
     cart.forEach((cartItem) => {
       for (let i = 0; i < cartItem.quantity; i++) {
-        const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, order_id: orderId, price: cartItem.eventTicket.price, used: false, user_id: user.id };
+        const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, event_tickets_name: cartItem.eventTicket.name, order_id: orderId, price: cartItem.eventTicket.price, used: false, user_id: user.id };
           supabase.from('wallet_tickets').insert(ticketToInsert)
           .select().then(({ data: wallet_tickets, error }) => { //TODO PAU this is very strange, if i just leave the insert (or insert and select) it doesnt actually insert the rows, but if i add select and then, it does.
             // if (error) {
