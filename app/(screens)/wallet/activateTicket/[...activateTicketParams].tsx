@@ -94,7 +94,7 @@ export default function ActivateTicketScreen() {
       <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
         <View style={styles.ticketTopContainer}>
           <Text style={styles.title}>{ ticketName }</Text>
-          <Text style={styles.subtitle}>{ eventName }</Text>
+          <Text style={styles.subtitle}>{ eventName || '...' }</Text>
         </View>
         <View style={styles.ticketDecorContainer}>
           <View style={styles.ticketLeftCutout}></View>
@@ -119,11 +119,11 @@ export default function ActivateTicketScreen() {
       </View>
       <View style={styles.actionsContainer}>
         { Platform.OS === 'web' ? <>
-          <Pressable onPress={() => router.back()} style={[styles.button, {height: '100%', flex: 1, justifyContent: 'center'}, {backgroundColor: eventBackgroundColor}]}>
+          <Pressable disabled={loading} onPress={() => router.back()} style={[styles.button, loading ? {opacity: .7} : {}, {height: '100%', flex: 1, justifyContent: 'center'}, {backgroundColor: eventBackgroundColor}]}>
             <FeatherIcon name="arrow-left" size={38} color={Colors[theme].text} />
           </Pressable>
         </> : <></> }
-        <Pressable disabled={!ticketActive} onPress={deactivateTicket} style={[styles.button, !ticketActive ? {opacity: .8} : {}, {backgroundColor: eventBackgroundColor}]}>
+        <Pressable disabled={!ticketActive} onPress={deactivateTicket} style={[styles.button, !ticketActive ? {opacity: .7} : {}, {backgroundColor: eventBackgroundColor}]}>
           {loading ?
             <ActivityIndicator style={styles.buttonLoading} size="large" />
           :
@@ -275,6 +275,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 20,
     fontWeight: 'bold',
-    paddingVertical: 23
+    paddingVertical: 24.5
   }
 });

@@ -25,7 +25,7 @@ export default {
     oppositeThemeText: '#FCFCFC',
     background: '#ffffff',
     backgroundHalfOpacity: '#ffffff40',
-    oppositeBackgroundHalfOpacity: '#00000040',
+    oppositeBackgroundHalfOpacity: '#9C9C9C33',
     // background: '#EFEFEF', //PAU info react default background color
     backgroundContrast: '#f2f2f2',
     tabBarBackground: '#613AC5', //#161311
@@ -43,7 +43,7 @@ export default {
     oppositeThemeText: '#202228',
     background: '#000000',
     backgroundHalfOpacity: '#00000040',
-    oppositeBackgroundHalfOpacity: '#ffffff40',
+    oppositeBackgroundHalfOpacity: '#9C9C9C33',
     backgroundContrast: '#1a1a1a',
     tabBarBackground: '#613AC5', //#161311
     tint: '#ff7f50',

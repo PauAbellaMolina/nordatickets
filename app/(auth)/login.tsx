@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
     paddingBottom: 35,
     paddingHorizontal: 20,
-    borderRadius: 35,
+    borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 20

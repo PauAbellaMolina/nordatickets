@@ -21,12 +21,13 @@ const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
     height: '100%',
-    backgroundColor: 'transparent',
+    backgroundColor: 'transparent'
   },
   blob: {
     position: 'absolute',
     backgroundColor: 'transparent',
-    zIndex: -1
+    zIndex: -1,
+    filter: 'blur(45px);'
   },
   orangeBlob: {
     top: -50,
