@@ -20,7 +20,6 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
 
   useFocusEffect(
     useCallback(() => {
-      // console.log("use focus effect");
       if (triggerNextFocus.current) {
         if (!walletTicket) return;
         fetchTicketUsed();
@@ -40,7 +39,6 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
   );
 
   const fetchTicketUsed = () => {
-    console.log("fetchTicketUsed", walletTicket.id, walletTicket.event_tickets_name);
     supabase.from('wallet_tickets').select().eq('id', walletTicket.id)
     .then(({ data: walletTickets, error }) => {
       if (error || !walletTickets.length) return;
@@ -66,7 +64,6 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
       }
       const status = redsysOrders[0].order_status;
       setEventTicketOrderStatus(status);
-      // console.log("4", walletTicket.id, walletTicket.event_tickets_name, redsysOrders[0].order_status);
       if (status === 'PENDING_PAYMENT') {
         if (updatesRedsysOrdersChannel.current) {
           supabase.removeChannel(updatesRedsysOrdersChannel.current);
@@ -82,7 +79,6 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
   };
 
   const subscribeRedsysOrdersInserts = () => {
-    // console.log("SUB INSERTS", walletTicket.id, walletTicket.event_tickets_name);
     const redsysOrdersChannel = supabase
     .channel(`redsys_orders:order_id=eq.${walletTicket.id}`)
     .on('postgres_changes',
@@ -99,7 +95,6 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
     
     const unsubscribeInterval = setInterval(() => {
       if (insertsRedsysOrdersChannel.current) {
-        // console.log("UNSUB INSERTS", walletTicket.id, walletTicket.event_tickets_name);
         supabase.removeChannel(insertsRedsysOrdersChannel.current);
         insertsRedsysOrdersChannel.current = null;
         clearInterval(unsubscribeInterval);
@@ -108,7 +103,6 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
   };
   
   const subscribeRedsysOrdersUpdates = () => {
-    // console.log("SUB UPDATES", walletTicket.id, walletTicket.event_tickets_name);
     const redsysOrdersChannel = supabase
     .channel(`redsys_orders:order_id=eq.${walletTicket.id}`)
     .on('postgres_changes',
@@ -125,7 +119,6 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
 
     const unsubscribeInterval = setInterval(() => {
       if (updatesRedsysOrdersChannel.current) {
-        // console.log("UNSUB UPDATES", walletTicket.id, walletTicket.event_tickets_name);
         supabase.removeChannel(updatesRedsysOrdersChannel.current);
         updatesRedsysOrdersChannel.current = null;
         clearInterval(unsubscribeInterval);
@@ -139,10 +132,6 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
     }
     router.push(`/wallet/activateTicket/${walletTicket.id}/${walletTicket.event_tickets_name}/${walletTicket.event_id}`);
   };
-
-  const body = {
-    
-  }
 
   return (
     <>{ !eventTicketUsed && (eventTicketOrderStatus === 'PAYMENT_SUCCEDED' || eventTicketOrderStatus === 'PENDING_PAYMENT') ?

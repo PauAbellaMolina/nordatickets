@@ -51,12 +51,13 @@ function RootLayoutNav() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)/welcome" options={{ title: 'ElTeuTikt', headerShown: false }} />
-          <Stack.Screen name="(auth)/login" options={{ title: 'Log In', headerShown: false }} />
-          <Stack.Screen name="(auth)/signup" options={{ title: 'Sign Up', headerShown: false }} />
+          <Stack.Screen name="(auth)/login" options={{ title: 'Iniciar sessió', headerShown: false }} />
+          <Stack.Screen name="(auth)/signup" options={{ title: 'Creació del compte', headerShown: false }} />
           <Stack.Screen name="(screens)/loadingApp" options={{ headerShown: false }} />
-          <Stack.Screen name="(screens)/event/[id]" options={{ title: 'Event details', headerShown: false }} />
-          <Stack.Screen name="(screens)/event/paymentModal/[...paymentParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Pay', headerShown: false }} />
-          <Stack.Screen name="(screens)/wallet/activateTicket/[...activateTicketParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Activate ticket', headerShown: false }} />
+          <Stack.Screen name="(screens)/event/[id]" options={{ title: 'Esdeveniment', headerShown: false }} />
+          <Stack.Screen name="(screens)/event/paymentModal/[...paymentParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Pagament', headerShown: false }} />
+          <Stack.Screen name="(screens)/wallet/activateTicket/[...activateTicketParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Activar ticket', headerShown: false }} />
+          <Stack.Screen name="(screens)/profile/receipts/index" options={{ title: 'Rebuts de compra', headerShown: false }} />
         </Stack>
       </ThemeProvider>
     </SupabaseProvider>

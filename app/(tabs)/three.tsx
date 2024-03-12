@@ -5,6 +5,7 @@ import { FeatherIcon } from '../../components/CustomIcons';
 import Colors from '../../constants/Colors';
 import { supabase } from "../../supabase";
 import { useSupabase } from '../../context/SupabaseProvider';
+import { router } from 'expo-router';
 
 export default function TabThreeScreen() {
   const theme = useColorScheme() ?? 'light';
@@ -19,10 +20,6 @@ export default function TabThreeScreen() {
       setCard(users[0].card_number);
     });
   }, [user]);
-
-  const onLogOut = () => {
-    signOut();
-  };
 
   const onDeleteUserCard = () => {
     supabase.from('users')
@@ -42,13 +39,17 @@ export default function TabThreeScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Perfil</Text>
       <View style={styles.wrapper}>
-        <View style={styles.singleLineContainer}><Text>{user?.email}</Text></View>
-        { card ?
-          <View style={styles.singleLineContainer}><Text>Tarjeta de crèdit guardada: {card.slice(9, card.length)}  ·  </Text><Pressable onPress={onDeleteUserCard}><Text style={{color: '#ff3737'}}>Eliminar</Text></Pressable></View>
-        : null }
+        <View style={styles.userInfo}>
+          <View style={styles.singleLineContainer}><Text>{user?.email}</Text></View>
+          { card ?
+            <View style={styles.singleLineContainer}><Text>Tarjeta de crèdit guardada: {card.slice(9, card.length)}  ·  </Text><Pressable onPress={onDeleteUserCard}><Text style={{color: '#ff3737'}}>Eliminar</Text></Pressable></View>
+          : null }
+        </View>
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-        <Pressable style={styles.logOutButton} onPress={onLogOut}><FeatherIcon name="log-out" size={18} color={Colors[theme].text} /><Text style={styles.logOutText}>Tancar sessió</Text></Pressable>
-        {/* TODO PAU add terms & conditions link to page and get in contact/support email */}
+        <View style={styles.entriesContainer}>
+          <Pressable style={styles.entryButton} onPress={() => router.push('/profile/receipts')}><FeatherIcon name="file-text" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>Rebuts de compra</Text></Pressable>
+          <Pressable style={styles.entryButton} onPress={() => signOut()}><FeatherIcon name="log-out" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>Tancar sessió</Text></Pressable>
+        </View>
       </View>
     </View>
   );
@@ -71,6 +72,11 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginHorizontal: 10,
     alignItems: 'flex-start',
+    gap: 30
+  },
+  userInfo: {
+    backgroundColor: 'transparent',
+    width: '100%',
     gap: 15
   },
   separator: {
@@ -82,14 +88,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     flexDirection: 'row'
   },
-  logOutButton: {
+  entriesContainer: {
+    backgroundColor: 'transparent',
+    width: '100%',
+    gap: 30
+  },
+  entryButton: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5
+    gap: 10
   },
-  logOutText: {
-    textDecorationLine: 'underline',
+  entryText: {
     fontSize: 16
   }
 });
