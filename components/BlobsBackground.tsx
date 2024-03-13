@@ -20,12 +20,10 @@ export default function BlobsBackground({ children, style }) {
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
-    height: '100%',
-    backgroundColor: 'transparent'
+    height: '100%'
   },
   blob: {
     position: 'absolute',
-    backgroundColor: 'transparent',
     zIndex: -1,
     filter: 'blur(45px);'
   },

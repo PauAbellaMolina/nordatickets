@@ -29,7 +29,7 @@ export default function TabOneScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={{backgroundColor: 'transparent'}}>
+        <View>
           <Text style={styles.title}>Esdeveniments</Text>
           <Text style={styles.infoLabel}>Afegeix un esdeveniment pel el seu codi</Text>
         </View>
@@ -42,7 +42,7 @@ export default function TabOneScreen() {
             style={styles.eventList}
             data={events}
             renderItem={({ item }) => <EventCardComponent {...item} />}
-            ItemSeparatorComponent={() => <View style={{height: 10, backgroundColor: 'transparent'}} />}
+            ItemSeparatorComponent={() => <View style={{height: 10}} />}
           />
         }
       </> : null }
@@ -52,7 +52,6 @@ export default function TabOneScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'transparent',
     paddingTop: 60,
     paddingBottom: 5,
     paddingHorizontal: 15,
@@ -60,7 +59,6 @@ const styles = StyleSheet.create({
     gap: 20
   },
   header: {
-    backgroundColor: 'transparent',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
   eventInfoContainer: {
     width: '84%',
     marginHorizontal: 10,
-    backgroundColor: 'transparent',
     flexDirection: 'column',
     justifyContent: 'flex-start',
     gap: 8
@@ -78,7 +77,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   sellingStatusContainer: {
-    backgroundColor: 'transparent',
     position: 'absolute',
     right: 15,
     top: 10,
@@ -100,7 +98,6 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
   goToDetailContainer: {
-    backgroundColor: 'transparent',
     position: 'absolute',
     right: 15,
     bottom: 10

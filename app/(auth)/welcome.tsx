@@ -40,7 +40,6 @@ const styles = StyleSheet.create({
     gap: 100
   },
   buttonsContainer: {
-    backgroundColor: 'transparent',
     width: '100%',
     alignItems: 'center',
     gap: 25,

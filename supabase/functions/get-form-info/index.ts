@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
     const redsysCurrency = currencyInfo.num; // Convert EUR -> 978
   
     try { //all this try catch is for deving
-      const form = createRedirectForm({ //TODO PAU when this is executed it throws the error "Cannot read properties of undefined (reading 'from')"
+      const form = createRedirectForm({
         DS_MERCHANT_MERCHANTCODE: '999008881',
         DS_MERCHANT_TERMINAL: '1',
         DS_MERCHANT_TRANSACTIONTYPE: TRANSACTION_TYPES.AUTHORIZATION, // '0'

@@ -72,7 +72,6 @@ export default function TabTwoScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'transparent',
     paddingTop: 60,
     paddingBottom: 5,
     paddingHorizontal: 15,
@@ -89,7 +88,6 @@ const styles = StyleSheet.create({
     lineHeight: 20
   },
   ticketsContainer: {
-    backgroundColor: 'transparent',
     marginTop: 30,
     marginHorizontal: 10
   },

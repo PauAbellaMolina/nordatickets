@@ -174,7 +174,6 @@ const styles = StyleSheet.create({
     elevation: 10
   },
   ticketTopContainer: {
-    backgroundColor: 'transparent',
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
@@ -182,7 +181,6 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   ticketBottomContainer: {
-    backgroundColor: 'transparent',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
@@ -192,7 +190,6 @@ const styles = StyleSheet.create({
     // paddingTop: 25
   },
   ticketDecorContainer: {
-    backgroundColor: 'transparent',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

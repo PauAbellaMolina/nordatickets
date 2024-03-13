@@ -172,7 +172,6 @@ const styles = StyleSheet.create({
     marginVertical: 5
   },
   ticketIconWrapper: {
-    backgroundColor: 'transparent',
     paddingVertical: 11,
     paddingHorizontal: 12,
     borderWidth: 2,
@@ -181,7 +180,6 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed'
   },
   ticketNameWrapper: {
-    backgroundColor: 'transparent',
     flex: 1,
     paddingHorizontal: 5
   },

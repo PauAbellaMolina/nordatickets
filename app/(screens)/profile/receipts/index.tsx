@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet, useColorScheme } from 'react-native';
 import { Text, View } from '../../../../components/Themed';
 import GoBackArrow from '../../../../components/GoBackArrow';
 import { useSupabase } from '../../../../context/SupabaseProvider';
@@ -9,10 +9,12 @@ import ReceiptsOrderComponent from '../../../../components/ReceiptsOrderComponen
 
 export default function ReceiptsScreen() {
 
+  const theme = useColorScheme() ?? 'light';
   const { user } = useSupabase();
 
   const [orderIdGroupedWalletTickets, setOrderIdGroupedWalletTickets] = useState<WalletTicket[][]>([]);
   const [eventIdsNames, setEventIdsNames] = useState<{ id: number, name: string }[]>([]);
+  const [eventIdsTicketFees, setEventIdsTicketFees] = useState<{ id: number, fee: number }[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -42,24 +44,24 @@ export default function ReceiptsScreen() {
         .then(({ data: events, error }) => {
           if (error || !events.length) return;
           eventIdsNames.push({ id: eventId, name: events[0].name });
+          eventIdsTicketFees.push({ id: eventId, fee: events[0].ticket_fee });
         });
       });
 
       setOrderIdGroupedWalletTickets(orderIdGroupedWalletTickets);
       setEventIdsNames(eventIdsNames);
-      console.log(orderIdGroupedWalletTickets, eventIds, eventIdsNames);
     });
   };
 
   return (
     <View style={styles.container}>
-      <GoBackArrow light={true} />
+      <GoBackArrow light={theme === 'dark'} />
       <Text style={styles.title}>Rebuts de compra</Text>
       <View style={styles.wrapper}>
         <FlatList
           data={orderIdGroupedWalletTickets}
-          renderItem={({ item }) => <ReceiptsOrderComponent order={item} eventName={eventIdsNames.find(event => event.id === item[0].event_id)?.name} />}
-          ItemSeparatorComponent={() => <View style={{height: 20}} />}
+          renderItem={({ item }) => <ReceiptsOrderComponent order={item} eventName={eventIdsNames.find(event => event.id === item[0].event_id)?.name} eventTicketFee={eventIdsTicketFees.find(event => event.id === item[0].event_id)?.fee} />}
+          ItemSeparatorComponent={() => <View style={{height: 14}} />}
         />
       </View>
     </View>
@@ -68,7 +70,6 @@ export default function ReceiptsScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'transparent',
     paddingTop: 75,
     paddingBottom: 5,
     paddingHorizontal: 15,
@@ -80,10 +81,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   wrapper: {
-    backgroundColor: 'transparent',
     marginTop: 30,
-    marginHorizontal: 10,
-    alignItems: 'flex-start',
-    gap: 30
+    marginHorizontal: 2
   },
 });

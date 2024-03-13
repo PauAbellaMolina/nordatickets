@@ -45,7 +45,7 @@ export default function TabThreeScreen() {
             <View style={styles.singleLineContainer}><Text>Tarjeta de crèdit guardada: {card.slice(9, card.length)}  ·  </Text><Pressable onPress={onDeleteUserCard}><Text style={{color: '#ff3737'}}>Eliminar</Text></Pressable></View>
           : null }
         </View>
-        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+        <View style={[styles.separator, {backgroundColor: Colors[theme].separatorBackgroundColor}]} />
         <View style={styles.entriesContainer}>
           <Pressable style={styles.entryButton} onPress={() => router.push('/profile/receipts')}><FeatherIcon name="file-text" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>Rebuts de compra</Text></Pressable>
           <Pressable style={styles.entryButton} onPress={() => signOut()}><FeatherIcon name="log-out" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>Tancar sessió</Text></Pressable>
@@ -57,7 +57,6 @@ export default function TabThreeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'transparent',
     paddingTop: 60,
     paddingBottom: 5,
     paddingHorizontal: 15,
@@ -68,14 +67,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   wrapper: {
-    backgroundColor: 'transparent',
     marginTop: 30,
     marginHorizontal: 10,
     alignItems: 'flex-start',
     gap: 30
   },
   userInfo: {
-    backgroundColor: 'transparent',
     width: '100%',
     gap: 15
   },
@@ -85,11 +82,9 @@ const styles = StyleSheet.create({
     width: '80%'
   },
   singleLineContainer: {
-    backgroundColor: 'transparent',
     flexDirection: 'row'
   },
   entriesContainer: {
-    backgroundColor: 'transparent',
     width: '100%',
     gap: 30
   },

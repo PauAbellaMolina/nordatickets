@@ -110,7 +110,7 @@ export default function Login() {
           :
             null
           }
-          <View style={{backgroundColor: 'transparent'}}>
+          <View>
             { loading ?
               <ActivityIndicator style={{marginTop: 12}} size="small" />
             : 
@@ -177,14 +177,12 @@ const styles = StyleSheet.create({
     wordWrap: 'normal'
   },
   emailSubmitted: {
-    backgroundColor: 'transparent',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12
   },
   inputContainer: {
-    backgroundColor: 'transparent',
     marginTop: 20,
     alignItems: 'center',
     paddingHorizontal: 25,
@@ -219,8 +217,7 @@ const styles = StyleSheet.create({
   },
   bottomActionContainer: {
     position: 'absolute',
-    bottom: 50,
-    backgroundColor: 'transparent'
+    bottom: 50
   },
   bottomActionTitle: {
     fontSize: 16

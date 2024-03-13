@@ -206,7 +206,7 @@ export default function EventDetailScreen() {
   };
 
   return (
-    <View style={[styles.container, {backgroundColor: Colors[theme].backgroundContrast}]}>
+    <View style={styles.container}>
       { event ?
         <>
           <View style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor}]}>
@@ -243,10 +243,10 @@ export default function EventDetailScreen() {
                         style={styles.cartList}
                         data={cart}
                         renderItem={({ item }) => <Text style={styles.cartItemsList}>{item.quantity}  -  {item.eventTicket.name} · {item.eventTicket.price/100}€</Text>}
-                        ItemSeparatorComponent={() => <View style={{backgroundColor: 'transparent', height: 3}} />}
+                        ItemSeparatorComponent={() => <View style={{height: 3}} />}
                       />
                       { event.ticket_fee ?
-                        <View style={{backgroundColor: 'transparent', marginHorizontal: 8, flexDirection: 'row', alignItems: 'flex-end'}}>
+                        <View style={{marginHorizontal: 8, flexDirection: 'row', alignItems: 'flex-end'}}>
                           <Text style={[styles.transactionFeePrice, {color: Colors[theme].cartContainerBackgroundContrast}]}>+ {event.ticket_fee * cartTotalQuantity / 100}€ </Text>
                           <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>comissió de servei</Text>
                         </View>
@@ -285,7 +285,6 @@ export default function EventDetailScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
     display: 'flex',
     height: '100%'
   },
@@ -320,7 +319,6 @@ const styles = StyleSheet.create({
   },
   ticketsContainer: {
     flex: 1,
-    backgroundColor: 'transparent',
     marginTop: 25,
     marginHorizontal: 30,
     borderRadius: 35
@@ -329,7 +327,6 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   sellingStatusContainer: {
-    backgroundColor: 'transparent',
     position: 'absolute',
     right: 10,
     top: 10,
@@ -372,7 +369,6 @@ const styles = StyleSheet.create({
     elevation: 10
   },
   orderConfirmedTextContainer: {
-    backgroundColor: 'transparent',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5
@@ -400,7 +396,6 @@ const styles = StyleSheet.create({
     elevation: 10
   },
   cartTitleRowContainer: {
-    backgroundColor: 'transparent',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5
@@ -413,7 +408,6 @@ const styles = StyleSheet.create({
     fontSize: 18
   },
   usingCreditCardContainer: {
-    backgroundColor: 'transparent',
     marginHorizontal: 8,
     marginTop: 8,
     flexDirection: 'row',

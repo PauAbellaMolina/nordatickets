@@ -38,7 +38,7 @@ export default function EventTicketCardComponent({eventSelling, quantityInCart, 
   }
   
   return (
-    <View style={styles.ticketCard}>
+    <View style={[styles.ticketCard, {backgroundColor: Colors[theme].backgroundContrast}]}>
       <View style={styles.ticketContents}>
         <View style={{flexDirection: 'row', gap: 10}}>
           <FontAwesomeIcon name="ticket" size={23} color={Colors[theme].text} />
@@ -83,13 +83,11 @@ const styles = StyleSheet.create({
     elevation: 10
   },
   ticketContents: {
-    backgroundColor: 'transparent',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center'
   },
   ticketActions: {
-    backgroundColor: 'transparent',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center'
@@ -112,8 +110,7 @@ const styles = StyleSheet.create({
   eventInfo: {
     width: '70%',
     marginTop: 5,
-    marginHorizontal: 10,
-    backgroundColor: 'transparent'
+    marginHorizontal: 10
   },
   eventTitle: {
     fontSize: 20,

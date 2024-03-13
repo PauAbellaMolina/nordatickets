@@ -18,7 +18,6 @@ export default function GoBackArrow({ light }: { light?: boolean }) {
 
 const styles = StyleSheet.create({
   goBackArrow: {
-    backgroundColor: 'transparent',
     position: 'absolute',
     top: 15,
     left: 15
