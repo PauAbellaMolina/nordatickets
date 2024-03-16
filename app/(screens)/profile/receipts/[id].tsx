@@ -5,13 +5,41 @@ import Colors from '../../../../constants/Colors';
 import { router, useLocalSearchParams } from 'expo-router';
 import GoBackArrow from '../../../../components/GoBackArrow';
 import TiktLight from '../../../../assets/svgs/tiktlight.svg';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FeatherIcon } from '../../../../components/CustomIcons';
+import { supabase } from '../../../../supabase';
+import { useSupabase } from '../../../../context/SupabaseProvider';
 
 export default function ReceiptDetailScreen() {
   const theme = useColorScheme() ?? 'light';
+  const { user } = useSupabase();
   const { id } = useLocalSearchParams(); //TODO PAU make sure that the user will only be able to retrieve their own receipts. With the corret fetch and also RLS config!!!!
+
+  const [orderIdWalletTickets, setOrderIdWalletTickets] = useState<WalletTicket[]>([]);
+  const [eventTicketFee, setEventTicketFee] = useState<number>(null);
   const [printMode, setPrintMode] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!user) return;
+    fetchWalletTickets();
+  }, [user]);
+
+  const fetchWalletTickets = () => { //TODO PAU the same useFocusEffect() stuff on WalletTicketCardComponent could be used here to optimize, but it's not as crucial as there
+    supabase.from('wallet_tickets').select().eq('user_id', user.id).eq('order_id', id).order('created_at', { ascending: false })
+    .then(({ data: wallet_tickets, error }) => {
+      if (error) return;
+      console.log("wallet_tickets", wallet_tickets);
+      setOrderIdWalletTickets(wallet_tickets);
+
+      const eventId = wallet_tickets[0].event_id;
+      supabase.from('events').select().eq('id', eventId)
+      .then(({ data: events, error }) => {
+        if (error || !events.length) return;
+        console.log("event ticket fee", events[0].ticket_fee);
+        setEventTicketFee(events[0].ticket_fee);
+      });
+    });
+  };
 
   const onPrint = () => {
     setPrintMode(true);
@@ -19,7 +47,7 @@ export default function ReceiptDetailScreen() {
       window.print();
       setPrintMode(false);
     });
-  }
+  };
   
   return (
     <View style={[styles.container, !printMode ? {paddingTop: 75} : null]}>
@@ -79,32 +107,35 @@ export default function ReceiptDetailScreen() {
               </View>
             </View>
             {/* TODO PAU flatlist render the below view */}
-            <View style={styles.tableRow}>
+            <FlatList
+              data={orderIdWalletTickets}
+              renderItem={({ item }) => {
+                return (<View style={styles.tableRow}>
+                  <View style={[styles.tableCell, styles.firstCol]}>
+                    <Text style={[styles.receiptText, styles.tableText]}>{item.event_tickets_name}</Text>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={[styles.receiptText, styles.tableText]}>{item.price/100}</Text>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={[styles.receiptText, styles.tableText]}>1</Text>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={[styles.receiptText, styles.tableText]}>{(item.price + eventTicketFee)/100}</Text>
+                  </View>
+                </View>)
+              }}
+            />
+            <View style={styles.tableFooter}>
               <View style={[styles.tableCell, styles.firstCol]}>
-                <Text style={[styles.receiptText, styles.tableText]}>Refresc</Text>
               </View>
               <View style={styles.tableCell}>
-                <Text style={[styles.receiptText, styles.tableText]}>2,5</Text>
               </View>
-              <View style={styles.tableCell}>
-                <Text style={[styles.receiptText, styles.tableText]}>1</Text>
+              <View style={[styles.tableCell, styles.borderTop]}>
+                <Text style={[styles.receiptText, styles.tableText]}>Comissió:</Text>
               </View>
-              <View style={styles.tableCell}>
-                <Text style={[styles.receiptText, styles.tableText]}>2,65</Text>
-              </View>
-            </View>
-            <View style={styles.tableRow}>
-              <View style={[styles.tableCell, styles.firstCol]}>
-                <Text style={[styles.receiptText, styles.tableText]}>Refresc</Text>
-              </View>
-              <View style={styles.tableCell}>
-                <Text style={[styles.receiptText, styles.tableText]}>2,5</Text>
-              </View>
-              <View style={styles.tableCell}>
-                <Text style={[styles.receiptText, styles.tableText]}>1</Text>
-              </View>
-              <View style={styles.tableCell}>
-                <Text style={[styles.receiptText, styles.tableText]}>2,65</Text>
+              <View style={[styles.tableCell, styles.borderTop]}>
+                <Text style={[styles.receiptText, styles.tableText]}>{ (eventTicketFee * orderIdWalletTickets.length) / 100 }€</Text>
               </View>
             </View>
             <View style={styles.tableFooter}>
@@ -112,18 +143,20 @@ export default function ReceiptDetailScreen() {
               </View>
               <View style={styles.tableCell}>
               </View>
-              <View style={[styles.tableCell, styles.borderTop]}>
+              <View style={styles.tableCell}>
                 <Text style={[styles.receiptText, styles.tableText, styles.tableTextTitle]}>Total:</Text>
               </View>
-              <View style={[styles.tableCell, styles.borderTop]}>
-                <Text style={[styles.receiptText, styles.tableText]}>5,3€</Text>
+              <View style={styles.tableCell}>
+                <Text style={[styles.receiptText, styles.tableText]}>{ (orderIdWalletTickets.reduce((acc, ticket) => acc + ticket.price, 0) + eventTicketFee * orderIdWalletTickets.length) / 100 }€</Text>
               </View>
             </View>
           </View>
         </View>
       </View>
       <>{ !printMode ?
+      <View style={styles.printButtonWrapper}>
         <Pressable style={[styles.printButton, {borderColor: Colors[theme].text}]} onPress={onPrint}><FeatherIcon name="download" size={18} color={Colors[theme].text} /><Text style={styles.printText}>Descarregar</Text></Pressable>
+      </View>
       : null }</>
     </View>
   );
@@ -146,7 +179,16 @@ const styles = StyleSheet.create({
     color: 'black',
     aspectRatio: 1/1.414,
     paddingVertical: 40,
-    paddingHorizontal: 50
+    paddingHorizontal: 30,
+    minWidth: 325,
+    maxWidth: 450,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.10,
+    shadowRadius: 8
   },
   wrapperMargins: {
     marginTop: 30,
@@ -212,10 +254,7 @@ const styles = StyleSheet.create({
   },
   tableFooter: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    // borderTopWidth: 1,
-    // borderTopColor: 'black',
-    // paddingTop: 5
+    justifyContent: 'space-between'
   },
   tableCell: {
     flex: 1,
@@ -229,13 +268,18 @@ const styles = StyleSheet.create({
   },
   firstCol: {
     flex: 2,
-    alignItems: 'flex-start',
-    // marginHorizontal: 5
+    alignItems: 'flex-start'
   },
   borderTop: {
     borderTopWidth: 1,
     borderTopColor: 'black',
     paddingTop: 5
+  },
+  printButtonWrapper: {
+    minWidth: 325,
+    maxWidth: 450,
+    alignContent: 'center',
+    marginHorizontal: 25
   },
   printButton: {
     alignSelf: 'center',
