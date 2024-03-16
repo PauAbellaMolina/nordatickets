@@ -58,6 +58,7 @@ function RootLayoutNav() {
           <Stack.Screen name="(screens)/event/paymentModal/[...paymentParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Pagament', headerShown: false }} />
           <Stack.Screen name="(screens)/wallet/activateTicket/[...activateTicketParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Activar ticket', headerShown: false }} />
           <Stack.Screen name="(screens)/profile/receipts/index" options={{ title: 'Rebuts de compra', headerShown: false }} />
+          <Stack.Screen name="(screens)/profile/receipts/[id]" options={{ title: 'Detalls del rebut de compra', headerShown: false }} />
         </Stack>
       </ThemeProvider>
     </SupabaseProvider>

@@ -83,5 +83,5 @@ const styles = StyleSheet.create({
   wrapper: {
     marginTop: 30,
     marginHorizontal: 2
-  },
+  }
 });

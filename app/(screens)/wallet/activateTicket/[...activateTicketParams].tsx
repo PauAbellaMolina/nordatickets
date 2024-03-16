@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   statusInfoText: {
     fontSize: 15
   },
-  infoContainer: {
+  infoContainer: {
     alignItems: 'center'
   },
   actionsContainer: {

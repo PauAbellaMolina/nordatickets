@@ -1,17 +1,24 @@
-import { FlatList, StyleSheet, useColorScheme } from 'react-native';
+import { FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { View, Text } from "./Themed";
 import { WalletTicket } from "../types/supabaseplain";
 import Colors from '../constants/Colors';
+import { router } from 'expo-router';
 
 export default function ReceiptsOrderComponent({ order, eventName, eventTicketFee }: { order: WalletTicket[], eventName: string, eventTicketFee: number}) {
   const theme = useColorScheme() ?? 'light';
+
+  const onGoToReceiptDetail = () => {
+    router.push(`/profile/receipts/${order[0].order_id}`);
+  }
   
   return (
     <View style={[styles.container, {backgroundColor: Colors[theme].backgroundContrast}]}>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <View>
           <Text style={styles.orderTitle}>Identificador:</Text>
-          <Text style={styles.orderTitle}>{ order[0].order_id }</Text>
+          <Pressable onPress={onGoToReceiptDetail}>
+            <Text style={styles.orderTitle}>{ order[0].order_id }</Text>
+          </Pressable>
         </View>
         <View>
           <Text style={styles.orderInfo}>{ new Date(order[0].created_at).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) }h</Text>
