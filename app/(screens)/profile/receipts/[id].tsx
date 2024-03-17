@@ -47,9 +47,13 @@ export default function ReceiptDetailScreen() {
   const onPrint = () => {
     setPrintMode(true);
     setTimeout(() => {
-      window.print();
-      setPrintMode(false);
-    }, 5000);
+      print();
+    }, 100);
+  };
+
+  const print = () => {
+    window.print();
+    setPrintMode(false);
   };
 
   //TODO PAU continue here: try spawning iframe with html invoice inside and triggering print on the iframes html
