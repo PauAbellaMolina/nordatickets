@@ -49,7 +49,7 @@ export default function ReceiptDetailScreen() {
     setTimeout(() => {
       window.print();
       setPrintMode(false);
-    }, 1000);
+    }, 5000);
   };
 
   //TODO PAU continue here: try spawning iframe with html invoice inside and triggering print on the iframes html
@@ -317,8 +317,8 @@ const styles = StyleSheet.create({
   },
   printButton: {
     alignSelf: 'center',
-    marginTop: 10,
-    marginBottom: 50,
+    marginTop: 15,
+    marginBottom: 20,
     paddingHorizontal: 15,
     paddingVertical: 7,
     borderRadius: 13,
