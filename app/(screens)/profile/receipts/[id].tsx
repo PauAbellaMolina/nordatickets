@@ -30,10 +30,9 @@ export default function ReceiptDetailScreen() {
       if (error) return;
       const paginatedWalletTickets = [];
       paginatedWalletTickets.push(wallet_tickets.slice(0, 10));
-      for (let i = 7; i < wallet_tickets.length; i += 14) {
-        paginatedWalletTickets.push(wallet_tickets.slice(i, i + 14));
+      for (let i = 10; i < wallet_tickets.length; i += 20) {
+        paginatedWalletTickets.push(wallet_tickets.slice(i, i + 20));
       }
-      console.log("paginatedWalletTickets", paginatedWalletTickets);
       setPaginatedWalletTickets(paginatedWalletTickets);
 
       const eventId = wallet_tickets[0].event_id;
@@ -50,23 +49,23 @@ export default function ReceiptDetailScreen() {
     setTimeout(() => {
       window.print();
       setPrintMode(false);
-    }, 100);
+    }, 1000);
   };
 
-  //TODO PAU continue here: try spawning iframe with html invoice inside and triggering print on the html
+  //TODO PAU continue here: try spawning iframe with html invoice inside and triggering print on the iframes html
   
   return (
-    <View style={[styles.container, !printMode ? {paddingTop: 75} : null]}>
+    <View style={[styles.container, !printMode ? {paddingTop: 75, flex: 1} : null]}>
       <>{ !printMode ?
         <><GoBackArrow light={theme === 'dark'} />
         <Text style={styles.title}>Rebut { id }</Text></>
       : null }</>
       <FlatList
         data={paginatedWalletTickets}
-        renderItem={({ item, index }) => {
+        renderItem={({ item: walletTickets, index: walletTicketsIndex }) => {
           return (
             <View style={[styles.wrapper, !printMode ? styles.wrapperMargins : null]}>
-              { index === 0 ? <>
+              { walletTicketsIndex === 0 ? <>
                 <View style={styles.titleRow}>
                   <TiktLight width={80} height={40} />
                   <Text style={[styles.receiptText, styles.receiptSubtitle]}>Factura Simplificada</Text>
@@ -119,63 +118,62 @@ export default function ReceiptDetailScreen() {
                     </View>
                   </View>
                   <FlatList
-                    data={item}
-                    renderItem={({ item }) => {
-                      return (
+                    data={walletTickets}
+                    renderItem={({ item: ticket, index: ticketIndex }) => {
+                      return (<>
                         <View style={styles.tableRow}>
                           <View style={[styles.tableCell, styles.firstCol]}>
-                            <Text style={[styles.receiptText, styles.tableText]}>{item.event_tickets_name}</Text>
+                            <Text style={[styles.receiptText, styles.tableText]}>{ticket.event_tickets_name}</Text>
                           </View>
                           <View style={styles.tableCell}>
-                            <Text style={[styles.receiptText, styles.tableText]}>{item.price/100}</Text>
+                            <Text style={[styles.receiptText, styles.tableText]}>{ticket.price/100}</Text>
                           </View>
                           <View style={styles.tableCell}>
                             <Text style={[styles.receiptText, styles.tableText]}>1</Text>
                           </View>
                           <View style={styles.tableCell}>
-                            <Text style={[styles.receiptText, styles.tableText]}>{(item.price + eventTicketFee)/100}</Text>
+                            <Text style={[styles.receiptText, styles.tableText]}>{(ticket.price + eventTicketFee)/100}</Text>
                           </View>
                         </View>
-                        //TODO PAU UNCOMMENT AND MAKE BELOW WORK
-                        // { index === item.length - 1 ? <>
-                        //   <View style={styles.tableFooter}>
-                        //     <View style={[styles.tableCell, styles.firstCol]}>
-                        //     </View>
-                        //     <View style={styles.tableCell}>
-                        //     </View>
-                        //     <View style={[styles.tableCell, styles.tableCellTitleFooter, styles.borderTop]}>
-                        //       <Text style={[styles.receiptText, styles.tableText, styles.tableTextEnd]}>Tickets:</Text>
-                        //     </View>
-                        //     <View style={[styles.tableCell, styles.borderTop]}>
-                        //       <Text style={[styles.receiptText, styles.tableText]}>{ item.reduce((acc, ticket) => acc + ticket.price, 0) / 100 }€</Text>
-                        //     </View>
-                        //   </View>
-                        //   <View style={styles.tableFooter}>
-                        //     <View style={[styles.tableCell, styles.firstCol]}>
-                        //     </View>
-                        //     <View style={styles.tableCell}>
-                        //     </View>
-                        //     <View style={[styles.tableCell, styles.tableCellTitleFooter]}>
-                        //       <Text style={[styles.receiptText, styles.tableText, styles.tableTextEnd]}>Gastos de gestió:</Text>
-                        //     </View>
-                        //     <View style={[styles.tableCell]}>
-                        //       <Text style={[styles.receiptText, styles.tableText]}>{ (eventTicketFee * item.length) / 100 }€</Text>
-                        //     </View>
-                        //   </View>
-                        //   <View style={styles.tableFooter}>
-                        //     <View style={[styles.tableCell, styles.firstCol]}>
-                        //     </View>
-                        //     <View style={styles.tableCell}>
-                        //     </View>
-                        //     <View style={[styles.tableCell, styles.tableCellTitleFooter]}>
-                        //       <Text style={[styles.receiptText, styles.tableText, styles.tableTextTitle, styles.tableTextEnd]}>Total:</Text>
-                        //     </View>
-                        //     <View style={styles.tableCell}>
-                        //       <Text style={[styles.receiptText, styles.tableText]}>{ (item.reduce((acc, ticket) => acc + ticket.price, 0) + eventTicketFee * item.length) / 100 }€</Text>
-                        //     </View>
-                        //   </View>
-                        //   </> : null }
-                      )
+                        { walletTicketsIndex === paginatedWalletTickets.length - 1 && ticketIndex === walletTickets.length - 1 ? <>
+                          <View style={styles.tableFooter}>
+                            <View style={[styles.tableCell, styles.firstCol]}>
+                            </View>
+                            <View style={styles.tableCell}>
+                            </View>
+                            <View style={[styles.tableCell, styles.tableCellTitleFooter, styles.borderTop]}>
+                              <Text style={[styles.receiptText, styles.tableText, styles.tableTextEnd]}>Tickets:</Text>
+                            </View>
+                            <View style={[styles.tableCell, styles.borderTop]}>
+                              <Text style={[styles.receiptText, styles.tableText]}>{ walletTickets.reduce((acc, ticket) => acc + ticket.price, 0) / 100 }€</Text>
+                            </View>
+                          </View>
+                          <View style={styles.tableFooter}>
+                            <View style={[styles.tableCell, styles.firstCol]}>
+                            </View>
+                            <View style={styles.tableCell}>
+                            </View>
+                            <View style={[styles.tableCell, styles.tableCellTitleFooter]}>
+                              <Text style={[styles.receiptText, styles.tableText, styles.tableTextEnd]}>Gastos de gestió:</Text>
+                            </View>
+                            <View style={[styles.tableCell]}>
+                              <Text style={[styles.receiptText, styles.tableText]}>{ (eventTicketFee * walletTickets.length) / 100 }€</Text>
+                            </View>
+                          </View>
+                          <View style={styles.tableFooter}>
+                            <View style={[styles.tableCell, styles.firstCol]}>
+                            </View>
+                            <View style={styles.tableCell}>
+                            </View>
+                            <View style={[styles.tableCell, styles.tableCellTitleFooter]}>
+                              <Text style={[styles.receiptText, styles.tableText, styles.tableTextTitle, styles.tableTextEnd]}>Total:</Text>
+                            </View>
+                            <View style={styles.tableCell}>
+                              <Text style={[styles.receiptText, styles.tableText]}>{ (walletTickets.reduce((acc, ticket) => acc + ticket.price, 0) + eventTicketFee * walletTickets.length) / 100 }€</Text>
+                            </View>
+                          </View>
+                          </> : null }
+                      </>)
                     }}
                   />
                 </View>
@@ -196,11 +194,10 @@ export default function ReceiptDetailScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     overflow: 'scroll'
   },
   title: {
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: 'bold',
     paddingHorizontal: 15
   },
@@ -219,8 +216,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8
   },
   wrapperMargins: {
-    minWidth: 325,
-    maxWidth: 450,
+    width: 325,
     marginTop: 30,
     marginBottom: 5,
     marginHorizontal: 25
@@ -235,11 +231,11 @@ const styles = StyleSheet.create({
     marginBottom: 35
   },
   receiptTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold'
   },
   receiptSubtitle: {
-    fontSize: 16
+    fontSize: 14
   },
   generalInfoRow: {
     flexDirection: 'row',
@@ -257,10 +253,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end'
   },
   bodyText: {
-    fontSize: 8
+    fontSize: 6
   },
   bodyTextTitle: {
-    fontSize: 10,
+    fontSize: 8,
     fontWeight: 'bold'
   },
   itemsRow: {
@@ -296,7 +292,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end'
   },
   tableText: {
-    fontSize: 10
+    fontSize: 8
   },
   tableTextTitle: {
     fontWeight: 'bold'
@@ -315,8 +311,7 @@ const styles = StyleSheet.create({
     paddingTop: 8
   },
   printButtonWrapper: {
-    minWidth: 325,
-    maxWidth: 450,
+    width: 325,
     alignContent: 'center',
     marginHorizontal: 25
   },
@@ -333,6 +328,6 @@ const styles = StyleSheet.create({
     gap: 10
   },
   printText: {
-    fontSize: 16
+    fontSize: 14
   }
 });
