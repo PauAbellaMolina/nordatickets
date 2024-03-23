@@ -14,7 +14,7 @@ type Cart = { eventTicket: EventTicket, quantity: number }[] | null;
 
 export default function EventDetailScreen() {
   const theme = useColorScheme() ?? 'light';
-  const { id } = useLocalSearchParams();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const { user, session } = useSupabase();
   const [cardNumber, setCardNumber] = useState<string>();
   const [redsysToken, setRedsysToken] = useState<string>();
@@ -156,14 +156,14 @@ export default function EventDetailScreen() {
       if (!data) {
         return;
       }
-      const formUrl = data.formUrl.replace(/\//g, '%2F');
-      const Ds_MerchantParameters = data.Ds_MerchantParameters.replace(/\//g, '%2F');
-      const Ds_Signature = data.Ds_Signature.replace(/\//g, '%2F');
-      const Ds_SignatureVersion = data.Ds_SignatureVersion.replace(/\//g, '%2F');
+      const formUrl: string = data.formUrl.replace(/\//g, '%2F');
+      const Ds_MerchantParameters: string = data.Ds_MerchantParameters.replace(/\//g, '%2F');
+      const Ds_Signature: string = data.Ds_Signature.replace(/\//g, '%2F');
+      const Ds_SignatureVersion: string = data.Ds_SignatureVersion.replace(/\//g, '%2F');
 
       addPendingTicketsToUser(data.orderId);
 
-      router.push(`/event/paymentModal/${event?.id}/${eventBackgroundColorIndex}/${formUrl}/${Ds_MerchantParameters}/${Ds_Signature}/${Ds_SignatureVersion}`);
+      router.push({ pathname: '/event/paymentModal', params: { eventId: +event?.id, bg: +eventBackgroundColorIndex, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } });
       setLoading(false);
     })
     .catch((err) => {
@@ -207,7 +207,9 @@ export default function EventDetailScreen() {
 
   return (
     <View style={styles.container}>
-      { event ?
+      { !event ?
+        <><ActivityIndicator size="large" /></>
+        :
         <>
           <View style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor}]}>
           {/* <View style={styles.eventInfoContainer}> */}
@@ -275,8 +277,6 @@ export default function EventDetailScreen() {
             <></>
           }
         </>
-        :
-        <ActivityIndicator style={{marginTop: '90%'}} size="large" />
       }
       {/* <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} /> */}
     </View> 
@@ -286,7 +286,8 @@ export default function EventDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     display: 'flex',
-    height: '100%'
+    height: '100%',
+    justifyContent: 'center'
   },
   eventInfoContainer: {
     height: 180,

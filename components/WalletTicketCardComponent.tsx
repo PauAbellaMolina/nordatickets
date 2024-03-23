@@ -130,7 +130,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
     if (eventTicketOrderStatus !== 'PAYMENT_SUCCEDED') {
       return;
     }
-    router.push(`/wallet/activateTicket/${walletTicket.id}/${walletTicket.event_tickets_name}/${walletTicket.event_id}`);
+    router.push(`/wallet/activateTicket/${walletTicket.id}`);
   };
 
   return (

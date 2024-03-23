@@ -10,14 +10,12 @@ import { supabase } from "../../../../supabase";
 export default function ActivateTicketScreen() {
   const theme = useColorScheme() ?? 'light';
   const [loading, setLoading] = useState<boolean>(false);
-  const [ticketActive, setTicketActive] = useState<boolean>(true);
+  const [ticketActive, setTicketActive] = useState<boolean>(undefined);
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
   const [eventName, setEventName] = useState<string>('');
+  const [ticketName, setTicketName] = useState<string>('');
 
-  const { activateTicketParams } = useLocalSearchParams();
-  const ticketId = activateTicketParams[0];
-  const ticketName = activateTicketParams[1];
-  const eventId = activateTicketParams[2];
+  const { id } = useLocalSearchParams<{ id: string }>();
 
   const chooseRandomColor = (): string => {
     const colors = Colors.eventBackgroundColorsArray[theme]
@@ -28,16 +26,17 @@ export default function ActivateTicketScreen() {
   useEffect(() => {
     setEventBackgroundColor(chooseRandomColor);
 
-    supabase.from('wallet_tickets').select().eq('id', ticketId)
+    supabase.from('wallet_tickets').select().eq('id', id)
     .then(({ data: wallet_tickets, error }) => {
       if (error || !wallet_tickets.length) return;
       setTicketActive(!wallet_tickets[0].used);
-    });
-
-    supabase.from('events').select().eq('id', eventId)
-    .then(({ data: events, error }) => {
-      if (error || !events.length) return;
-      setEventName(events[0].name);
+      setTicketName(wallet_tickets[0].event_tickets_name);
+      
+      supabase.from('events').select().eq('id', wallet_tickets[0].event_id)
+      .then(({ data: events, error }) => {
+        if (error || !events.length) return;
+        setEventName(events[0].name);
+      });
     });
 
   }, []);
@@ -80,7 +79,7 @@ export default function ActivateTicketScreen() {
     }
 
     setLoading(true);
-    supabase.from('wallet_tickets').update({ used: true }).eq('id', ticketId).select()
+    supabase.from('wallet_tickets').update({ used: true }).eq('id', id).select()
     .then(({ data: wallet_tickets, error }) => {
       if (error || !wallet_tickets.length) return;
       setTicketActive(!wallet_tickets[0].used);
@@ -93,8 +92,12 @@ export default function ActivateTicketScreen() {
       { Platform.OS !== 'web' ? <View style={styles.expanderNotch}></View> : <></> }
       <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
         <View style={styles.ticketTopContainer}>
-          <Text style={styles.title}>{ ticketName }</Text>
-          <Text style={styles.subtitle}>{ eventName || '...' }</Text>
+          { !eventName || !ticketName ? <>
+            <ActivityIndicator size="large" />
+          </> : <>
+            <Text style={styles.title}>{ ticketName }</Text>
+            <Text style={styles.subtitle}>{ eventName }</Text>
+          </>}
         </View>
         <View style={styles.ticketDecorContainer}>
           <View style={styles.ticketLeftCutout}></View>
@@ -102,17 +105,17 @@ export default function ActivateTicketScreen() {
           <View style={styles.ticketRightCutout}></View>
         </View>
         <View style={styles.ticketBottomContainer}>
-          <View style={[styles.statusContainer, {backgroundColor: ticketActive ? '#3fde7a' : '#ff3737'}]}>
-            { ticketActive ?
-              <>
+          <View style={[styles.statusContainer, {backgroundColor: ticketActive === undefined ? 'transparent' : ticketActive ? '#3fde7a' : '#ff3737'}]}>
+            { ticketActive === undefined ? <>
+              <Text style={[styles.statusText, {color: Colors['light'].text}]}>Carregant ticket...</Text>
+              <Text style={styles.statusInfoText}> </Text>
+            </> : <>{ ticketActive ? <>
                 <Text style={[styles.statusText, {color: Colors['light'].text}]}>Ticket actiu</Text>
                 <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>Desactivar ticket al rebre la beguda</Text>
-              </>
-            :
-              <>
+              </> : <>
                 <Text style={[styles.statusText, {color: Colors['light'].text}]}>Ticket desactivat</Text>
                 <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>Aquest ticket ja ha sigut utilitzat</Text>
-              </>
+              </>}</>
             }
           </View>
         </View>
@@ -186,8 +189,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     paddingHorizontal: 20,
-    paddingVertical: 20,
-    // paddingTop: 25
+    paddingVertical: 20
   },
   ticketDecorContainer: {
     flexDirection: 'row',

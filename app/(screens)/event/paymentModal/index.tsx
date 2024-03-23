@@ -9,19 +9,17 @@ import Colors from '../../../../constants/Colors';
 
 export default function PaymentModalScreen() {
   const theme = useColorScheme() ?? 'light';
-  const { paymentParams } = useLocalSearchParams();
-  const eventId = paymentParams[0];
-  const eventBackgroundColorIndex = +paymentParams[1];
-  const formUrl = paymentParams[2].replace(/%2F/g, '/');
-  const Ds_MerchantParameters = paymentParams[3].replace(/%2F/g, '/');
-  const Ds_Signature = paymentParams[4].replace(/%2F/g, '/');
-  const Ds_SignatureVersion = paymentParams[5].replace(/%2F/g, '/');
+  const { eventId, bg, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } = useLocalSearchParams<{ eventId: string, bg: string, formUrl: string, Ds_MerchantParameters: string, Ds_Signature: string, Ds_SignatureVersion: string }>();
+  const parsedFormUrl = formUrl.replace(/%2F/g, '/');
+  const parsedDs_MerchantParameters = Ds_MerchantParameters.replace(/%2F/g, '/');
+  const parsedDs_Signature = Ds_Signature.replace(/%2F/g, '/');
+  const parsedDs_SignatureVersion = Ds_SignatureVersion.replace(/%2F/g, '/');
   
   return (
     <View style={[styles.container, Platform.OS !== 'web' ? {marginTop: 50} : {paddingHorizontal: 15, paddingVertical: 20}]}>
       { Platform.OS === 'web' ? <>
         <View style={styles.fakeBackground}>
-          <View style={[styles.eventInfoContainer, {backgroundColor: Colors.eventBackgroundColorsArray[theme][eventBackgroundColorIndex]}]}>
+          <View style={[styles.eventInfoContainer, {backgroundColor: Colors.eventBackgroundColorsArray[theme][bg]}]}>
             <GoBackArrow />
           </View>
         </View>
@@ -35,10 +33,10 @@ export default function PaymentModalScreen() {
                 <body onload='document.forms[0].submit();'>
                   <h1>Carregant...</h1>
                   <p>Si no ets redireccionat a la pantalla de pagament automàticament, clica el següent botó.</p>
-                  <form action='${formUrl}' method='post'>
-                    <input type='hidden' name='Ds_MerchantParameters' value='${Ds_MerchantParameters}' />
-                    <input type='hidden' name='Ds_Signature' value='${Ds_Signature}' />
-                    <input type='hidden' name='Ds_SignatureVersion' value='${Ds_SignatureVersion}' />
+                  <form action='${parsedFormUrl}' method='post'>
+                    <input type='hidden' name='Ds_MerchantParameters' value='${parsedDs_MerchantParameters}' />
+                    <input type='hidden' name='Ds_Signature' value='${parsedDs_Signature}' />
+                    <input type='hidden' name='Ds_SignatureVersion' value='${parsedDs_SignatureVersion}' />
                     <input class='submitBtn' type='submit' value='Anar-hi' />
                   </form>
                 </body>
@@ -71,10 +69,10 @@ export default function PaymentModalScreen() {
             <body onload="document.forms[0].submit();">
               <h1>Carregant...</h1>
               <p>Si no ets redireccionat a la pantalla de pagament automàticament, clica el següent botó.</p>
-              <form action="${formUrl}" method="post">
-                <input type="hidden" name="Ds_MerchantParameters" value="${Ds_MerchantParameters}" />
-                <input type="hidden" name="Ds_Signature" value="${Ds_Signature}" />
-                <input type="hidden" name="Ds_SignatureVersion" value="${Ds_SignatureVersion}" />
+              <form action="${parsedFormUrl}" method="post">
+                <input type="hidden" name="Ds_MerchantParameters" value="${parsedDs_MerchantParameters}" />
+                <input type="hidden" name="Ds_Signature" value="${parsedDs_Signature}" />
+                <input type="hidden" name="Ds_SignatureVersion" value="${parsedDs_SignatureVersion}" />
                 <input class="submitBtn" type="submit" value="Anar-hi" />
               </form>
             </body>

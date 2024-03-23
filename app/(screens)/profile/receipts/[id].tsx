@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Dimensions } from 'react-native';
+import { FlatList, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 import { View, Text } from '../../../../components/Themed';
 import { WalletTicket } from "../../../../types/supabaseplain";
 import { useLocalSearchParams } from 'expo-router';
@@ -9,11 +9,14 @@ import { useSupabase } from '../../../../context/SupabaseProvider';
 
 export default function ReceiptDetailScreen() {
   const { user } = useSupabase();
-  const { id } = useLocalSearchParams(); //TODO PAU make sure that the user will only be able to retrieve their own receipts. With the corret fetch and also RLS config!!!!
+  const { id } = useLocalSearchParams<{ id: string }>(); //TODO PAU make sure that the user will only be able to retrieve their own receipts. With the correct fetch and also RLS config!!!!
   const { width, height } = Dimensions.get('window');
   const vwpDimension = width < height/1.414 ? width : height/1.414;
 
+  const [loaded, setLoaded] = useState<boolean>(false);
   const [paginatedWalletTickets, setPaginatedWalletTickets] = useState<WalletTicket[][]>([]);
+  const [receiptDate, setReceiptDate] = useState<Date>(null);
+  const [eventName, setEventName] = useState<string>(null);
   const [eventTicketFee, setEventTicketFee] = useState<number>(null);
 
   useEffect(() => {
@@ -21,10 +24,18 @@ export default function ReceiptDetailScreen() {
     fetchWalletTickets();
   }, [user]);
 
+  useEffect(() => {
+    if (paginatedWalletTickets.length && eventName && eventTicketFee && receiptDate && !loaded) {
+      setLoaded(true);
+    }
+  }, [paginatedWalletTickets, eventName, eventTicketFee, receiptDate]);
+
   const fetchWalletTickets = () => { //TODO PAU the same useFocusEffect() stuff on WalletTicketCardComponent could be used here to optimize, but it's not as crucial as there
     supabase.from('wallet_tickets').select().eq('user_id', user.id).eq('order_id', id).order('created_at', { ascending: false })
     .then(({ data: wallet_tickets, error }) => {
       if (error) return;
+      setReceiptDate(new Date(wallet_tickets[0].created_at));
+      
       const paginatedWalletTickets = [];
       paginatedWalletTickets.push(wallet_tickets.slice(0, 19));
       for (let i = 19; i < wallet_tickets.length; i += 40) {
@@ -37,11 +48,17 @@ export default function ReceiptDetailScreen() {
       .then(({ data: events, error }) => {
         if (error || !events.length) return;
         setEventTicketFee(events[0].ticket_fee);
+        setEventName(events[0].name);
       });
     });
   };
   
-  return (
+  return !loaded ? 
+  (
+    <View style={{height: '100%', justifyContent: 'center'}}>
+      <ActivityIndicator size="large" />
+    </View>
+  ) : (
     <View style={styles.container}>
       <FlatList
         contentContainerStyle={{alignItems: 'center'}}
@@ -81,7 +98,11 @@ export default function ReceiptDetailScreen() {
                     </View>
                     <View style={[styles.generalInfoEntry, styles.alignedRight]}>
                       <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>Data de la compra</Text>
-                      <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>xxxx</Text>
+                      <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ receiptDate.getDay() }/{ receiptDate.getMonth() }/{ receiptDate.getFullYear() } { receiptDate.getHours() }:{ ('0'+receiptDate.getMinutes()).slice(-2) }</Text>
+                    </View>
+                    <View style={[styles.generalInfoEntry, styles.alignedRight]}>
+                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>Esdeveniment</Text>
+                      <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ eventName }</Text>
                     </View>
                   </View>
                 </View>

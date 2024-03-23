@@ -30,22 +30,22 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
   
   return (
     <>
-      { event ?
-        <View style={[styles.eventContainer, {backgroundColor: eventBackgroundColor}]}>
-          <View style={styles.eventHeaderContainer}>
-            <Text style={[styles.eventName, {color: Colors['light'].text}]}>{event.name}</Text>
-          </View>
-          <FlatList
-            columnWrapperStyle={{flexWrap: 'wrap', gap: 10}}
-            numColumns={2}
-            style={styles.ticketsList}
-            data={eventWalletTickets}
-            renderItem={({ item }) => <WalletTicketCardComponent walletTicket={item} />}
-          />
-        </View>
-      :
-        <ActivityIndicator style={{marginTop: '25%'}} size="large" />
-      }
+      <View style={[styles.eventContainer, {backgroundColor: eventBackgroundColor}]}>
+        { event ? <>
+            <View style={styles.eventHeaderContainer}>
+              <Text style={[styles.eventName, {color: Colors['light'].text}]}>{event.name}</Text>
+            </View>
+            <FlatList
+              columnWrapperStyle={{flexWrap: 'wrap', gap: 10}}
+              numColumns={2}
+              style={styles.ticketsList}
+              data={eventWalletTickets}
+              renderItem={({ item }) => <WalletTicketCardComponent walletTicket={item} />}
+            />
+        </> :
+          <ActivityIndicator style={{marginVertical: '15%'}} size="large" />
+        }
+      </View>
     </>
   );
 }

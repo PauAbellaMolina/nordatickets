@@ -13,7 +13,7 @@ export {
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)', //PAU info this makes everything work, if this is not (wallet), navigation fails
+  initialRouteName: '(tabs)',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -53,10 +53,9 @@ function RootLayoutNav() {
           <Stack.Screen name="(auth)/welcome" options={{ title: 'ElTeuTikt', headerShown: false }} />
           <Stack.Screen name="(auth)/login" options={{ title: 'Iniciar sessió', headerShown: false }} />
           <Stack.Screen name="(auth)/signup" options={{ title: 'Creació del compte', headerShown: false }} />
-          <Stack.Screen name="(screens)/loadingApp" options={{ headerShown: false }} />
           <Stack.Screen name="(screens)/event/[id]" options={{ title: 'Esdeveniment', headerShown: false }} />
-          <Stack.Screen name="(screens)/event/paymentModal/[...paymentParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Pagament', headerShown: false }} />
-          <Stack.Screen name="(screens)/wallet/activateTicket/[...activateTicketParams]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Activar ticket', headerShown: false }} />
+          <Stack.Screen name="(screens)/event/paymentModal/index" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Pagament', headerShown: false }} />
+          <Stack.Screen name="(screens)/wallet/activateTicket/[id]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Activar ticket', headerShown: false }} />
           <Stack.Screen name="(screens)/profile/receipts/index" options={{ title: 'Rebuts de compra', headerShown: false }} />
           <Stack.Screen name="(screens)/profile/receipts/[id]" options={{ title: 'Detalls del rebut de compra', headerShown: false }} />
         </Stack>
