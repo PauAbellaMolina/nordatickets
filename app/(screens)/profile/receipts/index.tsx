@@ -8,9 +8,8 @@ import { supabase } from '../../../../supabase';
 import ReceiptsOrderComponent from '../../../../components/ReceiptsOrderComponent';
 
 export default function ReceiptsScreen() {
-
   const theme = useColorScheme() ?? 'light';
-  const { user } = useSupabase();
+  const { user, i18n } = useSupabase();
 
   const [orderIdGroupedWalletTickets, setOrderIdGroupedWalletTickets] = useState<WalletTicket[][]>([]);
   const [eventIdsNames, setEventIdsNames] = useState<{ id: number, name: string }[]>([]);
@@ -56,7 +55,7 @@ export default function ReceiptsScreen() {
   return (
     <View style={styles.container}>
       <GoBackArrow light={theme === 'dark'} />
-      <Text style={styles.title}>Rebuts de compra</Text>
+      <Text style={styles.title}>{ i18n?.t('buyReceipts') }</Text>
       <View style={styles.wrapper}>
         <FlatList
           data={orderIdGroupedWalletTickets}

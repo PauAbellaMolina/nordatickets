@@ -4,7 +4,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack, router } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { SupabaseProvider } from '../context/SupabaseProvider';
+import { SupabaseProvider, useSupabase } from '../context/SupabaseProvider';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -43,6 +43,7 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const { i18n } = useSupabase();
   const colorScheme = useColorScheme();
 
   return (
@@ -51,13 +52,13 @@ function RootLayoutNav() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)/welcome" options={{ title: 'ElTeuTikt', headerShown: false }} />
-          <Stack.Screen name="(auth)/login" options={{ title: 'Iniciar sessió', headerShown: false }} />
-          <Stack.Screen name="(auth)/signup" options={{ title: 'Creació del compte', headerShown: false }} />
-          <Stack.Screen name="(screens)/event/[id]" options={{ title: 'Esdeveniment', headerShown: false }} />
-          <Stack.Screen name="(screens)/event/paymentModal/index" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Pagament', headerShown: false }} />
-          <Stack.Screen name="(screens)/wallet/activateTicket/[id]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: 'Activar ticket', headerShown: false }} />
-          <Stack.Screen name="(screens)/profile/receipts/index" options={{ title: 'Rebuts de compra', headerShown: false }} />
-          <Stack.Screen name="(screens)/profile/receipts/[id]" options={{ title: 'Detalls del rebut de compra', headerShown: false }} />
+          <Stack.Screen name="(auth)/login" options={{ title: i18n?.t('logIn'), headerShown: false }} />
+          <Stack.Screen name="(auth)/signup" options={{ title: i18n?.t('accountCreation'), headerShown: false }} />
+          <Stack.Screen name="(screens)/event/[id]" options={{ title: i18n?.t('event'), headerShown: false }} />
+          <Stack.Screen name="(screens)/event/paymentModal/index" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: i18n?.t('payment'), headerShown: false }} />
+          <Stack.Screen name="(screens)/wallet/activateTicket/[id]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: i18n?.t('activateTicket'), headerShown: false }} />
+          <Stack.Screen name="(screens)/profile/receipts/index" options={{ title: i18n?.t('buyReceipts'), headerShown: false }} />
+          <Stack.Screen name="(screens)/profile/receipts/[id]" options={{ title: i18n?.t('buyReceiptDetails'), headerShown: false }} />
         </Stack>
       </ThemeProvider>
     </SupabaseProvider>

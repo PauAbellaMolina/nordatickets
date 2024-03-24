@@ -15,7 +15,7 @@ type Cart = { eventTicket: EventTicket, quantity: number }[] | null;
 export default function EventDetailScreen() {
   const theme = useColorScheme() ?? 'light';
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { user, session } = useSupabase();
+  const { user, session, i18n } = useSupabase();
   const [cardNumber, setCardNumber] = useState<string>();
   const [redsysToken, setRedsysToken] = useState<string>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
@@ -63,23 +63,18 @@ export default function EventDetailScreen() {
       if (error || !users.length) return;
       setCardNumber(users[0].card_number);
       setRedsysToken(users[0].redsys_token);
+      
+      const userEventIdsFollowing = users[0].event_ids_following;
+      if (userEventIdsFollowing.includes(+id)) {
+        return;
+      }
+      supabase.from('users')
+      .update({
+        event_ids_following: [...userEventIdsFollowing, +id]
+      })
+      .eq('id', user?.id).select().then();
     });
   }, [user]);
-
-  // useEffect(() => { //PAU info this adds event to user's event following list. Idea is to make a qr to go to this page (event/id) and that will add it to user's event list. Latest Info: Deep linking on web should work for this feature to be implemented.
-  //   if (!event || !user || user.eventIdsFollowing.includes(id as string)) {
-  //     return;
-  //   }
-  //   const userDocRef = doc(FIRESTORE_DB, 'users', user.id);
-  //   updateDoc(userDocRef, {
-  //     eventIdsFollowing: [...user.eventIdsFollowing, id]
-  //   }).then(() => {
-  //     setUser({
-  //       ...user,
-  //       eventIdsFollowing: [...user.eventIdsFollowing, id as string]
-  //     });
-  //   });
-  // }, [event]);
 
   useEffect(() => {
     if (!cart) {
@@ -212,17 +207,16 @@ export default function EventDetailScreen() {
         :
         <>
           <View style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor}]}>
-          {/* <View style={styles.eventInfoContainer}> */}
             <GoBackArrow />
             <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
-            <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}</Text>
+            <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
           </View>
           { eventTickets ?
             <>
               <View style={styles.ticketsContainer}>
                 <View style={styles.sellingStatusContainer}>
                   <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
-                  <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{event.selling ? 'Venent' : 'No venent'}</Text>
+                  <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{ i18n?.t(event.selling ? 'selling': 'notSelling') }</Text>
                 </View>
                 <Text style={styles.subtitle}>Tickets:</Text>
                 <FlatList
@@ -234,11 +228,11 @@ export default function EventDetailScreen() {
               { orderConfirmed ?
                 <Pressable style={[styles.orderConfirmedContainer, {backgroundColor: Colors[theme].cartContainerBackground}]} onPress={onGoToWallet}>
                   <FeatherIcon name="check-circle" size={40} color={Colors[theme].text} />
-                  <View style={styles.orderConfirmedTextContainer}><Text style={styles.orderConfirmedSubtitle}>Tickets afegits a la wallet</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
+                  <View style={styles.orderConfirmedTextContainer}><Text style={styles.orderConfirmedSubtitle}>{ i18n?.t('ticketsAddedToWallet') }</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
                 </Pressable>
               :
                 <View style={[styles.cartContainer, {backgroundColor: Colors[theme].cartContainerBackground}]}>
-                  <View style={styles.cartTitleRowContainer}><Text style={styles.subtitle}>Cistella</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
+                  <View style={styles.cartTitleRowContainer}><Text style={styles.subtitle}>{ i18n?.t('cart') }</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
                   { cart?.length ?
                     <>
                       <FlatList
@@ -250,25 +244,25 @@ export default function EventDetailScreen() {
                       { event.ticket_fee ?
                         <View style={{marginHorizontal: 8, flexDirection: 'row', alignItems: 'flex-end'}}>
                           <Text style={[styles.transactionFeePrice, {color: Colors[theme].cartContainerBackgroundContrast}]}>+ {event.ticket_fee * cartTotalQuantity / 100}€ </Text>
-                          <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>comissió de servei</Text>
+                          <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('serviceFee') }</Text>
                         </View>
                       : null }
                         { cardNumber ?
                           <View style={styles.usingCreditCardContainer}>
                             <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
-                            <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>Utilitzant la tarjeta {cardNumber.slice(-7)}</Text>
+                            <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCreditCard') } {cardNumber.slice(-7)}</Text>
                           </View>
                         : null }
                       <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground}]} onPress={onBuyCart}>
                       { loading ?
                         <ActivityIndicator style={{marginVertical: 1.5}} size="small" />
                       :
-                        <Text style={styles.buyButtonText}>{(cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)) / 100 + '€  ·  Comprar'}</Text>
+                        <Text style={styles.buyButtonText}>{(cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)) / 100 + '€  ·  '}{ i18n?.t('buy') }</Text>
                       }
                       </Pressable>
                     </>
                   :
-                    <Text style={[styles.emptyCard, {color: Colors[theme].cartContainerBackgroundContrast}]}>No hi ha tickets a la cistella</Text>
+                    <Text style={[styles.emptyCard, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('noTicketsInCart') }</Text>
                   }
                 </View>
               }

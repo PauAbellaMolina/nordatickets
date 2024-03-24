@@ -10,7 +10,7 @@ import { FeatherIcon } from "../../components/CustomIcons";
 export default function Signup() {
   const theme = useColorScheme() ?? 'light';
 
-  const { signInWithOTP, verifyOTP } = useSupabase();
+  const { signInWithOTP, verifyOTP, i18n } = useSupabase();
 
   const [email, setEmail] = useState<string>('');
   const [emailSent, setEmailSent] = useState<boolean>(false);
@@ -31,7 +31,7 @@ export default function Signup() {
     //Magic link
     // signInWithLink(email)
     // .catch(() => {
-    //   setEmailErrorMessage('Torna-ho a intentar');
+    //   setEmailErrorMessage(i18n?.t('tryAgain'));
     // })
     // .finally(() => {
     //   setLoading(false);
@@ -44,7 +44,7 @@ export default function Signup() {
     })
     .catch(() => {
       setEmailSent(false);
-      setEmailErrorMessage('Torna-ho a intentar');
+      setEmailErrorMessage(i18n?.t('tryAgain'));
     })
     .finally(() => {
       //TODO PAU show email sent message
@@ -57,7 +57,7 @@ export default function Signup() {
     setLoading(true);
     verifyOTP(email, oneTimeCode.toString())
     .catch(() => {
-      setEmailErrorMessage('Torna-ho a intentar');
+      setEmailErrorMessage(i18n?.t('tryAgain'));
     })
     .finally(() => {
       setLoading(false);
@@ -77,8 +77,8 @@ export default function Signup() {
   return (
     <BlobsBackground style={styles.container}>
       <View style={[styles.wrapper, {backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity}]}>
-        <Text style={styles.title}>Creació del compte</Text>
-        <Text style={styles.explanation}>T'enviarem un codi de 6 dígits al correu electrònic</Text>
+        <Text style={styles.title}>{ i18n?.t('accountCreation') }</Text>
+        <Text style={styles.explanation}>{ i18n?.t('emailCodeExplanation') }</Text>
         <View style={styles.inputContainer}>
           { !emailSent ?
             <TextInput
@@ -87,7 +87,7 @@ export default function Signup() {
               textContentType="emailAddress"
               autoComplete="email"
               inputMode="email"
-              placeholder="Correu electrònic"
+              placeholder={ i18n?.t('email') }
               onChangeText={setEmail}
             />
           : <>
@@ -101,7 +101,7 @@ export default function Signup() {
               key="oneTimeCodeInput"
               style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
               inputMode="numeric"
-              placeholder="Codi d'un sol ús"
+              placeholder={ i18n?.t('oneTimeCode') }
               onChangeText={setOneTimeCode}
             />
           </>}
@@ -121,7 +121,7 @@ export default function Signup() {
                     onPress={onEmailSignUp}
                     style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') ? 0.5 : 1}]}
                   >
-                    <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>Enviar</Text>
+                    <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('send') }</Text>
                   </Pressable>
                 :
                   <Pressable
@@ -129,7 +129,7 @@ export default function Signup() {
                     onPress={onCodeSubmit}
                     style={[styles.button, {backgroundColor: Colors[theme].text, opacity: oneTimeCode.length !== 6 ? 0.5 : 1}]}
                   >
-                    <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>Registra'm</Text>
+                    <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('signMeUp') }</Text>
                   </Pressable>
                 }
               </>
@@ -138,8 +138,8 @@ export default function Signup() {
         </View>
       </View>
       <View style={styles.bottomActionContainer}>
-        <Text style={styles.bottomActionTitle}>Ja tens un compte?</Text>
-        <Pressable onPress={onGoToLogIn}><Text style={styles.bottomActionLink}>Iniciar sessió</Text></Pressable>
+        <Text style={styles.bottomActionTitle}>{ i18n?.t('alreadyAccountQuestion') }</Text>
+        <Pressable onPress={onGoToLogIn}><Text style={styles.bottomActionLink}>{ i18n?.t('logIn') }</Text></Pressable>
       </View>
     </BlobsBackground>
   );

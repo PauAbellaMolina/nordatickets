@@ -7,9 +7,11 @@ import { FontAwesomeIcon } from './CustomIcons';
 import { supabase } from "../supabase";
 import { WalletTicket } from '../types/supabaseplain';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { useSupabase } from '../context/SupabaseProvider';
 
 export default function WalletTicketCardComponent({ walletTicket }: { walletTicket: WalletTicket}) {
   const theme = useColorScheme() ?? 'light';
+  const { i18n } = useSupabase();
   const [eventTicketOrderStatus, setEventTicketOrderStatus] = useState<string>();
   const [eventTicketUsed, setEventTicketUsed] = useState<boolean>();
 
@@ -142,7 +144,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
           </View>
           <View style={styles.ticketNameWrapper}>
             <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
-            <Text style={[styles.ticketSubtitle, {fontSize: 10, color: theme === 'dark' ? 'lightgray' : 'gray'}]}>Processant pagament...</Text>
+            <Text style={[styles.ticketSubtitle, {fontSize: 10, color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ i18n?.t('paymentProcessing') }...</Text>
           </View>
         </Pressable>
         :
@@ -152,7 +154,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
         </View>
         <View style={styles.ticketNameWrapper}>
           <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
-          <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>Activable</Text>
+          <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ i18n?.t('activable') }</Text>
         </View>
       </Pressable>
       }</>

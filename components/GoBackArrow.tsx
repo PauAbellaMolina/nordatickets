@@ -11,8 +11,7 @@ export default function GoBackArrow({ light }: { light?: boolean }) {
           <FeatherIcon name="arrow-left" size={35} color={light ? Colors['dark'].text : Colors['light'].text} />
         </Pressable>
       </View>
-    : <></>
-    }
+    : <></> }
   </>);
 }
 

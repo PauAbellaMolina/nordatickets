@@ -4,9 +4,11 @@ import { WalletTicket } from "../types/supabaseplain";
 import Colors from '../constants/Colors';
 import { router } from 'expo-router';
 import { FeatherIcon } from './CustomIcons';
+import { useSupabase } from '../context/SupabaseProvider';
 
 export default function ReceiptsOrderComponent({ order, eventName, eventTicketFee }: { order: WalletTicket[], eventName: string, eventTicketFee: number}) {
   const theme = useColorScheme() ?? 'light';
+  const { i18n } = useSupabase();
 
   const onGoToReceiptDetail = () => {
     router.push(`/profile/receipts/${order[0].order_id}`);
@@ -16,7 +18,7 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
     <View style={[styles.container, {backgroundColor: Colors[theme].backgroundContrast}]}>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <View>
-          <Text style={styles.orderTitle}>Identificador:</Text>
+          <Text style={styles.orderTitle}>{ i18n?.t('identifier') }:</Text>
           <Text style={styles.orderTitle}>{ order[0].order_id }</Text>
         </View>
         <View>
@@ -30,8 +32,8 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
           renderItem={({ item }) => <Text>{ item.event_tickets_name } - { item.price / 100 }€</Text>}
         />
         <View>
-          <Text>Comissió: { eventTicketFee ? eventTicketFee * order.length / 100 : '...' }€</Text>
-          <Text style={{fontWeight: 'bold'}}>Total: { (order.reduce((acc, ticket) => acc + ticket.price, 0) + eventTicketFee * order.length) / 100 || '...' }€</Text>
+          <Text>{ i18n?.t('serviceFee') }: { eventTicketFee ? eventTicketFee * order.length / 100 : '...' }€</Text>
+          <Text style={{fontWeight: 'bold'}}>{ i18n?.t('total') }: { (order.reduce((acc, ticket) => acc + ticket.price, 0) + eventTicketFee * order.length) / 100 || '...' }€</Text>
         </View>
       </View>
       <Pressable style={styles.goToReceiptContainer} onPress={onGoToReceiptDetail}>

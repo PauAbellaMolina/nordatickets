@@ -5,9 +5,11 @@ import { View, Text} from "../../components/Themed";
 import TiktDark from '../../assets/svgs/tiktdark.svg';
 import TiktLight from '../../assets/svgs/tiktlight.svg';
 import BlobsBackground from "../../components/BlobsBackground";
+import { useSupabase } from "../../context/SupabaseProvider";
 
 export default function Welcome() {
   const theme = useColorScheme() ?? 'light';
+  const { i18n } = useSupabase();
 
   const onGoToSignUp = () => {
     router.push('/signup');
@@ -21,10 +23,10 @@ export default function Welcome() {
       { theme === 'dark' ? <TiktDark width={175} height={175} /> : <TiktLight width={175} height={175} /> }
       <View style={styles.buttonsContainer}>
         <Pressable onPress={onGoToSignUp} style={[styles.button, {backgroundColor: Colors[theme].text}]}>
-          <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>Crear compte</Text>
+          <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('createAccount') }</Text>
         </Pressable>
         <Pressable onPress={onGoToLogIn} style={[styles.button, {borderWidth: 1, borderColor: Colors[theme].text}]}>
-          <Text style={[styles.buttonText, {color: Colors[theme].text}]}>Iniciar sessió</Text>
+          <Text style={[styles.buttonText, {color: Colors[theme].text}]}>{ i18n?.t('logIn') }</Text>
         </Pressable>
       </View>
     </BlobsBackground>

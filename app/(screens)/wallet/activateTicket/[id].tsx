@@ -6,9 +6,11 @@ import Colors from '../../../../constants/Colors';
 import { Text, View } from '../../../../components/Themed';
 import { FeatherIcon } from '../../../../components/CustomIcons';
 import { supabase } from "../../../../supabase";
+import { useSupabase } from '../../../../context/SupabaseProvider';
 
 export default function ActivateTicketScreen() {
   const theme = useColorScheme() ?? 'light';
+  const { i18n } = useSupabase();
   const [loading, setLoading] = useState<boolean>(false);
   const [ticketActive, setTicketActive] = useState<boolean>(undefined);
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
@@ -47,14 +49,14 @@ export default function ActivateTicketScreen() {
     }
 
     if (Platform.OS === 'web') {
-      if (!window.confirm("Segur que vols desactivar aquest ticket?")) {
+      if (!window.confirm(i18n?.t('deactivateTicketConfirmationQuestion'))) {
         return;
       }
     } else {
       const AsyncAlert = async () => new Promise<boolean>((resolve) => {
         Alert.prompt(
-          "Desactivar ticket",
-          "Segur que vols desactivar aquest ticket?",
+          i18n?.t('deactivateTicket'),
+          i18n?.t('deactivateTicketConfirmationQuestion'),
           [
             {
               text: "No",
@@ -64,7 +66,7 @@ export default function ActivateTicketScreen() {
               style: "cancel"
             },
             {
-              text: "Sí, desactivar",
+              text: i18n?.t('yesDeactivate'),
               onPress: () => {
                 resolve(false);
               }
@@ -107,14 +109,14 @@ export default function ActivateTicketScreen() {
         <View style={styles.ticketBottomContainer}>
           <View style={[styles.statusContainer, {backgroundColor: ticketActive === undefined ? 'transparent' : ticketActive ? '#3fde7a' : '#ff3737'}]}>
             { ticketActive === undefined ? <>
-              <Text style={[styles.statusText, {color: Colors['light'].text}]}>Carregant ticket...</Text>
+              <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('loading') } ticket...</Text>
               <Text style={styles.statusInfoText}> </Text>
             </> : <>{ ticketActive ? <>
-                <Text style={[styles.statusText, {color: Colors['light'].text}]}>Ticket actiu</Text>
-                <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>Desactivar ticket al rebre la beguda</Text>
+                <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketActive') }</Text>
+                <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('deactivateTicketOnDrinkExplanation') }</Text>
               </> : <>
-                <Text style={[styles.statusText, {color: Colors['light'].text}]}>Ticket desactivat</Text>
-                <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>Aquest ticket ja ha sigut utilitzat</Text>
+                <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUnactive') }</Text>
+                <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketAlreadyUsedExplanation') }</Text>
               </>}</>
             }
           </View>
@@ -130,7 +132,7 @@ export default function ActivateTicketScreen() {
           {loading ?
             <ActivityIndicator style={styles.buttonLoading} size="large" />
           :
-            <Text style={styles.buttonText}>Desactivar ticket</Text>
+            <Text style={styles.buttonText}>{ i18n?.t('deactivateTicket') }</Text>
           }
         </Pressable>
       </View>

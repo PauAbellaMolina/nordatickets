@@ -7,7 +7,7 @@ import { useSupabase } from '../../context/SupabaseProvider';
 import { Event } from '../../types/supabaseplain';
 
 export default function TabOneScreen() {
-  const { user } = useSupabase();
+  const { user, i18n } = useSupabase();
   const [events, setEvents] = useState<Event[]>();
   const [userEventIdsFollowing, setUserEventIdsFollowing] = useState<number[]>([]);
 
@@ -30,8 +30,8 @@ export default function TabOneScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>Esdeveniments</Text>
-          <Text style={styles.infoLabel}>Afegeix un esdeveniment pel el seu codi</Text>
+          <Text style={styles.title}>{ i18n?.t('events') }</Text>
+          <Text style={styles.infoLabel}>{ i18n?.t('addEventByQrExplanation') }</Text>
         </View>
       </View>
       { userEventIdsFollowing.length ? <>
@@ -52,7 +52,7 @@ export default function TabOneScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 60,
+    paddingTop: 30,
     paddingBottom: 5,
     paddingHorizontal: 15,
     flex: 1,

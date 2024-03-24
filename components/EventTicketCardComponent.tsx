@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { EventTicket } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { FeatherIcon, FontAwesomeIcon } from './CustomIcons';
+import { useSupabase } from '../context/SupabaseProvider';
 
 export interface TicketCardComponentProps {
   eventSelling: boolean,
@@ -15,17 +15,7 @@ export interface TicketCardComponentProps {
 
 export default function EventTicketCardComponent({eventSelling, quantityInCart, onRemoveTicket, onAddTicket, ticket}: TicketCardComponentProps) {
   const theme = useColorScheme() ?? 'light';
-  const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
-
-  const chooseRandomColor = (): string => {
-    const colors = Colors.eventBackgroundColorsArray[theme]
-    const randomIndex = Math.floor(Math.random() * colors.length);
-    return colors[randomIndex];
-  };
-
-  useEffect(() => {
-    setEventBackgroundColor(chooseRandomColor);
-  }, []);
+  const { i18n } = useSupabase();
 
   const onRemove = () => {
     if (quantityInCart === 0) {
@@ -55,11 +45,9 @@ export default function EventTicketCardComponent({eventSelling, quantityInCart, 
                 <FeatherIcon name="plus-circle" size={28} color={Colors[theme].text} />
               </Pressable>
             </> :
-              <Text style={styles.notAvailable}>No disponible</Text>
+              <Text style={styles.notAvailable}>{ i18n?.t('notAvailable') }</Text>
             }
-          </> :
-            <></>
-          }
+          </> : <></> }
         </View>
       </View>
     </View>
@@ -76,7 +64,7 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 1
     },
     shadowOpacity: 0.08,
     shadowRadius: 1,

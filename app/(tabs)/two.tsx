@@ -7,7 +7,7 @@ import { useSupabase } from '../../context/SupabaseProvider';
 import { WalletTicket } from '../../types/supabaseplain';
 
 export default function TabTwoScreen() {
-  const { user } = useSupabase();
+  const { user, i18n } = useSupabase();
 
   const [eventGroupedWalletTickets, setEventGroupedWalletTickets] = useState<WalletTicket[][]>([]);
 
@@ -63,7 +63,7 @@ export default function TabTwoScreen() {
             ItemSeparatorComponent={() => <View style={{height: 10}} />}
           />
         :
-          <Text style={styles.emptyWallet}>No tickets in wallet</Text>
+          <Text style={styles.emptyWallet}>{ i18n?.t('noTicketsInWallet') }</Text>
         }
       </View>
     </View>
@@ -72,7 +72,7 @@ export default function TabTwoScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 60,
+    paddingTop: 30,
     paddingBottom: 5,
     paddingHorizontal: 15,
     flex: 1,

@@ -5,9 +5,11 @@ import { Event } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { FeatherIcon } from './CustomIcons';
+import { useSupabase } from '../context/SupabaseProvider';
 
 export default function EventCardComponent(event: Event) {
   const theme = useColorScheme() ?? 'light';
+  const { i18n } = useSupabase();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
 
   const goToEventDetail = () => {
@@ -29,11 +31,11 @@ export default function EventCardComponent(event: Event) {
       <View style={[styles.eventCard, {backgroundColor: eventBackgroundColor}]}>
         <View style={styles.eventInfoContainer}>
           <Text style={[styles.eventTitle, {color: Colors['light'].text}]}>{event.name}</Text>
-          <Text ellipsizeMode='tail' numberOfLines={6} style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'}</Text>
+          <Text ellipsizeMode='tail' numberOfLines={6} style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
         </View>
         <View style={styles.sellingStatusContainer}>
           <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
-          <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{event.selling ? 'Venent' : 'No venent'}</Text>
+          <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{ i18n?.t(event.selling ? 'selling': 'notSelling') }</Text>
         </View>
         <View style={styles.goToDetailContainer}>
           <FeatherIcon name="arrow-up-right" size={40} color={Colors['light'].text} />
@@ -54,7 +56,7 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 1
     },
     shadowOpacity: 0.10,
     shadowRadius: 1.5,
@@ -74,7 +76,7 @@ const styles = StyleSheet.create({
   },
   eventDescription: {
     marginTop: 5,
-    fontSize: 13,
+    fontSize: 13
   },
   sellingStatusContainer: {
     position: 'absolute',

@@ -3,11 +3,15 @@ import { Session, User } from "@supabase/supabase-js";
 import { useRouter, useSegments } from "expo-router";
 // import { makeRedirectUri } from 'expo-auth-session'
 import { supabase } from "../supabase";
+import { I18n } from 'i18n-js';
+import { AvailableLocales, dict } from "../assets/translations/translation";
 
 type SupabaseContextProps = {
   user: User | null;
   session: Session | null;
   initialized?: boolean;
+  i18n: I18n | null;
+  setLanguage: (locale: AvailableLocales) => void;
   // signInWithLink: (email: string) => Promise<void>;
   signInWithOTP: (email: string) => Promise<void>;
   verifyOTP: (email: string, code: string) => Promise<void>;
@@ -22,6 +26,8 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
   user: null,
   session: null,
   initialized: false,
+  i18n: null,
+  setLanguage: (locale: AvailableLocales) => {},
   // signInWithLink: async () => {},
   signInWithOTP: async () => {},
   verifyOTP: async () => {},
@@ -34,6 +40,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [initialized, setInitialized] = useState<boolean>(false);
+  const [i18n, setI18n] = useState<I18n | null>(null);
 
   const segments = useSegments()[0];
   const router = useRouter();
@@ -83,7 +90,15 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
     }
   };
 
+  const setLanguage = (locale: AvailableLocales) => {
+    i18n.locale = locale;
+  };
+
   useEffect(() => {
+    const i18n = new I18n(dict);
+    i18n.locale = AvailableLocales.CA; //TODO PAU pull this from browser cookie
+    setI18n(i18n);
+
     const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
       setUser(session ? session.user : null);
@@ -125,6 +140,8 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
         user,
         session,
         initialized,
+        i18n,
+        setLanguage,
         // signInWithLink,
         signInWithOTP,
         verifyOTP,

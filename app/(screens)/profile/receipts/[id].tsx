@@ -8,7 +8,7 @@ import { supabase } from '../../../../supabase';
 import { useSupabase } from '../../../../context/SupabaseProvider';
 
 export default function ReceiptDetailScreen() {
-  const { user } = useSupabase();
+  const { user, i18n} = useSupabase();
   const { id } = useLocalSearchParams<{ id: string }>(); //TODO PAU make sure that the user will only be able to retrieve their own receipts. With the correct fetch and also RLS config!!!!
   const { width, height } = Dimensions.get('window');
   const vwpDimension = width < height/1.414 ? width : height/1.414;
@@ -70,38 +70,38 @@ export default function ReceiptDetailScreen() {
               { walletTicketsIndex === 0 ? <>
                 <View style={styles.titleRow}>
                   <TiktLight width={vwpDimension/6} height={vwpDimension/12} />
-                  <Text style={[styles.receiptText, {fontSize: vwpDimension/24}]}>Factura Simplificada</Text>
+                  <Text style={[styles.receiptText, {fontSize: vwpDimension/24}]}>{ i18n?.t('simplifiedInvoice') }</Text>
                 </View>
                 <View style={styles.generalInfoRow}>
                   <View style={[styles.generalInfoContainer, {gap: vwpDimension/120}]}>
                     <View style={styles.generalInfoEntry}>
-                      <Text style={[styles.receiptText, styles.bodyTextTitle,, {fontSize: vwpDimension/54}]}>Direcció</Text>
+                      <Text style={[styles.receiptText, styles.bodyTextTitle,, {fontSize: vwpDimension/54}]}>{ i18n?.t('address') }</Text>
                       <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>Av. Països Catalans 169 1 3</Text>
                     </View>
                     <View style={styles.generalInfoEntry}>
-                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>Ciutat i País</Text>
-                      <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>Reus, Catalunya, Espanya</Text>
+                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('cityAndCountry') }</Text>
+                      <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>Reus, { i18n?.t('catalonia') }, { i18n?.t('spain') }</Text>
                     </View>
                     <View style={styles.generalInfoEntry}>
                       <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>NIF</Text>
                       <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>39470763A</Text>
                     </View>
                     <View style={styles.generalInfoEntry}>
-                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>Contacte</Text>
+                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('contact') }</Text>
                       <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>factura@elteutikt.com · 694467917</Text>
                     </View>
                   </View>
                   <View style={[styles.generalInfoContainer, {gap: vwpDimension/120}]}>
                     <View style={[styles.generalInfoEntry, styles.alignedRight]}>
-                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>Número de factura</Text>
+                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('invoiceNumber') }</Text>
                       <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ id }</Text>
                     </View>
                     <View style={[styles.generalInfoEntry, styles.alignedRight]}>
-                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>Data de la compra</Text>
+                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('transactionDate') }</Text>
                       <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ receiptDate.getDay() }/{ receiptDate.getMonth() }/{ receiptDate.getFullYear() } { receiptDate.getHours() }:{ ('0'+receiptDate.getMinutes()).slice(-2) }</Text>
                     </View>
                     <View style={[styles.generalInfoEntry, styles.alignedRight]}>
-                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>Esdeveniment</Text>
+                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('event') }</Text>
                       <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ eventName }</Text>
                     </View>
                   </View>
@@ -110,16 +110,16 @@ export default function ReceiptDetailScreen() {
               <View style={styles.table}>
                 <View style={[styles.tableHeader, {borderBottomWidth: vwpDimension/500}]}>
                   <View style={[styles.tableCell, styles.firstCol]}>
-                    <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>Descripció</Text>
+                    <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>{ i18n?.t('description') }</Text>
                   </View>
                   <View style={styles.tableCell}>
-                    <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>Import</Text>
+                    <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>{ i18n?.t('amount') }</Text>
                   </View>
                   <View style={styles.tableCell}>
-                    <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>Quantitat</Text>
+                    <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>{ i18n?.t('quantity') }</Text>
                   </View>
                   <View style={styles.tableCell}>
-                    <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>Total</Text>
+                    <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>{ i18n?.t('total') }</Text>
                   </View>
                 </View>
                 <FlatList
@@ -159,7 +159,7 @@ export default function ReceiptDetailScreen() {
                           <View style={styles.tableCell}>
                           </View>
                           <View style={[styles.tableCell, styles.tableCellTitleFooter]}>
-                            <Text style={[styles.receiptText, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>Gastos de gestió:</Text>
+                            <Text style={[styles.receiptText, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>{ i18n?.t('serviceFee') }:</Text>
                           </View>
                           <View style={[styles.tableCell]}>
                             <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ (eventTicketFee * walletTickets.length) / 100 }€</Text>
@@ -171,7 +171,7 @@ export default function ReceiptDetailScreen() {
                           <View style={styles.tableCell}>
                           </View>
                           <View style={[styles.tableCell, styles.tableCellTitleFooter]}>
-                            <Text style={[styles.receiptText, styles.tableTextTitle, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>Total:</Text>
+                            <Text style={[styles.receiptText, styles.tableTextTitle, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>{ i18n?.t('total') }:</Text>
                           </View>
                           <View style={styles.tableCell}>
                             <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ (walletTickets.reduce((acc, ticket) => acc + ticket.price, 0) + eventTicketFee * walletTickets.length) / 100 }€</Text>

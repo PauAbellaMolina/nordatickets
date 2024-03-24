@@ -6,9 +6,11 @@ import { View } from '../../../../components/Themed';
 import GoBackArrow from '../../../../components/GoBackArrow';
 import { FeatherIcon } from '../../../../components/CustomIcons';
 import Colors from '../../../../constants/Colors';
+import { useSupabase } from '../../../../context/SupabaseProvider';
 
 export default function PaymentModalScreen() {
   const theme = useColorScheme() ?? 'light';
+  const { i18n } = useSupabase();
   const { eventId, bg, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } = useLocalSearchParams<{ eventId: string, bg: string, formUrl: string, Ds_MerchantParameters: string, Ds_Signature: string, Ds_SignatureVersion: string }>();
   const parsedFormUrl = formUrl.replace(/%2F/g, '/');
   const parsedDs_MerchantParameters = Ds_MerchantParameters.replace(/%2F/g, '/');
@@ -31,8 +33,8 @@ export default function PaymentModalScreen() {
             srcDoc={`
               <html>
                 <body onload='document.forms[0].submit();'>
-                  <h1>Carregant...</h1>
-                  <p>Si no ets redireccionat a la pantalla de pagament automàticament, clica el següent botó.</p>
+                  <h1>${ i18n?.t('loading') }...</h1>
+                  <p>${ i18n?.t('clickIfNoRedirectExplanation') }</p>
                   <form action='${parsedFormUrl}' method='post'>
                     <input type='hidden' name='Ds_MerchantParameters' value='${parsedDs_MerchantParameters}' />
                     <input type='hidden' name='Ds_Signature' value='${parsedDs_Signature}' />
@@ -67,8 +69,8 @@ export default function PaymentModalScreen() {
           containerStyle={styles.containerStyle}
           source={{ html: `
             <body onload="document.forms[0].submit();">
-              <h1>Carregant...</h1>
-              <p>Si no ets redireccionat a la pantalla de pagament automàticament, clica el següent botó.</p>
+              <h1>${ i18n?.t('loading') } ...</h1>
+              <p>${ i18n?.t('clickIfNoRedirectExplanation') }</p>
               <form action="${parsedFormUrl}" method="post">
                 <input type="hidden" name="Ds_MerchantParameters" value="${parsedDs_MerchantParameters}" />
                 <input type="hidden" name="Ds_Signature" value="${parsedDs_Signature}" />
