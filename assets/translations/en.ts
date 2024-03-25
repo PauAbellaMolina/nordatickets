@@ -2,6 +2,8 @@ export const en: { [key: string]: string } = {
   event: 'Event',
   events: 'Events',
   addEventByQrExplanation: 'Add an event by scanning its QR code',
+  stopFollowingEventQuestion: 'Stop following this event?',
+  stopFollowingEventConfirmation: 'Yes, stop following',
   noTicketsInWallet: 'No tickets in wallet',
   profile: 'Profile',
   savedCreditCard: 'Saved credit card',

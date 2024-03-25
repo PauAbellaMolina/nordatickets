@@ -2,6 +2,8 @@ export const es: { [key: string]: string } = {
   event: 'Evento',
   events: 'Eventos',
   addEventByQrExplanation: 'Añade un evento escaneando su código QR',
+  stopFollowingEventQuestion: '¿Dejar de seguir este evento?',
+  stopFollowingEventConfirmation: 'Sí, dejar de seguir',
   noTicketsInWallet: 'No tienes tickets en la wallet',
   profile: 'Perfil',
   savedCreditCard: 'Tarjeta de crédito guardada',

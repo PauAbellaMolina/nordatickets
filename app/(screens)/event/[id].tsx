@@ -9,6 +9,7 @@ import GoBackArrow from '../../../components/GoBackArrow';
 import { supabase } from "../../../supabase";
 import { Event, WalletTicket, EventTicket } from '../../../types/supabaseplain';
 import { useSupabase } from '../../../context/SupabaseProvider';
+import { Picker } from '@react-native-picker/picker';
 
 type Cart = { eventTicket: EventTicket, quantity: number }[] | null;
 
@@ -28,6 +29,7 @@ export default function EventDetailScreen() {
   const [loading, setLoading] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [lastBuyAttempt, setLastBuyAttempt] = useState<Date | null>(null);
+  const [selectedOption, setSelectedOption] = useState<string>('misc');
 
   const chooseRandomColor = (): string => {
     const colors = Colors.eventBackgroundColorsArray[theme]
@@ -57,7 +59,7 @@ export default function EventDetailScreen() {
   }, [event]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !event) return;
     supabase.from('users').select().eq('id', user?.id)
     .then(({ data: users, error }) => {
       if (error || !users.length) return;
@@ -74,7 +76,7 @@ export default function EventDetailScreen() {
       })
       .eq('id', user?.id).select().then();
     });
-  }, [user]);
+  }, [user, event]);
 
   useEffect(() => {
     if (!cart) {
@@ -184,14 +186,8 @@ export default function EventDetailScreen() {
     cart.forEach((cartItem) => {
       for (let i = 0; i < cartItem.quantity; i++) {
         const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, event_tickets_name: cartItem.eventTicket.name, order_id: orderId, price: cartItem.eventTicket.price, used: false, user_id: user.id };
-          supabase.from('wallet_tickets').insert(ticketToInsert)
-          .select().then(({ data: wallet_tickets, error }) => { //TODO PAU this is very strange, if i just leave the insert (or insert and select) it doesnt actually insert the rows, but if i add select and then, it does.
-            // if (error) {
-            //   console.log('PAU LOG-> addPendingTicketsToUser error: ', error);
-            //   return;
-            // }
-            // console.log('PAU LOG-> addPendingTicketsToUser success: ', wallet_tickets);
-          });
+        supabase.from('wallet_tickets').insert(ticketToInsert)
+        .select().then();
       }
     });
   };
@@ -200,14 +196,43 @@ export default function EventDetailScreen() {
     router.push('/(tabs)/two');
   };
 
+  const onStopFollowingEvent = () => {
+    setSelectedOption('misc');
+    if (!user || !event) return;
+    supabase.from('users').select().eq('id', user?.id)
+    .then(({ data: users, error }) => {
+      if (error || !users.length) return;
+      const userEventIdsFollowing = users[0].event_ids_following;
+      if (!userEventIdsFollowing.includes(+id)) {
+        return;
+      }
+      const filteredUserEventIdsFollowing = userEventIdsFollowing.filter((eventId) => eventId !== +id);
+      supabase.from('users')
+      .update({
+        event_ids_following: filteredUserEventIdsFollowing
+      })
+      .eq('id', user?.id).select().then();
+    });
+  };
+
   return (
     <View style={styles.container}>
-      { !event ?
-        <><ActivityIndicator size="large" /></>
-        :
-        <>
+      { !event ? <>
+          <ActivityIndicator size="large" />
+        </> : <>
           <View style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor}]}>
             <GoBackArrow />
+            <View style={styles.stopFollowingButton}>
+              <FeatherIcon name="more-horizontal" size={35} color={Colors['light'].text} />
+              <Picker
+                style={styles.optionsPicker}
+                selectedValue={selectedOption}
+                onValueChange={() => onStopFollowingEvent()}
+              >
+                <Picker.Item label={ i18n?.t('stopFollowingEventQuestion') } value="misc" enabled={false} />
+                <Picker.Item label={ i18n?.t('stopFollowingEventConfirmation') } value="unfollow" />
+              </Picker>
+            </View>
             <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
             <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
           </View>
@@ -299,6 +324,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.10,
     shadowRadius: 2.5,
     elevation: 10,
+  },
+  stopFollowingButton: {
+    position: 'absolute',
+    top: 15,
+    right: 15
+  },
+  optionsPicker: {
+    position: 'absolute',
+    width: '100%',
+    opacity: 0
   },
   title: {
     fontSize: 32,

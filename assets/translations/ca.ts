@@ -2,6 +2,8 @@ export const ca: { [key: string]: string } = {
   event: 'Esdeveniment',
   events: 'Esdeveniments',
   addEventByQrExplanation: 'Afegeix un esdeveniment escanejant el seu codi QR',
+  stopFollowingEventQuestion: 'Deixar de seguir aquest esdeveniment?',
+  stopFollowingEventConfirmation: 'Sí, deixar de seguir',
   noTicketsInWallet: 'No tens tickets a la wallet',
   profile: 'Perfil',
   savedCreditCard: 'Targeta de crèdit guardada',

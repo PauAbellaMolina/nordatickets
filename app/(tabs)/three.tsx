@@ -62,8 +62,8 @@ export default function TabThreeScreen() {
             <Picker
               style={styles.languagePicker}
               selectedValue={selectedLanguage}
-              onValueChange={(itemValue) => onSelectedLanguage(itemValue)
-            }>
+              onValueChange={(itemValue) => onSelectedLanguage(itemValue)}
+            >
               <Picker.Item label="Català" value="ca" />
               <Picker.Item label="Castellano" value="es" />
               <Picker.Item label="English" value="en" />
