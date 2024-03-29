@@ -14,7 +14,7 @@ export default function ReceiptDetailScreen() {
   const vwpDimension = width < height/1.414 ? width : height/1.414;
 
   const [loaded, setLoaded] = useState<boolean>(false);
-  const [paginatedWalletTickets, setPaginatedWalletTickets] = useState<WalletTicket[][]>([]);
+  const [paginatedGroupedWalletTickets, setPaginatedGroupedWalletTickets] = useState<WalletTicket[][][]>([]);
   const [receiptDate, setReceiptDate] = useState<Date>(null);
   const [eventName, setEventName] = useState<string>(null);
   const [eventTicketFee, setEventTicketFee] = useState<number>(null);
@@ -25,24 +25,15 @@ export default function ReceiptDetailScreen() {
   }, [user]);
 
   useEffect(() => {
-    if (paginatedWalletTickets.length && eventName && eventTicketFee && receiptDate && !loaded) {
+    if (paginatedGroupedWalletTickets.length && eventName && eventTicketFee && receiptDate && !loaded) {
       setLoaded(true);
     }
-  }, [paginatedWalletTickets, eventName, eventTicketFee, receiptDate]);
+  }, [paginatedGroupedWalletTickets, eventName, eventTicketFee, receiptDate]);
 
   const fetchWalletTickets = () => { //TODO PAU the same useFocusEffect() stuff on WalletTicketCardComponent could be used here to optimize, but it's not as crucial as there
     supabase.from('wallet_tickets').select().eq('user_id', user.id).eq('order_id', id).order('created_at', { ascending: false })
     .then(({ data: wallet_tickets, error }) => {
       if (error) return;
-      setReceiptDate(new Date(wallet_tickets[0].created_at));
-      
-      const paginatedWalletTickets = [];
-      paginatedWalletTickets.push(wallet_tickets.slice(0, 19));
-      for (let i = 19; i < wallet_tickets.length; i += 40) {
-        paginatedWalletTickets.push(wallet_tickets.slice(i, i + 40));
-      }
-      setPaginatedWalletTickets(paginatedWalletTickets);
-
       const eventId = wallet_tickets[0].event_id;
       supabase.from('events').select().eq('id', eventId)
       .then(({ data: events, error }) => {
@@ -50,6 +41,23 @@ export default function ReceiptDetailScreen() {
         setEventTicketFee(events[0].ticket_fee);
         setEventName(events[0].name);
       });
+
+      setReceiptDate(new Date(wallet_tickets[0].created_at));
+
+      const groupedWalletTickets: { [key: string]: WalletTicket[] } = {};
+      wallet_tickets.forEach((ticket) => {
+        if (!groupedWalletTickets[ticket.event_tickets_id]) groupedWalletTickets[ticket.event_tickets_id] = [];
+        groupedWalletTickets[ticket.event_tickets_id].push(ticket);
+      });
+      const arrayGroupedWalletTickets: WalletTicket[][] = Object.values(groupedWalletTickets);
+
+      const paginatedGroupedWalletTickets: WalletTicket[][][] = [];
+      paginatedGroupedWalletTickets.push(arrayGroupedWalletTickets.slice(0, 19));
+      for (let i = 19; i < arrayGroupedWalletTickets.length; i += 40) {
+        paginatedGroupedWalletTickets.push(arrayGroupedWalletTickets.slice(i, i + 40));
+      }
+
+      setPaginatedGroupedWalletTickets(paginatedGroupedWalletTickets);
     });
   };
   
@@ -62,12 +70,12 @@ export default function ReceiptDetailScreen() {
     <View style={styles.container}>
       <FlatList
         contentContainerStyle={{alignItems: 'center'}}
-        data={paginatedWalletTickets}
+        data={paginatedGroupedWalletTickets}
         ItemSeparatorComponent={() => <View style={{height: 20}} /> }
-        renderItem={({ item: walletTickets, index: walletTicketsIndex }) => {
+        renderItem={({ item: page, index: pageIndex }) => {
           return (
             <View style={[styles.folio, {width: vwpDimension}]}>
-              { walletTicketsIndex === 0 ? <>
+              { pageIndex === 0 ? <>
                 <View style={styles.titleRow}>
                   <TiktLight width={vwpDimension/6} height={vwpDimension/12} />
                   <Text style={[styles.receiptText, {fontSize: vwpDimension/24}]}>{ i18n?.t('simplifiedInvoice') }</Text>
@@ -123,24 +131,24 @@ export default function ReceiptDetailScreen() {
                   </View>
                 </View>
                 <FlatList
-                  data={walletTickets}
-                  renderItem={({ item: ticket, index: ticketIndex }) => {
+                  data={page}
+                  renderItem={({ item: tickets, index: ticketsIndex }) => {
                     return (<>
                       <View style={styles.tableRow}>
                         <View style={[styles.tableCell, styles.firstCol]}>
-                          <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ticket.event_tickets_name}</Text>
+                          <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{tickets[0].event_tickets_name}</Text>
                         </View>
                         <View style={styles.tableCell}>
-                          <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ticket.price/100}</Text>
+                          <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{tickets[0].price/100}€</Text>
                         </View>
                         <View style={styles.tableCell}>
-                          <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>1</Text>
+                          <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{tickets.length}</Text>
                         </View>
                         <View style={styles.tableCell}>
-                          <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{(ticket.price + eventTicketFee)/100}</Text>
+                          <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{tickets.reduce((acc, ticket) => acc + ticket.price, 0) / 100}€</Text>
                         </View>
                       </View>
-                      { walletTicketsIndex === paginatedWalletTickets.length - 1 && ticketIndex === walletTickets.length - 1 ? <>
+                      { pageIndex === paginatedGroupedWalletTickets.length - 1 && ticketsIndex === page.length - 1 ? <>
                         <View style={styles.tableFooter}>
                           <View style={[styles.tableCell, styles.firstCol]}>
                           </View>
@@ -150,7 +158,7 @@ export default function ReceiptDetailScreen() {
                             <Text style={[styles.receiptText, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>Tickets:</Text>
                           </View>
                           <View style={[styles.tableCell, styles.borderTop, {borderTopWidth: vwpDimension/500}]}>
-                            <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ walletTickets.reduce((acc, ticket) => acc + ticket.price, 0) / 100 }€</Text>
+                            <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ paginatedGroupedWalletTickets.reduce((acc, page) => acc + page.reduce((acc, walletTickets) => acc + walletTickets.reduce((acc, ticket) => acc + ticket.price, 0), 0), 0) / 100 }€</Text>
                           </View>
                         </View>
                         <View style={styles.tableFooter}>
@@ -162,7 +170,7 @@ export default function ReceiptDetailScreen() {
                             <Text style={[styles.receiptText, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>{ i18n?.t('serviceFee') }:</Text>
                           </View>
                           <View style={[styles.tableCell]}>
-                            <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ (eventTicketFee * walletTickets.length) / 100 }€</Text>
+                            <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ eventTicketFee * paginatedGroupedWalletTickets.reduce((acc, page) => acc + page.reduce((acc, walletTickets) => acc + walletTickets.length, 0), 0) / 100 }€</Text>
                           </View>
                         </View>
                         <View style={styles.tableFooter}>
@@ -174,7 +182,7 @@ export default function ReceiptDetailScreen() {
                             <Text style={[styles.receiptText, styles.tableTextTitle, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>{ i18n?.t('total') }:</Text>
                           </View>
                           <View style={styles.tableCell}>
-                            <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ (walletTickets.reduce((acc, ticket) => acc + ticket.price, 0) + eventTicketFee * walletTickets.length) / 100 }€</Text>
+                            <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ (paginatedGroupedWalletTickets.reduce((acc, page) => acc + page.reduce((acc, walletTickets) => acc + walletTickets.reduce((acc, ticket) => acc + ticket.price, 0), 0), 0) / 100) + (eventTicketFee * paginatedGroupedWalletTickets.reduce((acc, page) => acc + page.reduce((acc, walletTickets) => acc + walletTickets.length, 0), 0) / 100) }€</Text>
                           </View>
                         </View>
                         </> : null }
