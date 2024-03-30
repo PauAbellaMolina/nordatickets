@@ -24,6 +24,10 @@ export default function TabThreeScreen() {
     });
   }, [user]);
 
+  useEffect(() => {
+    setSelectedLanguage(i18n?.locale as AvailableLocales);
+  }, [i18n]);
+
   const onDeleteUserCard = () => {
     supabase.from('users')
     .update({

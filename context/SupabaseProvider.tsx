@@ -5,6 +5,7 @@ import { useRouter, useSegments } from "expo-router";
 import { supabase } from "../supabase";
 import { I18n } from 'i18n-js';
 import { AvailableLocales, dict } from "../assets/translations/translation";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type SupabaseContextProps = {
   user: User | null;
@@ -90,14 +91,37 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
     }
   };
 
-  const setLanguage = (locale: AvailableLocales) => {
+  const storeLocaleCookie = async (locale: AvailableLocales) => {
+    if (!locale) return;
     i18n.locale = locale;
+    try {
+      await AsyncStorage.setItem('locale', locale);
+    } catch (e) { }
+  };
+
+  const setLanguage = (locale: AvailableLocales) => {
+    storeLocaleCookie(locale);
+  };
+
+  const getLocaleFromCookie = async () => {
+    const i18n = new I18n(dict);
+    try {
+      const value = await AsyncStorage.getItem('locale');
+      if (value !== null) {
+        i18n.locale = value as AvailableLocales;
+        setI18n(i18n);
+      } else {
+        i18n.locale = AvailableLocales.CA;
+        setI18n(i18n);
+      }
+    } catch (e) {
+      i18n.locale = AvailableLocales.CA;
+      setI18n(i18n);
+    }
   };
 
   useEffect(() => {
-    const i18n = new I18n(dict);
-    i18n.locale = AvailableLocales.CA; //TODO PAU pull this from browser cookie
-    setI18n(i18n);
+    getLocaleFromCookie();
 
     const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);

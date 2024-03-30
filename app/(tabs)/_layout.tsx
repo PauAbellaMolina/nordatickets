@@ -37,7 +37,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="wallet"
         options={{
           headerShown: false,
           title: '',
@@ -45,7 +45,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="three"
+        name="profile"
         options={{
           headerShown: false,
           title: '',
