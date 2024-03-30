@@ -8,7 +8,7 @@ import BlobsBackground from "../../components/BlobsBackground";
 import { useSupabase } from "../../context/SupabaseProvider";
 import { FeatherIcon } from "../../components/CustomIcons";
 import { Picker } from "@react-native-picker/picker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AvailableLocales } from "../../assets/translations/translation";
 
 export default function Welcome() {
@@ -16,6 +16,10 @@ export default function Welcome() {
   const { i18n, setLanguage } = useSupabase();
 
   const [selectedLanguage, setSelectedLanguage] = useState<AvailableLocales>();
+
+  useEffect(() => {
+    setSelectedLanguage(i18n?.locale as AvailableLocales);
+  }, [i18n]);
 
   const onGoToSignUp = () => {
     router.push('/signup');
