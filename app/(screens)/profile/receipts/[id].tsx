@@ -50,11 +50,10 @@ export default function ReceiptDetailScreen() {
         groupedWalletTickets[ticket.event_tickets_id].push(ticket);
       });
       const arrayGroupedWalletTickets: WalletTicket[][] = Object.values(groupedWalletTickets);
-
       const paginatedGroupedWalletTickets: WalletTicket[][][] = [];
       paginatedGroupedWalletTickets.push(arrayGroupedWalletTickets.slice(0, 19));
-      for (let i = 19; i < arrayGroupedWalletTickets.length; i += 40) {
-        paginatedGroupedWalletTickets.push(arrayGroupedWalletTickets.slice(i, i + 40));
+      for (let i = 19; i < arrayGroupedWalletTickets.length; i += 30) {
+        paginatedGroupedWalletTickets.push(arrayGroupedWalletTickets.slice(i, i + 30));
       }
 
       setPaginatedGroupedWalletTickets(paginatedGroupedWalletTickets);

@@ -8,8 +8,8 @@ export const ca: { [key: string]: string } = {
   profile: 'Perfil',
   savedCreditCard: 'Targeta de crèdit guardada',
   delete: 'Esborrar',
-  buyReceipts: 'Rebuts de compra',
-  buyReceiptDetails: 'Detalls del rebut de compra',
+  purchaseReceipts: 'Rebuts de compra',
+  purchaseReceiptsDetails: 'Detalls del rebut de compra',
   changeLanguage: 'Canviar idioma',
   noAccountQuestion: 'No tens un compte?',
   alreadyAccountQuestion: 'Ja tens un compte?',
@@ -60,4 +60,7 @@ export const ca: { [key: string]: string } = {
   deactivateTicketOnDrinkExplanation: 'Desactivar ticket al rebre la beguda',
   ticketUnactive: 'Ticket desactivat',
   ticketAlreadyUsedExplanation: 'Aquest ticket ja ha estat utilitzat',
+  yourOneTimeCode: "El teu codi d'un sol ús",
+  yourOneTimeCodeGreeting: "Hola! Aquest és el teu codi d'un sol ús:",
+  yourOneTimeCodeExplanation: "Utilitza'l per iniciar sessió a ElTeuTikt"
 };

@@ -55,7 +55,7 @@ export default function ReceiptsScreen() {
   return (
     <View style={styles.container}>
       <GoBackArrow light={theme === 'dark'} />
-      <Text style={styles.title}>{ i18n?.t('buyReceipts') }</Text>
+      <Text style={styles.title}>{ i18n?.t('purchaseReceipts') }</Text>
       <View style={styles.wrapper}>
         <FlatList
           data={orderIdGroupedWalletTickets}

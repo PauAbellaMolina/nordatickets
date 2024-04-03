@@ -6,6 +6,8 @@ import { View, Text} from "../../components/Themed";
 import { useSupabase } from "../../context/SupabaseProvider";
 import BlobsBackground from "../../components/BlobsBackground";
 import { FeatherIcon } from "../../components/CustomIcons";
+import { AvailableLocales } from "../../assets/translations/translation";
+import { authEmailsTranslations } from "../../assets/translations/email";
 
 export default function Login() {
   const theme = useColorScheme() ?? 'light';
@@ -38,7 +40,14 @@ export default function Login() {
     // });
     
     //One time password (OTP)
-    signInWithOTP(email)
+    const langMetaData = authEmailsTranslations[i18n.locale as AvailableLocales];
+    signInWithOTP({
+      email: email,
+      options: {
+        shouldCreateUser: true,
+        data: langMetaData
+      }
+    })
     .then(() => {
       setEmailSent(true);
     })

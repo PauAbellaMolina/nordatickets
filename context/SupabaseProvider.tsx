@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { Session, User } from "@supabase/supabase-js";
+import { Session, SignInWithPasswordlessCredentials, User } from "@supabase/supabase-js";
 import { useRouter, useSegments } from "expo-router";
 // import { makeRedirectUri } from 'expo-auth-session'
 import { supabase } from "../supabase";
@@ -14,7 +14,7 @@ type SupabaseContextProps = {
   i18n: I18n | null;
   setLanguage: (locale: AvailableLocales) => void;
   // signInWithLink: (email: string) => Promise<void>;
-  signInWithOTP: (email: string) => Promise<void>;
+  signInWithOTP: (options: SignInWithPasswordlessCredentials) => Promise<void>;
   verifyOTP: (email: string, code: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -61,13 +61,8 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   //   }
   // };
 
-  const signInWithOTP = async (email: string) => {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        shouldCreateUser: true
-      }
-    });
+  const signInWithOTP = async (options: SignInWithPasswordlessCredentials) => {
+    const { error } = await supabase.auth.signInWithOtp(options);
     if (error) {
       throw error;
     }

@@ -8,8 +8,8 @@ export const en: { [key: string]: string } = {
   profile: 'Profile',
   savedCreditCard: 'Saved credit card',
   delete: 'Delete',
-  buyReceipts: 'Buy receipts',
-  buyReceiptDetails: 'Buy receipt details',
+  purchaseReceipts: 'Purchase receipts',
+  purchaseReceiptsDetails: 'Purchase receipt details',
   changeLanguage: 'Change language',
   noAccountQuestion: 'Don\'t have an account?',
   alreadyAccountQuestion: 'Already have an account?',
@@ -60,4 +60,7 @@ export const en: { [key: string]: string } = {
   deactivateTicketOnDrinkExplanation: 'Deactivate ticket upon receiving drink',
   ticketUnactive: 'Ticket unactive',
   ticketAlreadyUsedExplanation: 'This ticket has already been used',
+  yourOneTimeCode: 'Your one-time code',
+  yourOneTimeCodeGreeting: 'Hello! This is your one-time code:',
+  yourOneTimeCodeExplanation: 'Use this code to log into ElTeuTikt'
 };

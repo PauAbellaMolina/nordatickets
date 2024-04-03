@@ -57,8 +57,8 @@ function RootLayoutNav() {
           <Stack.Screen name="(screens)/event/[id]" options={{ title: i18n?.t('event'), headerShown: false }} />
           <Stack.Screen name="(screens)/event/paymentModal/index" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: i18n?.t('payment'), headerShown: false }} />
           <Stack.Screen name="(screens)/wallet/activateTicket/[id]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: i18n?.t('activateTicket'), headerShown: false }} />
-          <Stack.Screen name="(screens)/profile/receipts/index" options={{ title: i18n?.t('buyReceipts'), headerShown: false }} />
-          <Stack.Screen name="(screens)/profile/receipts/[id]" options={{ title: i18n?.t('buyReceiptDetails'), headerShown: false }} />
+          <Stack.Screen name="(screens)/profile/receipts/index" options={{ title: i18n?.t('purchaseReceipts'), headerShown: false }} />
+          <Stack.Screen name="(screens)/profile/receipts/[id]" options={{ title: i18n?.t('purchaseReceiptsDetails'), headerShown: false }} />
         </Stack>
       </ThemeProvider>
     </SupabaseProvider>

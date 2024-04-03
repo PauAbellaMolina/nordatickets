@@ -60,7 +60,7 @@ export default function TabThreeScreen() {
         </View>
         <View style={[styles.separator, {backgroundColor: Colors[theme].separatorBackgroundColor}]} />
         <View style={styles.entriesContainer}>
-          <Pressable style={styles.entryButton} onPress={() => router.push('/profile/receipts')}><FeatherIcon name="file-text" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('buyReceipts') }</Text></Pressable>
+          <Pressable style={styles.entryButton} onPress={() => router.push('/profile/receipts')}><FeatherIcon name="file-text" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('purchaseReceipts') }</Text></Pressable>
           <View>
             <Pressable style={styles.entryButton}><FeatherIcon name="globe" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('changeLanguage') }</Text></Pressable>
             <Picker
