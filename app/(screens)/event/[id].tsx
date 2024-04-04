@@ -193,7 +193,7 @@ export default function EventDetailScreen() {
   };
 
   const onGoToWallet = () => {
-    router.push('/(tabs)/two');
+    router.push('/(tabs)/wallet');
   };
 
   const onStopFollowingEvent = () => {
