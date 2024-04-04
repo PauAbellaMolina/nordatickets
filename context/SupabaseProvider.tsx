@@ -123,14 +123,14 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
       setUser(session ? session.user : null);
       setInitialized(true);
 
-      //if user not in db users table (not auth.users!) then insert it
+      //if user not in public.users db table (not auth.users!) then insert it
       if (event === "SIGNED_IN" && session && session.user) {
         supabase.from('users').select().eq('id', session.user.id)
         .then(({ data: users, error }) => {
           if (error || users.length > 0) return;
           supabase.from('users').insert({
             id: session.user.id
-          });
+          }).select().then();
         });
       }
     });

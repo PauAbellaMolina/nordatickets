@@ -10,6 +10,9 @@ import { supabase } from "../../../supabase";
 import { Event, WalletTicket, EventTicket } from '../../../types/supabaseplain';
 import { useSupabase } from '../../../context/SupabaseProvider';
 import { Picker } from '@react-native-picker/picker';
+import {
+  FIREBASE_FUNC_GET_FORM_INFO_URL
+} from '@env';
 
 type Cart = { eventTicket: EventTicket, quantity: number }[] | null;
 
@@ -66,7 +69,7 @@ export default function EventDetailScreen() {
       setCardNumber(users[0].card_number);
       setRedsysToken(users[0].redsys_token);
       
-      const userEventIdsFollowing = users[0].event_ids_following;
+      const userEventIdsFollowing = users[0].event_ids_following ?? [];
       if (userEventIdsFollowing.includes(+id)) {
         return;
       }
@@ -135,7 +138,7 @@ export default function EventDetailScreen() {
 
   const getPaymentFormInfo = () => {
     const finalAmount = cartTotalPrice + ((event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0));
-    fetch('https://getforminfo-estcwhnvtq-ew.a.run.app', {
+    fetch(FIREBASE_FUNC_GET_FORM_INFO_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -201,7 +204,7 @@ export default function EventDetailScreen() {
     if (!user || !event) return;
     supabase.from('users').select().eq('id', user?.id)
     .then(({ data: users, error }) => {
-      if (error || !users.length) return;
+      if (error || !users.length || !users[0].event_ids_following?.length) return;
       const userEventIdsFollowing = users[0].event_ids_following;
       if (!userEventIdsFollowing.includes(+id)) {
         return;

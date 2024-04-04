@@ -15,7 +15,7 @@ export default function TabOneScreen() {
     if (!user) return;
     supabase.from('users').select().eq('id', user?.id)
     .then(({ data: users, error }) => {
-      if (error || !users.length) return;
+      if (error || !users.length || !users[0].event_ids_following?.length) return;
       const userEventIdsFollowing = users[0].event_ids_following;
       setUserEventIdsFollowing(userEventIdsFollowing);
       supabase.from('events').select().in('id', userEventIdsFollowing)
@@ -34,7 +34,7 @@ export default function TabOneScreen() {
           <Text style={styles.infoLabel}>{ i18n?.t('addEventByQrExplanation') }</Text>
         </View>
       </View>
-      { userEventIdsFollowing.length ? <>
+      { userEventIdsFollowing?.length ? <>
         { !events ?
           <ActivityIndicator style={{marginTop: '25%'}} size="large" />
           :
