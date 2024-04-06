@@ -64,7 +64,7 @@ export const ca: { [key: string]: string } = {
   deactivateTicketOnDrinkExplanation: 'Desactivar ticket al rebre la beguda',
   ticketUnactive: 'Ticket desactivat',
   ticketAlreadyUsedExplanation: 'Aquest ticket ja ha estat utilitzat',
-  yourOneTimeCode: "El teu codi d'un sol ús",
+  yourOneTimeCode: "El teu codi per un sol ús",
   yourOneTimeCodeGreeting: "Hola! Aquest és el teu codi d'un sol ús:",
   yourOneTimeCodeExplanation: "Utilitza'l per iniciar sessió a ElTeuTikt"
 };
