@@ -59,6 +59,7 @@ function RootLayoutNav() {
           <Stack.Screen name="(screens)/wallet/activateTicket/[id]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: i18n?.t('activateTicket'), headerShown: false }} />
           <Stack.Screen name="(screens)/profile/receipts/index" options={{ title: i18n?.t('purchaseReceipts'), headerShown: false }} />
           <Stack.Screen name="(screens)/profile/receipts/[id]" options={{ title: i18n?.t('purchaseReceiptsDetails'), headerShown: false }} />
+          <Stack.Screen name="(screens)/profile/helpAndTerms/index" options={{ title: i18n?.t('helpAndTermsOfUse'), headerShown: false }} />
         </Stack>
       </ThemeProvider>
     </SupabaseProvider>
