@@ -5,21 +5,14 @@ import { Text, View } from './Themed';
 import { supabase } from "../supabase";
 import { Event, WalletTicket } from '../types/supabaseplain';
 import WalletTicketCardComponent from './WalletTicketCardComponent';
+import { getThemeRandomColor } from '../utils/chooseRandomColor';
 
 export default function WalletEventCardComponent({ eventWalletTickets }: { eventWalletTickets: WalletTicket[] }) {
   const theme = useColorScheme() ?? 'light';
   const [event, setEvent] = useState<Event>();
-  const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
-
-  const chooseRandomColor = (): string => {
-    const colors = Colors.eventBackgroundColorsArray[theme]
-    const randomIndex = Math.floor(Math.random() * colors.length);
-    return colors[randomIndex];
-  };
+  const [eventBackgroundColor, setEventBackgroundColor] = useState<string>();
 
   useEffect(() => {
-    setEventBackgroundColor(chooseRandomColor);
-
     if (!eventWalletTickets.length) return;
     supabase.from('events').select().eq('id', eventWalletTickets[0].event_id)
     .then(({ data: events, error }) => {
@@ -27,10 +20,22 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
       setEvent(events[0]);
     });
   }, [eventWalletTickets]);
+
+  useEffect(() => {
+    if (!event || (theme === 'dark' && !event?.color_code_dark) || (theme === 'light' && !event?.color_code_light)) {
+      setEventBackgroundColor(getThemeRandomColor(theme));
+      return;
+    };
+    if (theme === 'dark') {
+      setEventBackgroundColor(event.color_code_dark);
+    } else {
+      setEventBackgroundColor(event.color_code_light);
+    }
+  }, [event, theme]);
   
   return (
     <>
-      <View style={[styles.eventContainer, {backgroundColor: eventBackgroundColor}]}>
+      <View style={[styles.eventContainer, {backgroundColor: eventBackgroundColor ?? Colors[theme].backgroundContrast}]}>
         { event ? <>
             <View style={styles.eventHeaderContainer}>
               <Text style={[styles.eventName, {color: Colors['light'].text}]}>{event.name}</Text>
@@ -52,7 +57,6 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
 
 const styles = StyleSheet.create({
   eventContainer: {
-    backgroundColor: '#fff',
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 10

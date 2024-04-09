@@ -10,6 +10,7 @@ import { supabase } from "../../../supabase";
 import { Event, WalletTicket, EventTicket } from '../../../types/supabaseplain';
 import { useSupabase } from '../../../context/SupabaseProvider';
 import { Picker } from '@react-native-picker/picker';
+import { getThemeRandomColor } from '../../../utils/chooseRandomColor';
 import {
   FIREBASE_FUNC_GET_FORM_INFO_URL
 } from '@env';
@@ -23,7 +24,6 @@ export default function EventDetailScreen() {
   const [cardNumber, setCardNumber] = useState<string>();
   const [redsysToken, setRedsysToken] = useState<string>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
-  const [eventBackgroundColorIndex, setEventBackgroundColorIndex] = useState<number>(0);
   const [event, setEvent] = useState<Event>();
   const [eventTickets, setEventTickets] = useState<EventTicket[]>();
   const [cart, setCart] = useState<Cart>();
@@ -34,16 +34,7 @@ export default function EventDetailScreen() {
   const [lastBuyAttempt, setLastBuyAttempt] = useState<Date | null>(null);
   const [selectedOption, setSelectedOption] = useState<string>('misc');
 
-  const chooseRandomColor = (): string => {
-    const colors = Colors.eventBackgroundColorsArray[theme]
-    const randomIndex = Math.floor(Math.random() * colors.length);
-    setEventBackgroundColorIndex(randomIndex);
-    return colors[randomIndex];
-  };
-
   useEffect(() => {
-    setEventBackgroundColor(chooseRandomColor);
-
     supabase.from('events').select().eq('id', id as string)
     .then(({ data: events, error }) => {
       if (error || !events.length) return;
@@ -52,6 +43,18 @@ export default function EventDetailScreen() {
 
     return () => setCart(null);
   }, []);
+
+  useEffect(() => {
+    if (!event || (theme === 'dark' && !event?.color_code_dark) || (theme === 'light' && !event?.color_code_light)) {
+      setEventBackgroundColor(getThemeRandomColor(theme));
+      return;
+    };
+    if (theme === 'dark') {
+      setEventBackgroundColor(event.color_code_dark);
+    } else {
+      setEventBackgroundColor(event.color_code_light);
+    }
+  }, [event, theme]);
 
   useEffect(() => {
     supabase.from('event_tickets').select().eq('event_id', id as string)
@@ -163,7 +166,7 @@ export default function EventDetailScreen() {
 
       addPendingTicketsToUser(data.orderId);
 
-      router.push({ pathname: '/event/paymentModal', params: { eventId: +event?.id, bg: +eventBackgroundColorIndex, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } });
+      router.push({ pathname: '/event/paymentModal', params: { eventId: +event?.id, bg: eventBackgroundColor, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } });
       setLoading(false);
     })
     .catch((err) => {

@@ -21,7 +21,7 @@ export default function PaymentModalScreen() {
     <View style={[styles.container, Platform.OS !== 'web' ? {marginTop: 50} : {paddingHorizontal: 15, paddingVertical: 20}]}>
       { Platform.OS === 'web' ? <>
         <View style={styles.fakeBackground}>
-          <View style={[styles.eventInfoContainer, {backgroundColor: Colors.eventBackgroundColorsArray[theme][bg]}]}>
+          <View style={[styles.eventInfoContainer, {backgroundColor: bg}]}>
             <GoBackArrow />
           </View>
         </View>

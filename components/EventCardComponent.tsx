@@ -6,6 +6,7 @@ import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { FeatherIcon } from './CustomIcons';
 import { useSupabase } from '../context/SupabaseProvider';
+import { getThemeRandomColor } from '../utils/chooseRandomColor';
 
 export default function EventCardComponent(event: Event) {
   const theme = useColorScheme() ?? 'light';
@@ -16,15 +17,17 @@ export default function EventCardComponent(event: Event) {
     router.push(`/event/${event.id}`);
   }
 
-  const chooseRandomColor = (): string => {
-    const colors = Colors.eventBackgroundColorsArray[theme]
-    const randomIndex = Math.floor(Math.random() * colors.length);
-    return colors[randomIndex];
-  };
-
   useEffect(() => {
-    setEventBackgroundColor(chooseRandomColor);
-  }, []);
+    if (!event || (theme === 'dark' && !event?.color_code_dark) || (theme === 'light' && !event?.color_code_light)) {
+      setEventBackgroundColor(getThemeRandomColor(theme));
+      return;
+    };
+    if (theme === 'dark') {
+      setEventBackgroundColor(event.color_code_dark);
+    } else {
+      setEventBackgroundColor(event.color_code_light);
+    }
+  }, [theme]);
   
   return (
     <Pressable onPress={goToEventDetail}>

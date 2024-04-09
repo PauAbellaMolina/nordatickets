@@ -7,32 +7,39 @@ import { Text, View } from '../../../../components/Themed';
 import { FeatherIcon } from '../../../../components/CustomIcons';
 import { supabase } from "../../../../supabase";
 import { useSupabase } from '../../../../context/SupabaseProvider';
+import { getThemeRandomColor } from '../../../../utils/chooseRandomColor';
 
 export default function ActivateTicketScreen() {
   const theme = useColorScheme() ?? 'light';
   const { i18n } = useSupabase();
   const [loading, setLoading] = useState<boolean>(false);
   const [ticketActive, setTicketActive] = useState<boolean>(undefined);
-  const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
+  const [eventBackgroundColor, setEventBackgroundColor] = useState<string>();
   const [eventName, setEventName] = useState<string>('');
   const [ticketName, setTicketName] = useState<string>('');
 
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const chooseRandomColor = (): string => {
-    const colors = Colors.eventBackgroundColorsArray[theme]
-    const randomIndex = Math.floor(Math.random() * colors.length);
-    return colors[randomIndex];
-  };
-
   useEffect(() => {
-    setEventBackgroundColor(chooseRandomColor);
-
     supabase.from('wallet_tickets').select().eq('id', id)
     .then(({ data: wallet_tickets, error }) => {
       if (error || !wallet_tickets.length) return;
       setTicketActive(!wallet_tickets[0].used);
       setTicketName(wallet_tickets[0].event_tickets_name);
+
+      supabase.from('event_tickets').select().eq('id', wallet_tickets[0].event_tickets_id)
+      .then(({ data: event_tickets, error }) => {
+        if (error || !event_tickets.length) return;
+        if ((theme === 'dark' && !event_tickets[0]?.color_code_dark) || (theme === 'light' && !event_tickets[0]?.color_code_light)) {
+          setEventBackgroundColor(getThemeRandomColor(theme));
+          return;
+        };
+        if (theme === 'dark') {
+          setEventBackgroundColor(event_tickets[0].color_code_dark);
+        } else {
+          setEventBackgroundColor(event_tickets[0].color_code_light);
+        }
+      });
       
       supabase.from('events').select().eq('id', wallet_tickets[0].event_id)
       .then(({ data: events, error }) => {
@@ -90,52 +97,52 @@ export default function ActivateTicketScreen() {
   };
   
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, eventBackgroundColor && eventName && ticketName ? {marginTop: 75} : null]}>
       { Platform.OS !== 'web' ? <View style={styles.expanderNotch}></View> : <></> }
-      <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
-        <View style={styles.ticketTopContainer}>
-          { !eventName || !ticketName ? <>
-            <ActivityIndicator size="large" />
-          </> : <>
+      { !eventBackgroundColor || !eventName || !ticketName ? <>
+        <ActivityIndicator size="large" />
+      </> : <>
+        <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
+          <View style={styles.ticketTopContainer}>
             <Text style={styles.title}>{ ticketName }</Text>
             <Text style={styles.subtitle}>{ eventName }</Text>
-          </>}
-        </View>
-        <View style={styles.ticketDecorContainer}>
-          <View style={styles.ticketLeftCutout}></View>
-          <View style={styles.ticketDivider}></View>
-          <View style={styles.ticketRightCutout}></View>
-        </View>
-        <View style={styles.ticketBottomContainer}>
-          <View style={[styles.statusContainer, {backgroundColor: ticketActive === undefined ? 'transparent' : ticketActive ? '#3fde7a' : '#ff3737'}]}>
-            { ticketActive === undefined ? <>
-              <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('loading') } ticket...</Text>
-              <Text style={styles.statusInfoText}> </Text>
-            </> : <>{ ticketActive ? <>
-                <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketActive') }</Text>
-                <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('deactivateTicketOnDrinkExplanation') }</Text>
-              </> : <>
-                <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUnactive') }</Text>
-                <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketAlreadyUsedExplanation') }</Text>
-              </>}</>
-            }
+          </View>
+          <View style={styles.ticketDecorContainer}>
+            <View style={[styles.ticketLeftCutout, {backgroundColor: Colors[theme].background}]}></View>
+            <View style={[styles.ticketDivider, {backgroundColor: Colors[theme].background}]}></View>
+            <View style={[styles.ticketRightCutout, {backgroundColor: Colors[theme].background}]}></View>
+          </View>
+          <View style={styles.ticketBottomContainer}>
+            <View style={[styles.statusContainer, {backgroundColor: ticketActive === undefined ? 'transparent' : ticketActive ? '#3fde7a' : '#ff3737'}]}>
+              { ticketActive === undefined ? <>
+                <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('loading') } ticket...</Text>
+                <Text style={styles.statusInfoText}> </Text>
+              </> : <>{ ticketActive ? <>
+                  <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketActive') }</Text>
+                  <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('deactivateTicketOnDrinkExplanation') }</Text>
+                </> : <>
+                  <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUnactive') }</Text>
+                  <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketAlreadyUsedExplanation') }</Text>
+                </>}</>
+              }
+            </View>
           </View>
         </View>
-      </View>
-      <View style={styles.actionsContainer}>
-        { Platform.OS === 'web' ? <>
-          <Pressable disabled={loading} onPress={() => router.back()} style={[styles.button, loading ? {opacity: .7} : {}, {height: '100%', flex: 1, justifyContent: 'center'}, {backgroundColor: eventBackgroundColor}]}>
-            <FeatherIcon name="arrow-left" size={38} color={Colors[theme].text} />
+        <View style={styles.actionsContainer}>
+          { Platform.OS === 'web' ? <>
+            <Pressable disabled={loading} onPress={() => router.back()} style={[styles.button, loading ? {opacity: .7} : {}, {height: '100%', flex: 1, justifyContent: 'center'}, {backgroundColor: eventBackgroundColor}]}>
+              <FeatherIcon name="arrow-left" size={38} color={Colors[theme].text} />
+            </Pressable>
+          </> : <></> }
+          <Pressable disabled={!ticketActive} onPress={deactivateTicket} style={[styles.button, !ticketActive ? {opacity: .7} : {}, {backgroundColor: eventBackgroundColor}]}>
+            {loading ?
+              <ActivityIndicator style={styles.buttonLoading} size="large" />
+            :
+              <Text style={styles.buttonText}>{ i18n?.t('deactivateTicket') }</Text>
+            }
           </Pressable>
-        </> : <></> }
-        <Pressable disabled={!ticketActive} onPress={deactivateTicket} style={[styles.button, !ticketActive ? {opacity: .7} : {}, {backgroundColor: eventBackgroundColor}]}>
-          {loading ?
-            <ActivityIndicator style={styles.buttonLoading} size="large" />
-          :
-            <Text style={styles.buttonText}>{ i18n?.t('deactivateTicket') }</Text>
-          }
-        </Pressable>
-      </View>
+        </View>
+      </> }
 
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       {/* TODO PAU try if uncommenting this makes web crash, if not, leave it on */}
@@ -146,12 +153,11 @@ export default function ActivateTicketScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 50,
     borderTopLeftRadius: 75,
     borderTopRightRadius: 75,
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     padding: 25,
     paddingBottom: 40
   },
