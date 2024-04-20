@@ -30,15 +30,6 @@ export default function Signup() {
     setEmailErrorMessage(undefined);
     setLoading(true);
 
-    //Magic link
-    // signInWithLink(email)
-    // .catch(() => {
-    //   setEmailErrorMessage(i18n?.t('tryAgain'));
-    // })
-    // .finally(() => {
-    //   setLoading(false);
-    // });
-
     //One time password (OTP)
     const langMetaData = authEmailsTranslations[i18n.locale as AvailableLocales];
     signInWithOTP({
@@ -180,6 +171,10 @@ const styles = StyleSheet.create({
   },
   email: {
     fontSize: 25,
+    maxWidth: 250,
+    textOverflow: 'ellipsis',
+    overflow: 'hidden',
+    wordWrap: 'normal'
   },
   emailSubmitted: {
     display: 'flex',

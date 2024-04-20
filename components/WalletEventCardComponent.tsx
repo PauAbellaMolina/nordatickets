@@ -14,10 +14,10 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
 
   useEffect(() => {
     if (!eventWalletTickets.length) return;
-    supabase.from('events').select().eq('id', eventWalletTickets[0].event_id)
-    .then(({ data: events, error }) => {
-      if (error || !events.length) return;
-      setEvent(events[0]);
+    supabase.from('events').select().eq('id', eventWalletTickets[0].event_id).single()
+    .then(({ data: event, error }) => {
+      if (error || !event) return;
+      setEvent(event);
     });
   }, [eventWalletTickets]);
 

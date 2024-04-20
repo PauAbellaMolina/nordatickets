@@ -17,10 +17,10 @@ export default function TabThreeScreen() {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from('users').select().eq('id', user?.id)
-    .then(({ data: users, error }) => {
+    supabase.from('users').select().eq('id', user?.id).single()
+    .then(({ data: user, error }) => {
       if (error) return;
-      setCard(users[0].card_number);
+      setCard(user.card_number);
     });
   }, [user]);
 

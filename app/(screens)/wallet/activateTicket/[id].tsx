@@ -21,13 +21,13 @@ export default function ActivateTicketScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   useEffect(() => {
-    supabase.from('wallet_tickets').select().eq('id', id)
-    .then(({ data: wallet_tickets, error }) => {
-      if (error || !wallet_tickets.length) return;
-      setTicketActive(!wallet_tickets[0].used);
-      setTicketName(wallet_tickets[0].event_tickets_name);
+    supabase.from('wallet_tickets').select().eq('id', id).single()
+    .then(({ data: wallet_ticket, error }) => {
+      if (error || !wallet_ticket) return;
+      setTicketActive(!wallet_ticket.used);
+      setTicketName(wallet_ticket.event_tickets_name);
 
-      supabase.from('event_tickets').select().eq('id', wallet_tickets[0].event_tickets_id)
+      supabase.from('event_tickets').select().eq('id', wallet_ticket.event_tickets_id)
       .then(({ data: event_tickets, error }) => {
         if (error || !event_tickets.length) return;
         if ((theme === 'dark' && !event_tickets[0]?.color_code_dark) || (theme === 'light' && !event_tickets[0]?.color_code_light)) {
@@ -41,10 +41,10 @@ export default function ActivateTicketScreen() {
         }
       });
       
-      supabase.from('events').select().eq('id', wallet_tickets[0].event_id)
-      .then(({ data: events, error }) => {
-        if (error || !events.length) return;
-        setEventName(events[0].name);
+      supabase.from('events').select().eq('id', wallet_ticket.event_id).single()
+      .then(({ data: event, error }) => {
+        if (error || !event) return;
+        setEventName(event.name);
       });
     });
 
@@ -88,10 +88,10 @@ export default function ActivateTicketScreen() {
     }
 
     setLoading(true);
-    supabase.from('wallet_tickets').update({ used: true }).eq('id', id).select()
-    .then(({ data: wallet_tickets, error }) => {
-      if (error || !wallet_tickets.length) return;
-      setTicketActive(!wallet_tickets[0].used);
+    supabase.from('wallet_tickets').update({ used: true }).eq('id', id).select().single()
+    .then(({ data: wallet_ticket, error }) => {
+      if (error || !wallet_ticket) return;
+      setTicketActive(!wallet_ticket.used);
       setLoading(false);
     });
   };

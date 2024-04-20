@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session, SignInWithPasswordlessCredentials, User } from "@supabase/supabase-js";
 import { useRouter, useSegments } from "expo-router";
-// import { makeRedirectUri } from 'expo-auth-session'
 import { supabase } from "../supabase";
 import { I18n } from 'i18n-js';
 import { AvailableLocales, dict } from "../assets/translations/translation";
@@ -13,7 +12,6 @@ type SupabaseContextProps = {
   initialized?: boolean;
   i18n: I18n | null;
   setLanguage: (locale: AvailableLocales) => void;
-  // signInWithLink: (email: string) => Promise<void>;
   signInWithOTP: (options: SignInWithPasswordlessCredentials) => Promise<void>;
   verifyOTP: (email: string, code: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -29,7 +27,6 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
   initialized: false,
   i18n: null,
   setLanguage: (locale: AvailableLocales) => {},
-  // signInWithLink: async () => {},
   signInWithOTP: async () => {},
   verifyOTP: async () => {},
   signOut: async () => {},
@@ -45,21 +42,6 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 
   const segments = useSegments()[0];
   const router = useRouter();
-
-  //Magic link
-  // const signInWithLink = async (email: string) => {
-  //   const redirectTo = makeRedirectUri(); //IMPORTANT Leave empty for development but HARDCODE elteutikt.netlify.com (or whatever the prod domain is). Also, we need to add the domain to the list of allowed domains in supabase (in the auth section>URL Configuration>Redirect URLs)
-  //   const { error } = await supabase.auth.signInWithOtp({
-  //     email,
-  //     options: {
-  //       shouldCreateUser: true,
-  //       emailRedirectTo: redirectTo
-  //     }
-  //   });
-  //   if (error) {
-  //     throw error;
-  //   }
-  // };
 
   const signInWithOTP = async (options: SignInWithPasswordlessCredentials) => {
     const { error } = await supabase.auth.signInWithOtp(options);
@@ -122,17 +104,6 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
       setSession(session);
       setUser(session ? session.user : null);
       setInitialized(true);
-
-      //if user not in public.users db table (not auth.users!) then insert it
-      if (event === "SIGNED_IN" && session && session.user) {
-        supabase.from('users').select().eq('id', session.user.id)
-        .then(({ data: users, error }) => {
-          if (error || users.length > 0) return;
-          supabase.from('users').insert({
-            id: session.user.id
-          }).select().then();
-        });
-      }
     });
     return () => {
       data.subscription.unsubscribe();
@@ -161,7 +132,6 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
         initialized,
         i18n,
         setLanguage,
-        // signInWithLink,
         signInWithOTP,
         verifyOTP,
         signOut

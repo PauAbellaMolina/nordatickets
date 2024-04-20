@@ -35,11 +35,11 @@ export default function ReceiptDetailScreen() {
     .then(({ data: wallet_tickets, error }) => {
       if (error) return;
       const eventId = wallet_tickets[0].event_id;
-      supabase.from('events').select().eq('id', eventId)
-      .then(({ data: events, error }) => {
-        if (error || !events.length) return;
-        setEventTicketFee(events[0].ticket_fee);
-        setEventName(events[0].name);
+      supabase.from('events').select().eq('id', eventId).single()
+      .then(({ data: event, error }) => {
+        if (error || !event) return;
+        setEventTicketFee(event.ticket_fee);
+        setEventName(event.name);
       });
 
       setReceiptDate(new Date(wallet_tickets[0].created_at));

@@ -35,10 +35,10 @@ export default function EventDetailScreen() {
   const [selectedOption, setSelectedOption] = useState<string>('misc');
 
   useEffect(() => {
-    supabase.from('events').select().eq('id', id as string)
-    .then(({ data: events, error }) => {
-      if (error || !events.length) return;
-      setEvent(events[0]);
+    supabase.from('events').select().eq('id', id as string).single()
+    .then(({ data: event, error }) => {
+      if (error || !event) return;
+      setEvent(event);
     });
 
     return () => setCart(null);

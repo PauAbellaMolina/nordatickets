@@ -39,11 +39,11 @@ export default function ReceiptsScreen() {
 
       const eventIdsNames: { id: number, name: string }[] = [];
       eventIds.forEach(eventId => {
-        supabase.from('events').select().eq('id', eventId)
-        .then(({ data: events, error }) => {
-          if (error || !events.length) return;
-          eventIdsNames.push({ id: eventId, name: events[0].name });
-          eventIdsTicketFees.push({ id: eventId, fee: events[0].ticket_fee });
+        supabase.from('events').select().eq('id', eventId).single()
+        .then(({ data: event, error }) => {
+          if (error || !event) return;
+          eventIdsNames.push({ id: eventId, name: event.name });
+          eventIdsTicketFees.push({ id: eventId, fee: event.ticket_fee });
         });
       });
 

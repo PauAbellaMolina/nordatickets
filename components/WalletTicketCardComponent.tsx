@@ -41,10 +41,10 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
   );
 
   const fetchTicketUsed = () => {
-    supabase.from('wallet_tickets').select().eq('id', walletTicket.id)
-    .then(({ data: walletTickets, error }) => {
-      if (error || !walletTickets.length) return;
-      const used = walletTickets[0].used;
+    supabase.from('wallet_tickets').select().eq('id', walletTicket.id).single()
+    .then(({ data: walletTicket, error }) => {
+      if (error || !walletTicket) return;
+      const used = walletTicket.used;
       setEventTicketUsed(used);
       if (!used) {
         fetchTicketOrderStatus();
@@ -53,18 +53,18 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
   };
 
   const fetchTicketOrderStatus = () => {
-    supabase.from('redsys_orders').select().eq('order_id', walletTicket.order_id)
-    .then(({ data: redsysOrders, error }) => {
+    supabase.from('redsys_orders').select().eq('order_id', walletTicket.order_id).single()
+    .then(({ data: redsysOrder, error }) => {
       if (error) return;
       if (insertsRedsysOrdersChannel.current) {
         supabase.removeChannel(insertsRedsysOrdersChannel.current);
         insertsRedsysOrdersChannel.current = null;
       }
-      if (!redsysOrders.length) {
+      if (!redsysOrder) {
         subscribeRedsysOrdersInserts();
         return;
       }
-      const status = redsysOrders[0].order_status;
+      const status = redsysOrder.order_status;
       setEventTicketOrderStatus(status);
       if (status === 'PENDING_PAYMENT') {
         if (updatesRedsysOrdersChannel.current) {
@@ -73,7 +73,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
         }
         subscribeRedsysOrdersUpdates();
       }
-      if (updatesRedsysOrdersChannel.current && (redsysOrders[0].order_status === 'PAYMENT_SUCCEDED' || redsysOrders[0].order_status === 'PAYMENT_FAILED')) {
+      if (updatesRedsysOrdersChannel.current && (redsysOrder.order_status === 'PAYMENT_SUCCEDED' || redsysOrder.order_status === 'PAYMENT_FAILED')) {
         supabase.removeChannel(updatesRedsysOrdersChannel.current);
         updatesRedsysOrdersChannel.current = null;
       }
