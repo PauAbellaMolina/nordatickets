@@ -325,20 +325,24 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 2
     },
     shadowOpacity: 0.10,
     shadowRadius: 2.5,
-    elevation: 10,
+    elevation: 10
   },
   stopFollowingButton: {
+    display: 'flex',
+    alignItems: 'flex-end',
     position: 'absolute',
     top: 15,
     right: 15
   },
   optionsPicker: {
-    position: 'absolute',
-    width: '100%',
+    position: 'fixed',
+    top: 20,
+    right: -165,
+    height: 30,
     opacity: 0
   },
   title: {
