@@ -16,14 +16,19 @@ export default function ReceiptsScreen() {
   const [eventIdsTicketFees, setEventIdsTicketFees] = useState<{ id: number, fee: number }[]>([]);
 
   useEffect(() => {
+    let unmounted = false;
     if (!user) return;
-    fetchWalletTickets();
+    fetchWalletTickets(unmounted);
+
+    return () => {
+      unmounted = true;
+    };
   }, [user]);
 
-  const fetchWalletTickets = () => { //TODO PAU the same useFocusEffect() stuff on WalletTicketCardComponent could be used here to optimize, but it's not as crucial as there
+  const fetchWalletTickets = (unmounted: boolean) => { //TODO PAU the same useFocusEffect() stuff on WalletTicketCardComponent could be used here to optimize, but it's not as crucial as there
     supabase.from('wallet_tickets').select().eq('user_id', user.id).order('created_at', { ascending: false })
-    .then(({ data: wallet_tickets, error }) => {
-      if (error) return;
+    .then(async ({ data: wallet_tickets, error }) => {
+      if (unmounted || error) return;
       const eventIds = [...new Set(wallet_tickets.map(ticket => ticket.event_id))];
       const orderIdGroupedWalletTickets: WalletTicket[][] = 
       Object.values(
@@ -38,17 +43,22 @@ export default function ReceiptsScreen() {
       );
 
       const eventIdsNames: { id: number, name: string }[] = [];
-      eventIds.forEach(eventId => {
-        supabase.from('events').select().eq('id', eventId).single()
-        .then(({ data: event, error }) => {
-          if (error || !event) return;
-          eventIdsNames.push({ id: eventId, name: event.name });
-          eventIdsTicketFees.push({ id: eventId, fee: event.ticket_fee });
-        });
-      });
+      const eventIdsTicketFees: { id: number, fee: number }[] = [];
+
+      await Promise.all(
+        eventIds.map(eventId => {
+          supabase.from('events').select().eq('id', eventId).single()
+          .then(({ data: event, error }) => {
+            if (error || !event) return;
+            eventIdsNames.push({ id: eventId, name: event.name });
+            eventIdsTicketFees.push({ id: eventId, fee: event.ticket_fee });
+          });
+        })
+      );
 
       setOrderIdGroupedWalletTickets(orderIdGroupedWalletTickets);
       setEventIdsNames(eventIdsNames);
+      setEventIdsTicketFees(eventIdsTicketFees);
     });
   };
 

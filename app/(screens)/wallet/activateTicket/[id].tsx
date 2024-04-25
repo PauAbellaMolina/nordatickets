@@ -21,6 +21,15 @@ export default function ActivateTicketScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   useEffect(() => {
+    let unmounted = false;
+    fetchWalletTickets(unmounted);
+
+    return () => {
+      unmounted = true;
+    };
+  }, []);
+
+  const fetchWalletTickets = (unmounted: boolean) => {
     supabase.from('wallet_tickets').select().eq('id', id).single()
     .then(({ data: wallet_ticket, error }) => {
       if (error || !wallet_ticket) return;
@@ -29,7 +38,7 @@ export default function ActivateTicketScreen() {
 
       supabase.from('event_tickets').select().eq('id', wallet_ticket.event_tickets_id)
       .then(({ data: event_tickets, error }) => {
-        if (error || !event_tickets.length) return;
+        if (unmounted || error || !event_tickets.length) return;
         if ((theme === 'dark' && !event_tickets[0]?.color_code_dark) || (theme === 'light' && !event_tickets[0]?.color_code_light)) {
           setEventBackgroundColor(getThemeRandomColor(theme));
           return;
@@ -43,12 +52,11 @@ export default function ActivateTicketScreen() {
       
       supabase.from('events').select().eq('id', wallet_ticket.event_id).single()
       .then(({ data: event, error }) => {
-        if (error || !event) return;
+        if (unmounted || error || !event) return;
         setEventName(event.name);
       });
     });
-
-  }, []);
+  };
 
   const deactivateTicket = async () => {
     if (loading) {

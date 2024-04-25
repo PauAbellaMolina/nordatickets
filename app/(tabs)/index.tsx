@@ -7,24 +7,29 @@ import { useSupabase } from '../../context/SupabaseProvider';
 import { Event } from '../../types/supabaseplain';
 
 export default function TabOneScreen() {
-  const { user, i18n } = useSupabase();
+  const { user, i18n, followingEventsChanged } = useSupabase();
   const [events, setEvents] = useState<Event[]>();
   const [userEventIdsFollowing, setUserEventIdsFollowing] = useState<number[]>([]);
 
-  useEffect(() => { //TODO PAU i think this is getting triggered (and so makes 2 unnecessary supabase calls) when f5 but not at tab 1 screen (check it out when on receipts screen for example). It may be because of the default screen is tab 1 and so it gets rendered for a moment.
+  useEffect(() => {
+    let unmounted = false;
     if (!user) return;
     supabase.from('users').select().eq('id', user?.id).single()
     .then(({ data: user, error }) => {
-      if (error || !user || !user.event_ids_following?.length) return;
+      if (unmounted || error || !user) return;
       const userEventIdsFollowing = user.event_ids_following;
       setUserEventIdsFollowing(userEventIdsFollowing);
       supabase.from('events').select().in('id', userEventIdsFollowing)
       .then(({ data: events, error }) => {
-        if (error) return;
+        if (unmounted || error) return;
         setEvents(events);
       });
     });
-  }, [user]);
+
+    return () => {
+      unmounted = true;
+    };
+  }, [user, followingEventsChanged]);
 
   return (
     <View style={styles.container}>

@@ -16,17 +16,26 @@ export default function TabThreeScreen() {
   const [selectedLanguage, setSelectedLanguage] = useState<AvailableLocales>();
 
   useEffect(() => {
-    if (!user) return;
-    supabase.from('users').select().eq('id', user?.id).single()
-    .then(({ data: user, error }) => {
-      if (error) return;
-      setCard(user.card_number);
-    });
+    let unmounted = false;
+    fetchUser(unmounted);
+
+    return () => {
+      unmounted = true;
+    };
   }, [user]);
 
   useEffect(() => {
     setSelectedLanguage(i18n?.locale as AvailableLocales);
   }, [i18n]);
+
+  const fetchUser = (unmounted: boolean) => {
+    if (!user) return;
+    supabase.from('users').select().eq('id', user?.id).single()
+    .then(({ data: user, error }) => {
+      if (unmounted || error) return;
+      setCard(user.card_number);
+    });
+  };
 
   const onDeleteUserCard = () => {
     supabase.from('users')

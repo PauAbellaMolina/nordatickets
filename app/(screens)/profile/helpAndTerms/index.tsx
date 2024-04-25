@@ -1,6 +1,6 @@
 import { Text, View } from '../../../../components/Themed';
 import GoBackArrow from '../../../../components/GoBackArrow';
-import { FlatList, StyleSheet, useColorScheme } from 'react-native';
+import { StyleSheet, useColorScheme } from 'react-native';
 import { useSupabase } from '../../../../context/SupabaseProvider';
 import Colors from '../../../../constants/Colors';
 

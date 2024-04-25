@@ -5,16 +5,20 @@ import { useEffect, useState } from 'react';
 import { supabase } from "../../supabase";
 import { useSupabase } from '../../context/SupabaseProvider';
 import { WalletTicket } from '../../types/supabaseplain';
+import { RealtimeChannel } from '@supabase/realtime-js';
 
 export default function TabTwoScreen() {
   const { user, i18n } = useSupabase();
-
   const [eventGroupedWalletTickets, setEventGroupedWalletTickets] = useState<WalletTicket[][]>([]);
 
   useEffect(() => {
     if (!user) return;
     fetchWalletTickets();
-    subscribeWalletTickets();
+    const subscription = subscribeWalletTickets();
+
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, [user]);
 
   const fetchWalletTickets = () => {
@@ -36,8 +40,8 @@ export default function TabTwoScreen() {
     });
   };
 
-  const subscribeWalletTickets = () => {
-    supabase
+  const subscribeWalletTickets = (): RealtimeChannel => {
+    return supabase
     .channel('wallet_tickets')
     .on('postgres_changes',
       {

@@ -13,12 +13,12 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>();
 
   useEffect(() => {
-    if (!eventWalletTickets.length) return;
-    supabase.from('events').select().eq('id', eventWalletTickets[0].event_id).single()
-    .then(({ data: event, error }) => {
-      if (error || !event) return;
-      setEvent(event);
-    });
+    let unmounted = false;
+    fetchEvent(unmounted);
+    
+    return () => {
+      unmounted = true;
+    };
   }, [eventWalletTickets]);
 
   useEffect(() => {
@@ -32,6 +32,15 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
       setEventBackgroundColor(event.color_code_light);
     }
   }, [event, theme]);
+
+  const fetchEvent = (unmounted: boolean) => {
+    if (!eventWalletTickets.length) return;
+    supabase.from('events').select().eq('id', eventWalletTickets[0].event_id).single()
+    .then(({ data: event, error }) => {
+      if (unmounted || error || !event) return;
+      setEvent(event);
+    });
+  };
   
   return (
     <>

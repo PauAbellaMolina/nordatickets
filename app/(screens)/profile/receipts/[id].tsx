@@ -20,27 +20,39 @@ export default function ReceiptDetailScreen() {
   const [eventTicketFee, setEventTicketFee] = useState<number>(null);
 
   useEffect(() => {
+    let unmounted = false;
     if (!user) return;
-    fetchWalletTickets();
+    fetchWalletTickets(unmounted);
+
+    return () => {
+      unmounted = true;
+    };
   }, [user]);
 
   useEffect(() => {
-    if (paginatedGroupedWalletTickets.length && eventName && eventTicketFee && receiptDate && !loaded) {
+    let unmounted = false;
+    if (!unmounted && paginatedGroupedWalletTickets.length && eventName && eventTicketFee && receiptDate && !loaded) {
       setLoaded(true);
     }
+
+    return () => {
+      unmounted = true;
+    };
   }, [paginatedGroupedWalletTickets, eventName, eventTicketFee, receiptDate]);
 
-  const fetchWalletTickets = () => { //TODO PAU the same useFocusEffect() stuff on WalletTicketCardComponent could be used here to optimize, but it's not as crucial as there
+  const fetchWalletTickets = (unmounted: boolean) => { //TODO PAU the same useFocusEffect() stuff on WalletTicketCardComponent could be used here to optimize, but it's not as crucial as there
     supabase.from('wallet_tickets').select().eq('user_id', user.id).eq('order_id', id).order('created_at', { ascending: false })
     .then(({ data: wallet_tickets, error }) => {
       if (error) return;
       const eventId = wallet_tickets[0].event_id;
       supabase.from('events').select().eq('id', eventId).single()
       .then(({ data: event, error }) => {
-        if (error || !event) return;
+        if (unmounted || error || !event) return;
         setEventTicketFee(event.ticket_fee);
         setEventName(event.name);
       });
+
+      if (unmounted) return
 
       setReceiptDate(new Date(wallet_tickets[0].created_at));
 

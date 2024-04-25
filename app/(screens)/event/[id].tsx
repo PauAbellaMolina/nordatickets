@@ -20,7 +20,7 @@ type Cart = { eventTicket: EventTicket, quantity: number }[] | null;
 export default function EventDetailScreen() {
   const theme = useColorScheme() ?? 'light';
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { user, session, i18n } = useSupabase();
+  const { user, session, i18n, swapFollowingEventsChanged } = useSupabase();
   const [cardNumber, setCardNumber] = useState<string>();
   const [redsysToken, setRedsysToken] = useState<string>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
@@ -35,13 +35,17 @@ export default function EventDetailScreen() {
   const [selectedOption, setSelectedOption] = useState<string>('misc');
 
   useEffect(() => {
+    let unmounted = false;
     supabase.from('events').select().eq('id', id as string).single()
     .then(({ data: event, error }) => {
-      if (error || !event) return;
+      if (unmounted || error || !event) return;
       setEvent(event);
     });
 
-    return () => setCart(null);
+    return () => {
+      setCart(null);
+      unmounted = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -57,20 +61,28 @@ export default function EventDetailScreen() {
   }, [event, theme]);
 
   useEffect(() => {
+    let unmounted = false;
     supabase.from('event_tickets').select().eq('event_id', id as string)
     .then(({ data: event_tickets, error }) => {
-      if (error || !event_tickets.length) return;
+      if (unmounted || error || !event_tickets.length) return;
       setEventTickets(event_tickets);
     });
+
+    return () => {
+      unmounted = true;
+    };
   }, [event]);
 
   useEffect(() => {
+    let unmounted = false;
     if (!user || !event) return;
     supabase.from('users').select().eq('id', user?.id)
     .then(({ data: users, error }) => {
       if (error || !users.length) return;
-      setCardNumber(users[0].card_number);
-      setRedsysToken(users[0].redsys_token);
+      if (!unmounted) {
+        setCardNumber(users[0].card_number);
+        setRedsysToken(users[0].redsys_token);
+      }
       
       const userEventIdsFollowing = users[0].event_ids_following ?? [];
       if (userEventIdsFollowing.includes(+id)) {
@@ -80,8 +92,16 @@ export default function EventDetailScreen() {
       .update({
         event_ids_following: [...userEventIdsFollowing, +id]
       })
-      .eq('id', user?.id).select().then();
+      .eq('id', user?.id).select()
+      .then(({ data: users, error }) => {
+        if (error || !users.length) return;
+        swapFollowingEventsChanged();
+      });
     });
+
+    return () => {
+      unmounted = true;
+    };
   }, [user, event]);
 
   useEffect(() => {
@@ -174,20 +194,20 @@ export default function EventDetailScreen() {
     });
   }
 
+  type NewWalletTicket = {
+    event_id: WalletTicket['event_id'];
+    event_tickets_id: WalletTicket['event_tickets_id'];
+    event_tickets_name: WalletTicket['event_tickets_name'];
+    order_id: WalletTicket['order_id'];
+    price: WalletTicket['price'];
+    used: WalletTicket['used'];
+    user_id: WalletTicket['user_id'];
+  };
+
   const addPendingTicketsToUser = (orderId: string) => {
     if (!cart?.length || !cartTotalPrice || !event || !user) {
       return;
     }
-
-    type NewWalletTicket = { //TODO PAU maybe this is overkill type safety??
-      event_id: WalletTicket['event_id'];
-      event_tickets_id: WalletTicket['event_tickets_id'];
-      event_tickets_name: WalletTicket['event_tickets_name'];
-      order_id: WalletTicket['order_id'];
-      price: WalletTicket['price'];
-      used: WalletTicket['used'];
-      user_id: WalletTicket['user_id'];
-    };
 
     cart.forEach((cartItem) => {
       for (let i = 0; i < cartItem.quantity; i++) {
@@ -217,7 +237,11 @@ export default function EventDetailScreen() {
       .update({
         event_ids_following: filteredUserEventIdsFollowing
       })
-      .eq('id', user?.id).select().then();
+      .eq('id', user?.id).select()
+      .then(({ data: users, error }) => {
+        if (error || !users.length) return;
+        swapFollowingEventsChanged();
+      });
     });
   };
 

@@ -11,6 +11,8 @@ type SupabaseContextProps = {
   session: Session | null;
   initialized?: boolean;
   i18n: I18n | null;
+  followingEventsChanged?: boolean;
+  swapFollowingEventsChanged: () => void;
   setLanguage: (locale: AvailableLocales) => void;
   signInWithOTP: (options: SignInWithPasswordlessCredentials) => Promise<void>;
   verifyOTP: (email: string, code: string) => Promise<void>;
@@ -26,6 +28,8 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
   session: null,
   initialized: false,
   i18n: null,
+  followingEventsChanged: false,
+  swapFollowingEventsChanged: () => {},
   setLanguage: (locale: AvailableLocales) => {},
   signInWithOTP: async () => {},
   verifyOTP: async () => {},
@@ -37,8 +41,10 @@ export const useSupabase = () => useContext(SupabaseContext);
 export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [realSession, setRealSession] = useState<Session | null>(null);
   const [initialized, setInitialized] = useState<boolean>(false);
   const [i18n, setI18n] = useState<I18n | null>(null);
+  const [auxFollowingEventsChanged, setAuxFollowingEventsChanged] = useState<boolean>(false);
 
   const segments = useSegments()[0];
   const router = useRouter();
@@ -97,18 +103,36 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
     }
   };
 
+  const swapFollowingEventsChanged = () => {
+    setAuxFollowingEventsChanged(!auxFollowingEventsChanged);
+  };
+
   useEffect(() => {
     getLocaleFromCookie();
 
     const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
-      setUser(session ? session.user : null);
+      if (!session) {
+        setRealSession(null)
+        setUser(null);
+      }
       setInitialized(true);
     });
     return () => {
       data.subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => { //TODO PAU this seems to work, but test deeply and make sure theres no security issues
+    if (!realSession && session) {
+      setRealSession(session)
+      setUser(session.user);
+    }
+    if (session && session?.access_token !== realSession?.access_token) {
+      setRealSession(session)
+      setUser(session.user);
+    }
+  }, [session, realSession]);
 
   useEffect(() => {
     if (!initialized) return;
@@ -131,6 +155,8 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
         session,
         initialized,
         i18n,
+        followingEventsChanged: auxFollowingEventsChanged,
+        swapFollowingEventsChanged,
         setLanguage,
         signInWithOTP,
         verifyOTP,
