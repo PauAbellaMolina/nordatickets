@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { ActivityIndicator, FlatList, LayoutAnimation, LayoutChangeEvent, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text, View } from '../../../components/Themed';
 import EventTicketCardComponent from '../../../components/EventTicketCardComponent';
@@ -14,6 +14,8 @@ import { getThemeRandomColor } from '../../../utils/chooseRandomColor';
 import {
   FIREBASE_FUNC_GET_FORM_INFO_URL
 } from '@env';
+import { CollapsableMoreInfoComponent } from '../../../components/CollapsableMoreInfoComponent';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 type Cart = { eventTicket: EventTicket, quantity: number }[] | null;
 
@@ -26,6 +28,7 @@ export default function EventDetailScreen() {
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
   const [event, setEvent] = useState<Event>();
   const [eventTickets, setEventTickets] = useState<EventTicket[]>();
+  const [moreInfoExpanded, setMoreInfoExpanded] = useState<boolean>(false);
   const [cart, setCart] = useState<Cart>();
   const [cartTotalPrice, setCartTotalPrice] = useState<number>(0);
   const [cartTotalQuantity, setCartTotalQuantity] = useState<number>(0);
@@ -245,6 +248,31 @@ export default function EventDetailScreen() {
     });
   };
 
+  const onMoreInfo = () => {
+    setMoreInfoExpanded(!moreInfoExpanded);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
+  };
+
+  const [height, setHeight] = useState(0);
+  const animatedHeight = useSharedValue(0);
+
+  const onLayout = (event: LayoutChangeEvent) => {
+    const onLayoutHeight = event.nativeEvent.layout.height;
+    // const onLayoutHeight = 1000;
+
+    if (onLayoutHeight > 0 && height !== onLayoutHeight) {
+      setHeight(onLayoutHeight);
+    }
+  };
+
+  const collapsableStyle = useAnimatedStyle(() => {
+    animatedHeight.value = moreInfoExpanded ? withTiming(height) : withTiming(0);
+
+    return {
+      height: animatedHeight.value,
+    };
+  }, [moreInfoExpanded]);
+
   return (
     <View style={styles.container}>
       { !event ? <>
@@ -264,7 +292,14 @@ export default function EventDetailScreen() {
               </Picker>
             </View>
             <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
-            <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
+            <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description} kashjdjkahsdkjhasasdasdasdas</Text>
+            <Pressable style={styles.moreEventInfo} onPress={onMoreInfo}>
+              <FeatherIcon name={moreInfoExpanded ? 'chevron-up' : 'chevron-down'} size={21} color={Colors['light'].text} />
+              <Text style={[styles.moreEventInfoActionable, {color: Colors['light'].text}]}>More info</Text>
+            </Pressable>
+            <CollapsableMoreInfoComponent expanded={moreInfoExpanded}>
+              <Text style={[styles.moreEventInfoText, {color: Colors['light'].text}]}>Holña dajdajkshdkjahsdkj ahsdjkahs djkas hdjashdjHolña dajdajkshdkjahsdkj ahsdjkahs djkas hdjashdjHolña dajdajkshdkjahsdkj ahsdjkahs djkas hdjashdjHolña dajdajkshdkjahsdkj ahsdjkahs djkas hdjashdjHolña dajdajkshdkjahsdkj ahsdjkahs djkas hdjashdjHolña dajdajkshdkjahsdkj ahsdjkahs djkas hdjashdjHolña dajdajkshdkjahsdkj</Text>
+            </CollapsableMoreInfoComponent>
           </View>
           { eventTickets ?
             <>
@@ -336,12 +371,17 @@ const styles = StyleSheet.create({
   container: {
     display: 'flex',
     height: '100%',
-    justifyContent: 'center'
+    // flex: 1
+    // justifyContent: 'center'
   },
   eventInfoContainer: {
-    height: 180,
-    justifyContent: 'flex-end',
-    paddingBottom: 30,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    minHeight: 180,
+    // justifyContent: 'flex-end',
+    paddingTop: 71,
+    paddingBottom: 40,
     paddingHorizontal: 20,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
@@ -353,7 +393,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.10,
     shadowRadius: 2.5,
-    elevation: 10
+    elevation: 10,
+    zIndex: 1
   },
   stopFollowingButton: {
     display: 'flex',
@@ -379,11 +420,31 @@ const styles = StyleSheet.create({
   },
   eventDescription: {
     fontSize: 16,
-    marginTop: 10
+    marginTop: 10,
+    whiteSpace: 'nowrap',
+    overflow: 'scroll'
+  },
+  moreEventInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    // marginTop: 10,
+    gap: 3,
+    position: 'absolute',
+    bottom: 10,
+    alignSelf: 'center'
+  },
+  moreEventInfoActionable: {
+    fontSize: 14,
+    fontWeight: '500'
+  },
+  moreEventInfoText: {
+    fontSize: 16,
+    marginTop: 10,
   },
   ticketsContainer: {
     flex: 1,
-    marginTop: 25,
+    marginTop: 205,
     marginHorizontal: 30,
     borderRadius: 35
   },

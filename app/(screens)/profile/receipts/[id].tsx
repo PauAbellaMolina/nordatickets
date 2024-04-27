@@ -117,7 +117,7 @@ export default function ReceiptDetailScreen() {
                     </View>
                     <View style={[styles.generalInfoEntry, styles.alignedRight]}>
                       <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('transactionDate') }</Text>
-                      <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ receiptDate.getDay() }/{ receiptDate.getMonth() }/{ receiptDate.getFullYear() } { receiptDate.getHours() }:{ ('0'+receiptDate.getMinutes()).slice(-2) }</Text>
+                      <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ receiptDate.toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) }h</Text>
                     </View>
                     <View style={[styles.generalInfoEntry, styles.alignedRight]}>
                       <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('event') }</Text>
