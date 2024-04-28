@@ -71,7 +71,7 @@ export default function Signup() {
   };
 
   const onGoToLogIn = () => {
-    router.push('/login');
+    router.navigate('/login');
   };
 
   return (

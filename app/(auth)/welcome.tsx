@@ -22,10 +22,10 @@ export default function Welcome() {
   }, [i18n]);
 
   const onGoToSignUp = () => {
-    router.push('/signup');
+    router.navigate('/signup');
   };
   const onGoToLogIn = () => {
-    router.push('/login');
+    router.navigate('/login');
   };
 
   const onSelectedLanguage = (language: AvailableLocales) => {

@@ -11,7 +11,7 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
   const { i18n } = useSupabase();
 
   const onGoToReceiptDetail = () => {
-    router.push(`/profile/receipts/${order[0].order_id}`);
+    router.navigate(`/profile/receipts/${order[0].order_id}`);
   }
   
   return (

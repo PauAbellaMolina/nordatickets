@@ -14,7 +14,7 @@ export default function EventCardComponent(event: Event) {
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
 
   const goToEventDetail = () => {
-    router.push(`/event/${event.id}`);
+    router.navigate(`/event/${event.id}`);
   }
 
   useEffect(() => {

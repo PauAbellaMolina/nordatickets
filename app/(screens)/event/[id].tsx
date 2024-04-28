@@ -11,7 +11,6 @@ import { Event, WalletTicket, EventTicket } from '../../../types/supabaseplain';
 import { useSupabase } from '../../../context/SupabaseProvider';
 import { Picker } from '@react-native-picker/picker';
 import { getThemeRandomColor } from '../../../utils/chooseRandomColor';
-import { FIREBASE_FUNC_GET_FORM_INFO_URL } from '@env';
 import { CollapsableMoreInfoComponent } from '../../../components/CollapsableMoreInfoComponent';
 
 type Cart = { eventTicket: EventTicket, quantity: number }[] | null;
@@ -161,7 +160,7 @@ export default function EventDetailScreen() {
 
   const getPaymentFormInfo = () => {
     const finalAmount = cartTotalPrice + ((event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0));
-    fetch(FIREBASE_FUNC_GET_FORM_INFO_URL, {
+    fetch(process.env.EXPO_PUBLIC_FIREBASE_FUNC_GET_FORM_INFO_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -186,7 +185,7 @@ export default function EventDetailScreen() {
 
       addPendingTicketsToUser(data.orderId);
 
-      router.push({ pathname: '/event/paymentModal', params: { eventId: +event?.id, bg: eventBackgroundColor, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } });
+      router.navigate({ pathname: '/event/paymentModal', params: { eventId: +event?.id, bg: eventBackgroundColor, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } });
       setLoading(false);
     })
     .catch((err) => {
@@ -219,7 +218,7 @@ export default function EventDetailScreen() {
   };
 
   const onGoToWallet = () => {
-    router.push('/(tabs)/wallet');
+    router.navigate('/(tabs)/wallet');
   };
 
   const onStopFollowingEvent = () => {
