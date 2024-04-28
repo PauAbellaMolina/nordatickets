@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, LayoutAnimation, LayoutChangeEvent, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text, View } from '../../../components/Themed';
 import EventTicketCardComponent from '../../../components/EventTicketCardComponent';
@@ -11,11 +11,8 @@ import { Event, WalletTicket, EventTicket } from '../../../types/supabaseplain';
 import { useSupabase } from '../../../context/SupabaseProvider';
 import { Picker } from '@react-native-picker/picker';
 import { getThemeRandomColor } from '../../../utils/chooseRandomColor';
-import {
-  FIREBASE_FUNC_GET_FORM_INFO_URL
-} from '@env';
+import { FIREBASE_FUNC_GET_FORM_INFO_URL } from '@env';
 import { CollapsableMoreInfoComponent } from '../../../components/CollapsableMoreInfoComponent';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 type Cart = { eventTicket: EventTicket, quantity: number }[] | null;
 
@@ -250,118 +247,98 @@ export default function EventDetailScreen() {
 
   const onMoreInfo = () => {
     setMoreInfoExpanded(!moreInfoExpanded);
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
   };
-
-  const [height, setHeight] = useState(0);
-  const animatedHeight = useSharedValue(0);
-
-  const onLayout = (event: LayoutChangeEvent) => {
-    const onLayoutHeight = event.nativeEvent.layout.height;
-    // const onLayoutHeight = 1000;
-
-    if (onLayoutHeight > 0 && height !== onLayoutHeight) {
-      setHeight(onLayoutHeight);
-    }
-  };
-
-  const collapsableStyle = useAnimatedStyle(() => {
-    animatedHeight.value = moreInfoExpanded ? withTiming(height) : withTiming(0);
-
-    return {
-      height: animatedHeight.value,
-    };
-  }, [moreInfoExpanded]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, !event ? { justifyContent: 'center' } : null]}>
       { !event ? <>
-          <ActivityIndicator size="large" />
-        </> : <>
-          <View style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor}]}>
-            <GoBackArrow />
-            <View style={styles.stopFollowingButton}>
-              <FeatherIcon name="more-horizontal" size={35} color={Colors['light'].text} />
-              <Picker
-                style={styles.optionsPicker}
-                selectedValue={selectedOption}
-                onValueChange={() => onStopFollowingEvent()}
-              >
-                <Picker.Item label={ i18n?.t('stopFollowingEventQuestion') } value="misc" enabled={false} />
-                <Picker.Item label={ i18n?.t('stopFollowingEventConfirmation') } value="unfollow" />
-              </Picker>
-            </View>
-            <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
-            <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description} kashjdjkahsdkjhasasdasdasdas</Text>
+        <ActivityIndicator size="large" />
+      </> : <>
+        <View style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor}]}>
+          <GoBackArrow />
+          <View style={styles.stopFollowingButton}>
+            <FeatherIcon name="more-horizontal" size={35} color={Colors['light'].text} />
+            <Picker
+              style={styles.optionsPicker}
+              selectedValue={selectedOption}
+              onValueChange={() => onStopFollowingEvent()}
+            >
+              <Picker.Item label={ i18n?.t('stopFollowingEventQuestion') } value="misc" enabled={false} />
+              <Picker.Item label={ i18n?.t('stopFollowingEventConfirmation') } value="unfollow" />
+            </Picker>
+          </View>
+          <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
+          <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description} kashjdjkahsdkjhasasdasdasdas</Text>
+          { event.more_info_content ? <>
             <Pressable style={styles.moreEventInfo} onPress={onMoreInfo}>
               <FeatherIcon name={moreInfoExpanded ? 'chevron-up' : 'chevron-down'} size={21} color={Colors['light'].text} />
               <Text style={[styles.moreEventInfoActionable, {color: Colors['light'].text}]}>More info</Text>
             </Pressable>
             <CollapsableMoreInfoComponent expanded={moreInfoExpanded}>
-              <Text style={[styles.moreEventInfoText, {color: Colors['light'].text}]}>Holña dajdajkshdkjahsdkj ahsdjkahs djkas hdjashdjHolña dajdajkshdkjahsdkj ahsdjkahs djkas hdjashdjHolña dajdajkshdkjahsdkj ahsdjkahs djkas hdjashdjHolña dajdajkshdkjahsdkj ahsdjkahs djkas hdjashdjHolña dajdajkshdkjahsdkj ahsdjkahs djkas hdjashdjHolña dajdajkshdkjahsdkj ahsdjkahs djkas hdjashdjHolña dajdajkshdkjahsdkj</Text>
+              <Text style={[styles.moreEventInfoText, {color: Colors['light'].text}]}>{event.more_info_content}</Text>
             </CollapsableMoreInfoComponent>
-          </View>
-          { eventTickets ?
-            <>
-              <View style={styles.ticketsContainer}>
-                <View style={styles.sellingStatusContainer}>
-                  <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
-                  <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{ i18n?.t(event.selling ? 'selling': 'notSelling') }</Text>
-                </View>
-                <Text style={styles.subtitle}>Tickets:</Text>
-                <FlatList
-                  style={styles.ticketsList}
-                  data={eventTickets}
-                  renderItem={({ item }) => <EventTicketCardComponent eventSelling={event.selling} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />}
-                />
+          </> : null }
+        </View>
+        { eventTickets ?
+          <>
+            <View style={styles.ticketsContainer}>
+              <View style={styles.sellingStatusContainer}>
+                <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
+                <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{ i18n?.t(event.selling ? 'selling': 'notSelling') }</Text>
               </View>
-              { orderConfirmed ?
-                <Pressable style={[styles.orderConfirmedContainer, {backgroundColor: Colors[theme].cartContainerBackground}]} onPress={onGoToWallet}>
-                  <FeatherIcon name="check-circle" size={40} color={Colors[theme].text} />
-                  <View style={styles.orderConfirmedTextContainer}><Text style={styles.orderConfirmedSubtitle}>{ i18n?.t('ticketsAddedToWallet') }</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
-                </Pressable>
-              :
-                <View style={[styles.cartContainer, {backgroundColor: Colors[theme].cartContainerBackground}]}>
-                  <View style={styles.cartTitleRowContainer}><Text style={styles.subtitle}>{ i18n?.t('cart') }</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
-                  { cart?.length ?
-                    <>
-                      <FlatList
-                        style={styles.cartList}
-                        data={cart}
-                        renderItem={({ item }) => <Text style={styles.cartItemsList}>{item.quantity}  -  {item.eventTicket.name} · {item.eventTicket.price/100}€</Text>}
-                        ItemSeparatorComponent={() => <View style={{height: 3}} />}
-                      />
-                      { event.ticket_fee ?
-                        <View style={{marginHorizontal: 8, flexDirection: 'row', alignItems: 'flex-end'}}>
-                          <Text style={[styles.transactionFeePrice, {color: Colors[theme].cartContainerBackgroundContrast}]}>+ {event.ticket_fee * cartTotalQuantity / 100}€ </Text>
-                          <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('serviceFee') }</Text>
+              <Text style={styles.subtitle}>Tickets:</Text>
+              <FlatList
+                style={styles.ticketsList}
+                data={eventTickets}
+                renderItem={({ item }) => <EventTicketCardComponent eventSelling={event.selling} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />}
+              />
+            </View>
+            { orderConfirmed ?
+              <Pressable style={[styles.orderConfirmedContainer, {backgroundColor: Colors[theme].cartContainerBackground}]} onPress={onGoToWallet}>
+                <FeatherIcon name="check-circle" size={40} color={Colors[theme].text} />
+                <View style={styles.orderConfirmedTextContainer}><Text style={styles.orderConfirmedSubtitle}>{ i18n?.t('ticketsAddedToWallet') }</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
+              </Pressable>
+            :
+              <View style={[styles.cartContainer, {backgroundColor: Colors[theme].cartContainerBackground}]}>
+                <View style={styles.cartTitleRowContainer}><Text style={styles.subtitle}>{ i18n?.t('cart') }</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
+                { cart?.length ?
+                  <>
+                    <FlatList
+                      style={styles.cartList}
+                      data={cart}
+                      renderItem={({ item }) => <Text style={styles.cartItemsList}>{item.quantity}  -  {item.eventTicket.name} · {item.eventTicket.price/100}€</Text>}
+                      ItemSeparatorComponent={() => <View style={{height: 3}} />}
+                    />
+                    { event.ticket_fee ?
+                      <View style={{marginHorizontal: 8, flexDirection: 'row', alignItems: 'flex-end'}}>
+                        <Text style={[styles.transactionFeePrice, {color: Colors[theme].cartContainerBackgroundContrast}]}>+ {event.ticket_fee * cartTotalQuantity / 100}€ </Text>
+                        <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('serviceFee') }</Text>
+                      </View>
+                    : null }
+                      { cardNumber ?
+                        <View style={styles.usingCreditCardContainer}>
+                          <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
+                          <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCreditCard') } {cardNumber.slice(-7)}</Text>
                         </View>
                       : null }
-                        { cardNumber ?
-                          <View style={styles.usingCreditCardContainer}>
-                            <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
-                            <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCreditCard') } {cardNumber.slice(-7)}</Text>
-                          </View>
-                        : null }
-                      <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground}]} onPress={onBuyCart}>
-                      { loading ?
-                        <ActivityIndicator style={{marginVertical: 1.5}} size="small" />
-                      :
-                        <Text style={styles.buyButtonText}>{(cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)) / 100 + '€  ·  '}{ i18n?.t('buy') }</Text>
-                      }
-                      </Pressable>
-                    </>
-                  :
-                    <Text style={[styles.emptyCard, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('noTicketsInCart') }</Text>
-                  }
-                </View>
-              }
-            </>
-          :
-            <></>
-          }
-        </>
-      }
+                    <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground}]} onPress={onBuyCart}>
+                    { loading ?
+                      <ActivityIndicator style={{marginVertical: 1.5}} size="small" />
+                    :
+                      <Text style={styles.buyButtonText}>{(cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)) / 100 + '€  ·  '}{ i18n?.t('buy') }</Text>
+                    }
+                    </Pressable>
+                  </>
+                :
+                  <Text style={[styles.emptyCard, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('noTicketsInCart') }</Text>
+                }
+              </View>
+            }
+          </>
+        :
+          <></>
+        }
+      </>}
       {/* <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} /> */}
     </View> 
   );
@@ -370,16 +347,13 @@ export default function EventDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     display: 'flex',
-    height: '100%',
-    // flex: 1
-    // justifyContent: 'center'
+    height: '100%'
   },
   eventInfoContainer: {
     position: 'absolute',
     left: 0,
     right: 0,
     minHeight: 180,
-    // justifyContent: 'flex-end',
     paddingTop: 71,
     paddingBottom: 40,
     paddingHorizontal: 20,
@@ -428,7 +402,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    // marginTop: 10,
     gap: 3,
     position: 'absolute',
     bottom: 10,
@@ -441,6 +414,7 @@ const styles = StyleSheet.create({
   moreEventInfoText: {
     fontSize: 16,
     marginTop: 10,
+    whiteSpace: 'pre-line'
   },
   ticketsContainer: {
     flex: 1,
