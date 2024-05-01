@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { ActivityIndicator, FlatList, Platform, Pressable, ScrollView, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text, View } from '../../../components/Themed';
 import EventTicketCardComponent from '../../../components/EventTicketCardComponent';
@@ -267,7 +267,9 @@ export default function EventDetailScreen() {
             </Picker>
           </View>
           <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
-          <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description} kashjdjkahsdkjhasasdasdasdas</Text>
+          <ScrollView horizontal>
+            <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
+          </ScrollView>
           { event.more_info_content ? <>
             <Pressable style={styles.moreEventInfo} onPress={onMoreInfo}>
               <FeatherIcon name={moreInfoExpanded ? 'chevron-up' : 'chevron-down'} size={21} color={Colors['light'].text} />
@@ -343,6 +345,36 @@ export default function EventDetailScreen() {
   );
 }
 
+const eventInfoContainerMobileShadow = {
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 2
+  },
+  shadowOpacity: 0.10,
+  shadowRadius: 2.5
+};
+
+const orderConfirmedContainerMobileShadow = {
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 1
+  },
+  shadowOpacity: 0.15,
+  shadowRadius: 3
+};
+
+const cartContainerMobileShadow = {
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 1
+  },
+  shadowOpacity: 0.15,
+  shadowRadius: 3
+};
+
 const styles = StyleSheet.create({
   container: {
     display: 'flex',
@@ -359,15 +391,14 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
     borderRadius: 35,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.10,
-    shadowRadius: 2.5,
-    elevation: 10,
-    zIndex: 1
+    zIndex: 1,
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 2px 2.5px rgba(0, 0, 0, 0.10)'
+      },
+      ios: {...eventInfoContainerMobileShadow},
+      android: {...eventInfoContainerMobileShadow, elevation: 4}
+    })
   },
   stopFollowingButton: {
     display: 'flex',
@@ -377,7 +408,7 @@ const styles = StyleSheet.create({
     right: 15
   },
   optionsPicker: {
-    position: 'fixed',
+    position: 'absolute',
     top: 20,
     right: -165,
     height: 30,
@@ -393,9 +424,7 @@ const styles = StyleSheet.create({
   },
   eventDescription: {
     fontSize: 16,
-    marginTop: 10,
-    whiteSpace: 'nowrap',
-    overflow: 'scroll'
+    marginTop: 10
   },
   moreEventInfo: {
     flexDirection: 'row',
@@ -412,8 +441,7 @@ const styles = StyleSheet.create({
   },
   moreEventInfoText: {
     fontSize: 16,
-    marginTop: 10,
-    whiteSpace: 'pre-line'
+    marginTop: 10
   },
   ticketsContainer: {
     flex: 1,
@@ -457,14 +485,13 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
     paddingHorizontal: 20,
     borderRadius: 35,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 10
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.15)'
+      },
+      ios: {...orderConfirmedContainerMobileShadow},
+      android: {...orderConfirmedContainerMobileShadow, elevation: 3}
+    })
   },
   orderConfirmedTextContainer: {
     flexDirection: 'row',
@@ -484,14 +511,13 @@ const styles = StyleSheet.create({
     paddingBottom: 23,
     paddingHorizontal: 20,
     borderRadius: 35,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 10
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.15)'
+      },
+      ios: {...cartContainerMobileShadow},
+      android: {...cartContainerMobileShadow, elevation: 3}
+    })
   },
   cartTitleRowContainer: {
     flexDirection: 'row',

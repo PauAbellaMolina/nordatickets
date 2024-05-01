@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Platform } from 'react-native';
-import { WebView } from 'react-native-webview';
+// import { WebView } from 'react-native-webview'; // Install package when adding support to ios and android
 import { View } from '../../../../components/Themed';
 import GoBackArrow from '../../../../components/GoBackArrow';
 import { FeatherIcon } from '../../../../components/CustomIcons';
@@ -64,8 +64,9 @@ export default function PaymentModalScreen() {
             `}
           >
         </iframe>
-        </>:<>
-        <WebView
+      </>:<>
+        {/* Uncomment when adding support to ios and android */}
+        {/* <WebView
           containerStyle={styles.containerStyle}
           source={{ html: `
             <body onload="document.forms[0].submit();">
@@ -96,8 +97,8 @@ export default function PaymentModalScreen() {
               }
             </style>
           ` }}
-        /></>
-      }
+        /> */}
+      </>}
     </View>
   );
 }
@@ -133,20 +134,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: -1,
     top: 0,
-    filter: 'blur(3px)'
+    ...Platform.select({
+      web: {
+        filter: 'blur(3px)'
+      }
+    })
   },
   eventInfoContainer: {
     height: 180,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
     borderRadius: 35,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.10,
-    shadowRadius: 2.5,
-    elevation: 10
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 2px 2.5px rgba(0, 0, 0, 0.1)'
+      }
+    })
   }
 });

@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { EventTicket } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
@@ -54,6 +54,16 @@ export default function EventTicketCardComponent({eventSelling, quantityInCart, 
   );
 }
 
+const eventCardMobileShadow = {
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 1
+  },
+  shadowOpacity: 0.08,
+  shadowRadius: 1
+};
+
 const styles = StyleSheet.create({
   ticketCard: {
     paddingVertical: 15,
@@ -61,14 +71,13 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     marginBottom: 10,
     borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 1,
-    elevation: 10
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.08)'
+      },
+      ios: {...eventCardMobileShadow},
+      android: {...eventCardMobileShadow, elevation: 3}
+    })
   },
   ticketContents: {
     flexDirection: 'row',

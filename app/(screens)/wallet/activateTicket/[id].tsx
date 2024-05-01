@@ -159,6 +159,26 @@ export default function ActivateTicketScreen() {
   );
 }
 
+const ticketContainerMobileShadow = {
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 3,
+  },
+  shadowOpacity: 0.12,
+  shadowRadius: 2
+};
+
+const buttonMobileShadow = {
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 1,
+    height: 2,
+  },
+  shadowOpacity: 0.2,
+  shadowRadius: 2.5
+};
+
 const styles = StyleSheet.create({
   container: {
     borderTopLeftRadius: 75,
@@ -183,14 +203,13 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 50,
     marginBottom: 25,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.12,
-    shadowRadius: 2,
-    elevation: 10
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 3px 2px rgba(0, 0, 0, 0.12)'
+      },
+      ios: {...ticketContainerMobileShadow},
+      android: {...ticketContainerMobileShadow, elevation: 7}
+    })
   },
   ticketTopContainer: {
     flex: 1,
@@ -248,9 +267,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     paddingVertical: 30,
-    borderRadius: 40,
-    transitionDuration: '0.5s',
-    transitionProperty: 'backgroundColor'
+    borderRadius: 40
   },
   statusText: {
     fontSize: 30,
@@ -275,14 +292,13 @@ const styles = StyleSheet.create({
     borderColor: '#0000001A',
     alignItems: 'center',
     flex: 3,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 1,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 2.5,
-    elevation: 10
+    ...Platform.select({
+      web: {
+        boxShadow: '1px 2px 2.5px rgba(0, 0, 0, 0.2)'
+      },
+      ios: {...buttonMobileShadow},
+      android: {...buttonMobileShadow, elevation: 5}
+    })
   },
   buttonLoading: {
     paddingVertical: 18

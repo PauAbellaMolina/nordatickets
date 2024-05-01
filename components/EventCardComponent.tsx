@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { router } from 'expo-router';
 import { Event } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
@@ -48,6 +48,16 @@ export default function EventCardComponent(event: Event) {
   );
 }
 
+const eventCardMobileShadow = {
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 1
+  },
+  shadowOpacity: 0.10,
+  shadowRadius: 1.5
+};
+
 const styles = StyleSheet.create({
   eventCard: {
     flexDirection: 'row',
@@ -56,14 +66,13 @@ const styles = StyleSheet.create({
     paddingBottom: 25,
     paddingHorizontal: 15,
     borderRadius: 35,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1
-    },
-    shadowOpacity: 0.10,
-    shadowRadius: 1.5,
-    elevation: 10
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 1px 1.5px rgba(0, 0, 0, 0.10)'
+      },
+      ios: {...eventCardMobileShadow},
+      android: {...eventCardMobileShadow, elevation: 3}
+    })
   },
   eventInfoContainer: {
     width: '84%',

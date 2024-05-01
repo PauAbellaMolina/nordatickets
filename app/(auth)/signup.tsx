@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, TextInput, useColorScheme, ActivityIndicator, Pressable } from "react-native";
+import { StyleSheet, TextInput, useColorScheme, ActivityIndicator, Pressable, ScrollView } from "react-native";
 import { router } from "expo-router";
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
@@ -92,7 +92,9 @@ export default function Signup() {
             />
           : <>
             <View style={styles.emailSubmitted}>
-              <Text style={styles.email}>{email}</Text>
+              <ScrollView horizontal>
+                <Text style={styles.email}>{email}</Text>
+              </ScrollView>
               <Pressable onPress={onChangeEmail}>
                 <FeatherIcon name="edit-2" size={18} color={Colors[theme].text} />
               </Pressable>
@@ -170,17 +172,14 @@ const styles = StyleSheet.create({
     width: '70%',
   },
   email: {
-    fontSize: 25,
-    maxWidth: 250,
-    textOverflow: 'ellipsis',
-    overflow: 'hidden',
-    wordWrap: 'normal'
+    fontSize: 25
   },
   emailSubmitted: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12
+    gap: 12,
+    maxWidth: 250
   },
   inputContainer: {
     marginTop: 20,

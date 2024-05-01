@@ -80,14 +80,14 @@ export default function ReceiptsScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingTop: 75,
-    paddingBottom: 5,
-    paddingHorizontal: 15,
+    paddingBottom: 20,
     flex: 1,
     overflow: 'scroll'
   },
   title: {
     fontSize: 30,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    paddingHorizontal: 15,
   },
   wrapper: {
     marginTop: 30,

@@ -1,4 +1,4 @@
-import { FlatList, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { FlatList, Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { View, Text } from "./Themed";
 import { WalletTicket } from "../types/supabaseplain";
 import Colors from '../constants/Colors';
@@ -44,12 +44,30 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
 
 };
 
+const containerMobileShadow = {
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 1
+  },
+  shadowOpacity: 0.10,
+  shadowRadius: 1.5
+};
+
 const styles = StyleSheet.create({
   container: {
+    marginHorizontal: 15,
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 10,
-    gap: 10
+    gap: 10,
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 1px 1.5px rgba(0, 0, 0, 0.10)'
+      },
+      ios: {...containerMobileShadow},
+      android: {...containerMobileShadow, elevation: 3}
+    })
   },
   orderTitle: {
     fontSize: 16,

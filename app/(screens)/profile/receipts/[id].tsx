@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
+import { FlatList, StyleSheet, Dimensions, ActivityIndicator, Platform } from 'react-native';
 import { View, Text } from '../../../../components/Themed';
 import { WalletTicket } from "../../../../types/supabaseplain";
 import { useLocalSearchParams } from 'expo-router';
@@ -210,15 +210,18 @@ export default function ReceiptDetailScreen() {
 
 };
 
-const styles = StyleSheet.create({
-  iframe: {
-    height: 0,
-    zIndex: -1,
-    pointerEvents: 'none'
+const folioMobileShadow = {
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 2
   },
+  shadowOpacity: 0.10,
+  shadowRadius: 8
+};
+
+const styles = StyleSheet.create({
   container: {
-    overflow: 'scroll',
-    overflowX: 'scroll',
     flex: 1
   },
   folio: {
@@ -227,13 +230,13 @@ const styles = StyleSheet.create({
     aspectRatio: 1/1.414,
     paddingVertical: '7%',
     paddingHorizontal: '9%',
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.10,
-    shadowRadius: 8
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)'
+      },
+      ios: {...folioMobileShadow},
+      android: {...folioMobileShadow, elevation: 4}
+    })
   },
   receiptText: {
     color: 'black'
@@ -293,8 +296,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   tableTextEnd: {
-    textAlign: 'right',
-    whiteSpace: 'nowrap'
+    textAlign: 'right'
   },
   firstCol: {
     flex: 2,
