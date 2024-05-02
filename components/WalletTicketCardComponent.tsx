@@ -170,8 +170,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 2,
     flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 5
+    alignItems: 'center'
   },
   ticketIconWrapper: {
     paddingVertical: 11,

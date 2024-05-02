@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, useColorScheme } from 'react-native';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
@@ -41,6 +41,14 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
       setEvent(event);
     });
   };
+
+  const getItemLayout = (_data: WalletTicket[], index: number) => (
+    {length: 56, offset: 56 * index, index}
+  );
+
+  const renderItem = useCallback(({item}: {item: WalletTicket}) => (
+    <WalletTicketCardComponent walletTicket={item} />
+  ), []);
   
   return (
     <>
@@ -53,8 +61,9 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
               columnWrapperStyle={{flexWrap: 'wrap', gap: 10}}
               numColumns={2}
               style={styles.ticketsList}
+              getItemLayout={getItemLayout}
               data={eventWalletTickets}
-              renderItem={({ item }) => <WalletTicketCardComponent walletTicket={item} />}
+              renderItem={renderItem}
             />
         </> :
           <ActivityIndicator style={{marginVertical: '15%'}} size="large" />
@@ -81,6 +90,7 @@ const styles = StyleSheet.create({
     marginBottom: 5
   },
   ticketsList: {
-    marginTop: 10
+    marginTop: 10,
+    gap: 10
   }
 });

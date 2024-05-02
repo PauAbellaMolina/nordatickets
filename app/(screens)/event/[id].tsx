@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Platform, Pressable, ScrollView, StyleSheet, useColorScheme } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text, View } from '../../../components/Themed';
@@ -13,7 +13,8 @@ import { Picker } from '@react-native-picker/picker';
 import { getThemeRandomColor } from '../../../utils/chooseRandomColor';
 import { CollapsableMoreInfoComponent } from '../../../components/CollapsableMoreInfoComponent';
 
-type Cart = { eventTicket: EventTicket, quantity: number }[] | null;
+type CartItem = { eventTicket: EventTicket, quantity: number };
+type Cart = CartItem[] | null;
 
 export default function EventDetailScreen() {
   const theme = useColorScheme() ?? 'light';
@@ -248,6 +249,14 @@ export default function EventDetailScreen() {
     setMoreInfoExpanded(!moreInfoExpanded);
   };
 
+  const renderItemTickets = useCallback(({item}: {item: EventTicket}) => (
+    <EventTicketCardComponent eventSelling={event?.selling} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />
+  ), [cart, event]);
+
+  const renderItemCartTicket = useCallback(({item}: {item: CartItem}) => (
+    <Text style={styles.cartItemsList}>{item.quantity}  -  {item.eventTicket.name} · {item.eventTicket.price/100}€</Text>
+  ), []);
+
   return (
     <View style={[styles.container, !event ? { justifyContent: 'center' } : null]}>
       { !event ? <>
@@ -291,7 +300,7 @@ export default function EventDetailScreen() {
               <FlatList
                 style={styles.ticketsList}
                 data={eventTickets}
-                renderItem={({ item }) => <EventTicketCardComponent eventSelling={event.selling} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />}
+                renderItem={renderItemTickets}
               />
             </View>
             { orderConfirmed ?
@@ -307,7 +316,7 @@ export default function EventDetailScreen() {
                     <FlatList
                       style={styles.cartList}
                       data={cart}
-                      renderItem={({ item }) => <Text style={styles.cartItemsList}>{item.quantity}  -  {item.eventTicket.name} · {item.eventTicket.price/100}€</Text>}
+                      renderItem={renderItemCartTicket}
                       ItemSeparatorComponent={() => <View style={{height: 3}} />}
                     />
                     { event.ticket_fee ?

@@ -1,7 +1,7 @@
 import { FlatList, StyleSheet } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import WalletEventCardComponent from '../../components/WalletEventCardComponent';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { supabase } from "../../supabase";
 import { useSupabase } from '../../context/SupabaseProvider';
 import { WalletTicket } from '../../types/supabaseplain';
@@ -13,18 +13,20 @@ export default function TabTwoScreen() {
 
   useEffect(() => {
     if (!user) return;
-    fetchWalletTickets();
-    const subscription = subscribeWalletTickets();
+    let unmounted = false;
+    fetchWalletTickets(unmounted);
+    const subscription = subscribeWalletTickets(unmounted);
 
     return () => {
+      unmounted = true;
       subscription?.unsubscribe();
     };
   }, [user]);
 
-  const fetchWalletTickets = () => {
+  const fetchWalletTickets = (unmounted: boolean) => {
     supabase.from('wallet_tickets').select().eq('user_id', user.id).eq('used', false)
     .then(({ data: wallet_tickets, error }) => {
-      if (error) return;
+      if (unmounted || error) return;
       const eventGroupedWalletTickets: WalletTicket[][] = 
       Object.values(
         wallet_tickets.reduce((groups, ticket) => {
@@ -40,7 +42,7 @@ export default function TabTwoScreen() {
     });
   };
 
-  const subscribeWalletTickets = (): RealtimeChannel => {
+  const subscribeWalletTickets = (unmounted: boolean): RealtimeChannel => {
     return supabase
     .channel('wallet_tickets')
     .on('postgres_changes',
@@ -50,9 +52,13 @@ export default function TabTwoScreen() {
         table: 'wallet_tickets',
         filter: `user_id=eq.${user.id}`
       },
-      (payload) => fetchWalletTickets())
+      (payload) => fetchWalletTickets(unmounted))
     .subscribe();
   };
+
+  const renderItem = useCallback(({item}: {item: WalletTicket[]}) => (
+    <WalletEventCardComponent eventWalletTickets={item} />
+  ), []);
 
   return (
     <View style={styles.container}>
@@ -63,7 +69,7 @@ export default function TabTwoScreen() {
           <FlatList
             style={styles.walletTicketList}
             data={eventGroupedWalletTickets}
-            renderItem={({ item }) => <WalletEventCardComponent eventWalletTickets={item} />}
+            renderItem={renderItem}
             ItemSeparatorComponent={() => <View style={{height: 10}} />}
           />
         :

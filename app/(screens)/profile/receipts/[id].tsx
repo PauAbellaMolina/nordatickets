@@ -3,7 +3,7 @@ import { View, Text } from '../../../../components/Themed';
 import { WalletTicket } from "../../../../types/supabaseplain";
 import { useLocalSearchParams } from 'expo-router';
 import TiktLight from '../../../../assets/svgs/tiktlight.svg';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../supabase';
 import { useSupabase } from '../../../../context/SupabaseProvider';
 
@@ -71,6 +71,126 @@ export default function ReceiptDetailScreen() {
       setPaginatedGroupedWalletTickets(paginatedGroupedWalletTickets);
     });
   };
+
+  const renderItemFolio = useCallback(({item: page, index: pageIndex}: {item: WalletTicket[][], index: number}) => (
+    <View style={[styles.folio, {width: vwpDimension}]}>
+      { pageIndex === 0 ? <>
+        <View style={styles.titleRow}>
+          <TiktLight width={vwpDimension/6} height={vwpDimension/12} />
+          <Text style={[styles.receiptText, {fontSize: vwpDimension/24}]}>{ i18n?.t('simplifiedInvoice') }</Text>
+        </View>
+        <View style={styles.generalInfoRow}>
+          <View style={[styles.generalInfoContainer, {gap: vwpDimension/120}]}>
+            <View style={styles.generalInfoEntry}>
+              <Text style={[styles.receiptText, styles.bodyTextTitle,, {fontSize: vwpDimension/54}]}>{ i18n?.t('address') }</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>Av. Països Catalans 169 1 3</Text>
+            </View>
+            <View style={styles.generalInfoEntry}>
+              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('cityAndCountry') }</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>Reus, { i18n?.t('catalonia') }, { i18n?.t('spain') }</Text>
+            </View>
+            <View style={styles.generalInfoEntry}>
+              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>NIF</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>39470763A</Text>
+            </View>
+            <View style={styles.generalInfoEntry}>
+              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('contact') }</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>factura@elteutikt.com · 694467917</Text>
+            </View>
+          </View>
+          <View style={[styles.generalInfoContainer, {gap: vwpDimension/120}]}>
+            <View style={[styles.generalInfoEntry, styles.alignedRight]}>
+              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('invoiceNumber') }</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ id }</Text>
+            </View>
+            <View style={[styles.generalInfoEntry, styles.alignedRight]}>
+              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('transactionDate') }</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ receiptDate?.toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) }h</Text>
+            </View>
+            <View style={[styles.generalInfoEntry, styles.alignedRight]}>
+              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('event') }</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ eventName }</Text>
+            </View>
+          </View>
+        </View>
+      </> : null }
+      <View style={styles.table}>
+        <View style={[styles.tableHeader, {borderBottomWidth: vwpDimension/500}]}>
+          <View style={[styles.tableCell, styles.firstCol]}>
+            <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>{ i18n?.t('description') }</Text>
+          </View>
+          <View style={styles.tableCell}>
+            <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>{ i18n?.t('amount') }</Text>
+          </View>
+          <View style={styles.tableCell}>
+            <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>{ i18n?.t('quantity') }</Text>
+          </View>
+          <View style={styles.tableCell}>
+            <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>{ i18n?.t('total') }</Text>
+          </View>
+        </View>
+        <FlatList
+          data={page}
+          renderItem={({ item: tickets, index: ticketsIndex }) => {
+            return (<>
+              <View style={styles.tableRow}>
+                <View style={[styles.tableCell, styles.firstCol]}>
+                  <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{tickets[0].event_tickets_name}</Text>
+                </View>
+                <View style={styles.tableCell}>
+                  <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{tickets[0].price/100}€</Text>
+                </View>
+                <View style={styles.tableCell}>
+                  <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{tickets.length}</Text>
+                </View>
+                <View style={styles.tableCell}>
+                  <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{tickets.reduce((acc, ticket) => acc + ticket.price, 0) / 100}€</Text>
+                </View>
+              </View>
+              { pageIndex === paginatedGroupedWalletTickets.length - 1 && ticketsIndex === page.length - 1 ? <>
+                <View style={styles.tableFooter}>
+                  <View style={[styles.tableCell, styles.firstCol]}>
+                  </View>
+                  <View style={styles.tableCell}>
+                  </View>
+                  <View style={[styles.tableCell, styles.tableCellTitleFooter, styles.borderTop, {borderTopWidth: vwpDimension/500}]}>
+                    <Text style={[styles.receiptText, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>Tickets:</Text>
+                  </View>
+                  <View style={[styles.tableCell, styles.borderTop, {borderTopWidth: vwpDimension/500}]}>
+                    <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ paginatedGroupedWalletTickets.reduce((acc, page) => acc + page.reduce((acc, walletTickets) => acc + walletTickets.reduce((acc, ticket) => acc + ticket.price, 0), 0), 0) / 100 }€</Text>
+                  </View>
+                </View>
+                <View style={styles.tableFooter}>
+                  <View style={[styles.tableCell, styles.firstCol]}>
+                  </View>
+                  <View style={styles.tableCell}>
+                  </View>
+                  <View style={[styles.tableCell, styles.tableCellTitleFooter]}>
+                    <Text style={[styles.receiptText, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>{ i18n?.t('serviceFee') }:</Text>
+                  </View>
+                  <View style={[styles.tableCell]}>
+                    <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ eventTicketFee * paginatedGroupedWalletTickets.reduce((acc, page) => acc + page.reduce((acc, walletTickets) => acc + walletTickets.length, 0), 0) / 100 }€</Text>
+                  </View>
+                </View>
+                <View style={styles.tableFooter}>
+                  <View style={[styles.tableCell, styles.firstCol]}>
+                  </View>
+                  <View style={styles.tableCell}>
+                  </View>
+                  <View style={[styles.tableCell, styles.tableCellTitleFooter]}>
+                    <Text style={[styles.receiptText, styles.tableTextTitle, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>{ i18n?.t('total') }:</Text>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ (paginatedGroupedWalletTickets.reduce((acc, page) => acc + page.reduce((acc, walletTickets) => acc + walletTickets.reduce((acc, ticket) => acc + ticket.price, 0), 0), 0) / 100) + (eventTicketFee * paginatedGroupedWalletTickets.reduce((acc, page) => acc + page.reduce((acc, walletTickets) => acc + walletTickets.length, 0), 0) / 100) }€</Text>
+                  </View>
+                </View>
+                </> : null }
+            </>)
+          }}
+        />
+      </View>
+    </View>
+  ), [receiptDate]);
   
   return !loaded ? 
   (
@@ -83,127 +203,7 @@ export default function ReceiptDetailScreen() {
         contentContainerStyle={{alignItems: 'center'}}
         data={paginatedGroupedWalletTickets}
         ItemSeparatorComponent={() => <View style={{height: 20}} /> }
-        renderItem={({ item: page, index: pageIndex }) => {
-          return (
-            <View style={[styles.folio, {width: vwpDimension}]}>
-              { pageIndex === 0 ? <>
-                <View style={styles.titleRow}>
-                  <TiktLight width={vwpDimension/6} height={vwpDimension/12} />
-                  <Text style={[styles.receiptText, {fontSize: vwpDimension/24}]}>{ i18n?.t('simplifiedInvoice') }</Text>
-                </View>
-                <View style={styles.generalInfoRow}>
-                  <View style={[styles.generalInfoContainer, {gap: vwpDimension/120}]}>
-                    <View style={styles.generalInfoEntry}>
-                      <Text style={[styles.receiptText, styles.bodyTextTitle,, {fontSize: vwpDimension/54}]}>{ i18n?.t('address') }</Text>
-                      <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>Av. Països Catalans 169 1 3</Text>
-                    </View>
-                    <View style={styles.generalInfoEntry}>
-                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('cityAndCountry') }</Text>
-                      <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>Reus, { i18n?.t('catalonia') }, { i18n?.t('spain') }</Text>
-                    </View>
-                    <View style={styles.generalInfoEntry}>
-                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>NIF</Text>
-                      <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>39470763A</Text>
-                    </View>
-                    <View style={styles.generalInfoEntry}>
-                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('contact') }</Text>
-                      <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>factura@elteutikt.com · 694467917</Text>
-                    </View>
-                  </View>
-                  <View style={[styles.generalInfoContainer, {gap: vwpDimension/120}]}>
-                    <View style={[styles.generalInfoEntry, styles.alignedRight]}>
-                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('invoiceNumber') }</Text>
-                      <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ id }</Text>
-                    </View>
-                    <View style={[styles.generalInfoEntry, styles.alignedRight]}>
-                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('transactionDate') }</Text>
-                      <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ receiptDate.toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) }h</Text>
-                    </View>
-                    <View style={[styles.generalInfoEntry, styles.alignedRight]}>
-                      <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('event') }</Text>
-                      <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ eventName }</Text>
-                    </View>
-                  </View>
-                </View>
-              </> : null }
-              <View style={styles.table}>
-                <View style={[styles.tableHeader, {borderBottomWidth: vwpDimension/500}]}>
-                  <View style={[styles.tableCell, styles.firstCol]}>
-                    <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>{ i18n?.t('description') }</Text>
-                  </View>
-                  <View style={styles.tableCell}>
-                    <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>{ i18n?.t('amount') }</Text>
-                  </View>
-                  <View style={styles.tableCell}>
-                    <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>{ i18n?.t('quantity') }</Text>
-                  </View>
-                  <View style={styles.tableCell}>
-                    <Text style={[styles.receiptText, styles.tableTextTitle, {fontSize: vwpDimension/48}]}>{ i18n?.t('total') }</Text>
-                  </View>
-                </View>
-                <FlatList
-                  data={page}
-                  renderItem={({ item: tickets, index: ticketsIndex }) => {
-                    return (<>
-                      <View style={styles.tableRow}>
-                        <View style={[styles.tableCell, styles.firstCol]}>
-                          <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{tickets[0].event_tickets_name}</Text>
-                        </View>
-                        <View style={styles.tableCell}>
-                          <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{tickets[0].price/100}€</Text>
-                        </View>
-                        <View style={styles.tableCell}>
-                          <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{tickets.length}</Text>
-                        </View>
-                        <View style={styles.tableCell}>
-                          <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{tickets.reduce((acc, ticket) => acc + ticket.price, 0) / 100}€</Text>
-                        </View>
-                      </View>
-                      { pageIndex === paginatedGroupedWalletTickets.length - 1 && ticketsIndex === page.length - 1 ? <>
-                        <View style={styles.tableFooter}>
-                          <View style={[styles.tableCell, styles.firstCol]}>
-                          </View>
-                          <View style={styles.tableCell}>
-                          </View>
-                          <View style={[styles.tableCell, styles.tableCellTitleFooter, styles.borderTop, {borderTopWidth: vwpDimension/500}]}>
-                            <Text style={[styles.receiptText, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>Tickets:</Text>
-                          </View>
-                          <View style={[styles.tableCell, styles.borderTop, {borderTopWidth: vwpDimension/500}]}>
-                            <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ paginatedGroupedWalletTickets.reduce((acc, page) => acc + page.reduce((acc, walletTickets) => acc + walletTickets.reduce((acc, ticket) => acc + ticket.price, 0), 0), 0) / 100 }€</Text>
-                          </View>
-                        </View>
-                        <View style={styles.tableFooter}>
-                          <View style={[styles.tableCell, styles.firstCol]}>
-                          </View>
-                          <View style={styles.tableCell}>
-                          </View>
-                          <View style={[styles.tableCell, styles.tableCellTitleFooter]}>
-                            <Text style={[styles.receiptText, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>{ i18n?.t('serviceFee') }:</Text>
-                          </View>
-                          <View style={[styles.tableCell]}>
-                            <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ eventTicketFee * paginatedGroupedWalletTickets.reduce((acc, page) => acc + page.reduce((acc, walletTickets) => acc + walletTickets.length, 0), 0) / 100 }€</Text>
-                          </View>
-                        </View>
-                        <View style={styles.tableFooter}>
-                          <View style={[styles.tableCell, styles.firstCol]}>
-                          </View>
-                          <View style={styles.tableCell}>
-                          </View>
-                          <View style={[styles.tableCell, styles.tableCellTitleFooter]}>
-                            <Text style={[styles.receiptText, styles.tableTextTitle, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>{ i18n?.t('total') }:</Text>
-                          </View>
-                          <View style={styles.tableCell}>
-                            <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ (paginatedGroupedWalletTickets.reduce((acc, page) => acc + page.reduce((acc, walletTickets) => acc + walletTickets.reduce((acc, ticket) => acc + ticket.price, 0), 0), 0) / 100) + (eventTicketFee * paginatedGroupedWalletTickets.reduce((acc, page) => acc + page.reduce((acc, walletTickets) => acc + walletTickets.length, 0), 0) / 100) }€</Text>
-                          </View>
-                        </View>
-                        </> : null }
-                    </>)
-                  }}
-                />
-              </View>
-            </View>
-          )
-        }}
+        renderItem={renderItemFolio}
       />
     </View>
   );

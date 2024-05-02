@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import EventCardComponent from '../../components/EventCardComponent';
@@ -16,7 +16,7 @@ export default function TabOneScreen() {
     if (!user) return;
     supabase.from('users').select().eq('id', user?.id).single()
     .then(({ data: user, error }) => {
-      if (unmounted || error || !user) return;
+      if (unmounted || error || !user || !user?.event_ids_following?.length) return;
       const userEventIdsFollowing = user.event_ids_following;
       setUserEventIdsFollowing(userEventIdsFollowing);
       supabase.from('events').select().in('id', userEventIdsFollowing)
@@ -30,6 +30,10 @@ export default function TabOneScreen() {
       unmounted = true;
     };
   }, [user, followingEventsChanged]);
+
+  const renderItem = useCallback(({item}: {item: Event}) => (
+    <EventCardComponent {...item} />
+  ), []);
 
   return (
     <View style={styles.container}>
@@ -46,7 +50,7 @@ export default function TabOneScreen() {
           <FlatList
             style={styles.eventList}
             data={events}
-            renderItem={({ item }) => <EventCardComponent {...item} />}
+            renderItem={renderItem}
             ItemSeparatorComponent={() => <View style={{height: 10}} />}
           />
         }

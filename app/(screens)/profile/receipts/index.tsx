@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, useColorScheme } from 'react-native';
 import { Text, View } from '../../../../components/Themed';
 import GoBackArrow from '../../../../components/GoBackArrow';
@@ -62,6 +62,10 @@ export default function ReceiptsScreen() {
     });
   };
 
+  const renderItem = useCallback(({item}: {item: WalletTicket[]}) => (
+    <ReceiptsOrderComponent order={item} eventName={eventIdsNames?.find(event => event.id === item[0].event_id)?.name} eventTicketFee={eventIdsTicketFees?.find(event => event.id === item[0].event_id)?.fee} />
+  ), [eventIdsNames, eventIdsTicketFees]);
+
   return (
     <View style={styles.container}>
       <GoBackArrow light={theme === 'dark'} />
@@ -69,7 +73,7 @@ export default function ReceiptsScreen() {
       <View style={styles.wrapper}>
         <FlatList
           data={orderIdGroupedWalletTickets}
-          renderItem={({ item }) => <ReceiptsOrderComponent order={item} eventName={eventIdsNames.find(event => event.id === item[0].event_id)?.name} eventTicketFee={eventIdsTicketFees.find(event => event.id === item[0].event_id)?.fee} />}
+          renderItem={renderItem}
           ItemSeparatorComponent={() => <View style={{height: 14}} />}
         />
       </View>

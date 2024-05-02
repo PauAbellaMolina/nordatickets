@@ -5,6 +5,7 @@ import Colors from '../constants/Colors';
 import { router } from 'expo-router';
 import { FeatherIcon } from './CustomIcons';
 import { useSupabase } from '../context/SupabaseProvider';
+import { useCallback } from 'react';
 
 export default function ReceiptsOrderComponent({ order, eventName, eventTicketFee }: { order: WalletTicket[], eventName: string, eventTicketFee: number}) {
   const theme = useColorScheme() ?? 'light';
@@ -13,6 +14,10 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
   const onGoToReceiptDetail = () => {
     router.navigate(`/profile/receipts/${order[0].order_id}`);
   }
+
+  const renderItem = useCallback(({item}: {item: WalletTicket}) => (
+    <Text>{ item.event_tickets_name } - { item.price / 100 }€</Text>
+  ), []);
   
   return (
     <View style={[styles.container, {backgroundColor: Colors[theme].backgroundContrast}]}>
@@ -29,7 +34,7 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
       <View style={styles.orderContent}>
         <FlatList
           data={order}
-          renderItem={({ item }) => <Text>{ item.event_tickets_name } - { item.price / 100 }€</Text>}
+          renderItem={renderItem}
         />
         <View>
           <Text>{ i18n?.t('serviceFee') }: { eventTicketFee ? eventTicketFee * order.length / 100 : '...' }€</Text>
