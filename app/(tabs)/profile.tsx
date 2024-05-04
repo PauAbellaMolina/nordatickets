@@ -16,6 +16,7 @@ export default function TabThreeScreen() {
   const [selectedLanguage, setSelectedLanguage] = useState<AvailableLocales>();
 
   useEffect(() => {
+    if (!user) return;
     let unmounted = false;
     fetchUser(unmounted);
 
@@ -25,6 +26,7 @@ export default function TabThreeScreen() {
   }, [user]);
 
   useEffect(() => {
+    if (!user) return;
     setSelectedLanguage(i18n?.locale as AvailableLocales);
   }, [i18n]);
 

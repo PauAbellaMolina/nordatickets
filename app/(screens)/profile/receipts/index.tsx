@@ -16,8 +16,8 @@ export default function ReceiptsScreen() {
   const [eventIdsTicketFees, setEventIdsTicketFees] = useState<{ id: number, fee: number }[]>([]);
 
   useEffect(() => {
-    let unmounted = false;
     if (!user) return;
+    let unmounted = false;
     fetchWalletTickets(unmounted);
 
     return () => {

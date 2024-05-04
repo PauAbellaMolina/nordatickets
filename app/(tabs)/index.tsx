@@ -12,8 +12,8 @@ export default function TabOneScreen() {
   const [userEventIdsFollowing, setUserEventIdsFollowing] = useState<number[]>([]);
 
   useEffect(() => {
-    let unmounted = false;
     if (!user) return;
+    let unmounted = false;
     supabase.from('users').select().eq('id', user?.id).single()
     .then(({ data: user, error }) => {
       if (unmounted || error || !user || !user?.event_ids_following?.length) return;

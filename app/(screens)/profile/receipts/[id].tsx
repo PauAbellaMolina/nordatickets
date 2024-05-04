@@ -20,8 +20,8 @@ export default function ReceiptDetailScreen() {
   const [eventTicketFee, setEventTicketFee] = useState<number>(null);
 
   useEffect(() => {
-    let unmounted = false;
     if (!user) return;
+    let unmounted = false;
     fetchWalletTickets(unmounted);
 
     return () => {
@@ -30,6 +30,7 @@ export default function ReceiptDetailScreen() {
   }, [user]);
 
   useEffect(() => {
+    if (!user) return;
     let unmounted = false;
     if (!unmounted && paginatedGroupedWalletTickets.length && eventName && eventTicketFee && receiptDate && !loaded) {
       setLoaded(true);

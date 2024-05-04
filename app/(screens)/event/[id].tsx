@@ -35,6 +35,7 @@ export default function EventDetailScreen() {
   const [selectedOption, setSelectedOption] = useState<string>('misc');
 
   useEffect(() => {
+    if (!user) return;
     let unmounted = false;
     supabase.from('events').select().eq('id', id as string).single()
     .then(({ data: event, error }) => {
@@ -49,6 +50,7 @@ export default function EventDetailScreen() {
   }, []);
 
   useEffect(() => {
+    if (!user) return;
     if (!event || (theme === 'dark' && !event?.color_code_dark) || (theme === 'light' && !event?.color_code_light)) {
       setEventBackgroundColor(getThemeRandomColor(theme));
       return;
@@ -61,6 +63,7 @@ export default function EventDetailScreen() {
   }, [event, theme]);
 
   useEffect(() => {
+    if (!user) return;
     let unmounted = false;
     supabase.from('event_tickets').select().eq('event_id', id as string)
     .then(({ data: event_tickets, error }) => {
@@ -74,6 +77,7 @@ export default function EventDetailScreen() {
   }, [event]);
 
   useEffect(() => {
+    if (!user) return;
     let unmounted = false;
     if (!user || !event) return;
     supabase.from('users').select().eq('id', user?.id)
@@ -105,6 +109,7 @@ export default function EventDetailScreen() {
   }, [user, event]);
 
   useEffect(() => {
+    if (!user) return;
     if (!cart) {
       setCartTotalPrice(0);
       setCartTotalQuantity(0);

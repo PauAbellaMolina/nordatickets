@@ -11,7 +11,7 @@ import { getThemeRandomColor } from '../../../../utils/chooseRandomColor';
 
 export default function ActivateTicketScreen() {
   const theme = useColorScheme() ?? 'light';
-  const { i18n } = useSupabase();
+  const { i18n, user } = useSupabase();
   const [loading, setLoading] = useState<boolean>(false);
   const [ticketActive, setTicketActive] = useState<boolean>(undefined);
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>();
@@ -21,6 +21,7 @@ export default function ActivateTicketScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   useEffect(() => {
+    if (!user) return;
     let unmounted = false;
     fetchWalletTickets(unmounted);
 
