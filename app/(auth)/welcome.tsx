@@ -1,5 +1,5 @@
 import { StyleSheet, useColorScheme, Pressable } from "react-native";
-import { router } from "expo-router";
+import { router, useGlobalSearchParams } from "expo-router";
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
 import TiktDark from '../../assets/svgs/tiktdark.svg';
@@ -14,6 +14,7 @@ import { AvailableLocales } from "../../assets/translations/translation";
 export default function Welcome() {
   const theme = useColorScheme() ?? 'light';
   const { i18n, setLanguage } = useSupabase();
+  const params = useGlobalSearchParams();
 
   const [selectedLanguage, setSelectedLanguage] = useState<AvailableLocales>();
 
@@ -23,9 +24,11 @@ export default function Welcome() {
 
   const onGoToSignUp = () => {
     router.navigate('/signup');
+    router.setParams(params as Record<string, string>);
   };
   const onGoToLogIn = () => {
     router.navigate('/login');
+    router.setParams(params as Record<string, string>);
   };
 
   const onSelectedLanguage = (language: AvailableLocales) => {

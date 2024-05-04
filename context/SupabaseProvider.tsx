@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session, SignInWithPasswordlessCredentials, User } from "@supabase/supabase-js";
-import { useRouter, useSegments } from "expo-router";
+import { useGlobalSearchParams, useRouter, useSegments } from "expo-router";
 import { supabase } from "../supabase";
 import { I18n } from 'i18n-js';
 import { AvailableLocales, dict } from "../assets/translations/translation";
@@ -46,7 +46,8 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   const [i18n, setI18n] = useState<I18n | null>(null);
   const [auxFollowingEventsChanged, setAuxFollowingEventsChanged] = useState<boolean>(false);
 
-  const segments = useSegments()[0];
+  const params = useGlobalSearchParams();
+  const segments = useSegments();
   const router = useRouter();
 
   const signInWithOTP = async (options: SignInWithPasswordlessCredentials) => {
@@ -136,11 +137,24 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 
   useEffect(() => {
     if (!initialized) return;
+    
+     //TODO PAU this seems to work, but test deeply and make sure theres no security issues
+    const cleanParamsId = params.id && typeof params.id === "string" ? params.id : null;
+    const cleanParamsEventId = params.event && typeof params.event === "string" ? params.event : null;
 
-    if (!session && segments !== "(auth)") {
+    if (!session && segments[0] !== "(auth)") {
       router.replace("/welcome");
-    } else if (session && segments === "(auth)") {
-      router.replace("/");
+      if (segments[0] === "(screens)" && segments[1] === "event" && segments[2] === "[id]") {
+        if (!cleanParamsId) return;
+        router.setParams({ event: cleanParamsId });
+      }
+    } else if (session && segments[0] === "(auth)") {
+      if (cleanParamsEventId) {
+        router.replace("/");
+        router.navigate(`/event/${cleanParamsEventId}`);
+      } else {
+        router.replace("/");
+      }
     }
     //this should be commented out so that we can go to /something (/event/:id) and not be redirected to / (tab 1 index)
     // else if (session && segments !== "(app)") {
