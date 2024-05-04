@@ -16,10 +16,15 @@ export default function TabOneScreen() {
     let unmounted = false;
     supabase.from('users').select().eq('id', user?.id).single()
     .then(({ data: user, error }) => {
-      if (unmounted || error || !user || !user?.event_ids_following?.length) return;
-      const userEventIdsFollowing = user.event_ids_following;
-      setUserEventIdsFollowing(userEventIdsFollowing);
-      supabase.from('events').select().in('id', userEventIdsFollowing)
+      if (unmounted || error || !user) return;
+      if (userEventIdsFollowing.length && !user?.event_ids_following?.length) {
+        setUserEventIdsFollowing([]);
+        setEvents([]);
+        return;
+      }
+      const auxUserEventIdsFollowing = user.event_ids_following;
+      setUserEventIdsFollowing(auxUserEventIdsFollowing);
+      supabase.from('events').select().in('id', auxUserEventIdsFollowing)
       .then(({ data: events, error }) => {
         if (unmounted || error) return;
         setEvents(events);
