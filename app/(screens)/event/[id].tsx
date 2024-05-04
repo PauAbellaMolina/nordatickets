@@ -47,7 +47,7 @@ export default function EventDetailScreen() {
       setCart(null);
       unmounted = true;
     };
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -60,7 +60,7 @@ export default function EventDetailScreen() {
     } else {
       setEventBackgroundColor(event.color_code_light);
     }
-  }, [event, theme]);
+  }, [user, event, theme]);
 
   useEffect(() => {
     if (!user) return;
@@ -74,7 +74,7 @@ export default function EventDetailScreen() {
     return () => {
       unmounted = true;
     };
-  }, [event]);
+  }, [user, event]);
 
   useEffect(() => {
     if (!user) return;
@@ -119,7 +119,7 @@ export default function EventDetailScreen() {
     setCartTotalPrice(totalPrice);
     const totalQuantity = cart.reduce((acc, cartItem) => acc + cartItem.quantity, 0);
     setCartTotalQuantity(totalQuantity);
-  }, [cart]);
+  }, [user, cart]);
 
   const onAddTicketHandler = (ticket: EventTicket) => {
     if (!cart) {
