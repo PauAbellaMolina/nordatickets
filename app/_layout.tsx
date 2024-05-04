@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Platform, useColorScheme } from 'react-native';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { SplashScreen, Stack, router } from 'expo-router';
+import { SplashScreen, Stack } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { SupabaseProvider, useSupabase } from '../context/SupabaseProvider';
+import WebSplashScreen from '../components/WebSplashScreen';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -20,8 +21,9 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const [appIsReady, setAppIsReady] = useState<boolean>(false);
   const [loaded, error] = useFonts({
-    ...FontAwesome.font,
+    ...FontAwesome.font
   });
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
@@ -31,11 +33,17 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
+      setTimeout(() => {  
+        SplashScreen.hideAsync();
+        setAppIsReady(true);
+      }, 800);
     }
   }, [loaded]);
 
-  if (!loaded) {
+  if (!appIsReady) {
+    if(Platform.OS === 'web') {
+      return <WebSplashScreen />;
+    }
     return null;
   }
 
