@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, TextInput, useColorScheme, ActivityIndicator, Pressable, ScrollView } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
+import Checkbox from 'expo-checkbox';
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
 import { useSupabase } from "../../context/SupabaseProvider";
@@ -14,6 +15,7 @@ export default function Signup() {
   const { signInWithOTP, verifyOTP, i18n } = useSupabase();
   const params = useGlobalSearchParams();
 
+  const [termsChecked, setTermsChecked] = useState(false);
   const [email, setEmail] = useState<string>('');
   const [emailSent, setEmailSent] = useState<boolean>(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState<string | undefined>(undefined);
@@ -75,23 +77,39 @@ export default function Signup() {
     router.setParams(params as Record<string, string>);
   };
 
+  const onGoToTerms = () => {
+    router.navigate('/terms');
+  }
+
   return (
     <BlobsBackground style={styles.container}>
       <View style={[styles.wrapper, {backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity}]}>
         <Text style={styles.title}>{ i18n?.t('accountCreation') }</Text>
         <Text style={styles.explanation}>{ i18n?.t('emailCodeExplanation') }</Text>
         <View style={styles.inputContainer}>
-          { !emailSent ?
+          { !emailSent ? <>
             <TextInput
               key="emailInput"
-              style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
+              style={[styles.input, {color: Colors[theme].text, backgroundColor: Colors[theme].inputBackgroundColor, borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
               textContentType="emailAddress"
               autoComplete="email"
               inputMode="email"
               placeholder={ i18n?.t('email') }
               onChangeText={setEmail}
             />
-          : <>
+            <View style={styles.acceptTerms}>
+              <View style={styles.acceptTermsCheckbox}>
+                <Checkbox
+                  style={styles.acceptTermsCheckboxInput}
+                  value={termsChecked}
+                  onValueChange={setTermsChecked}
+                  color={termsChecked ? '#613AC5' : undefined}
+                />
+                <Text>{ i18n?.t('haveReadAndAcceptTermsAndPrivacy') }</Text>
+              </View>
+              <Pressable onPress={onGoToTerms}><Text style={styles.termsActionLink}>{ i18n?.t('termsAndPrivacy') }</Text></Pressable>
+            </View>
+          </> : <>
             <View style={styles.emailSubmitted}>
               <ScrollView horizontal>
                 <Text style={styles.email}>{email}</Text>
@@ -102,7 +120,7 @@ export default function Signup() {
             </View>
             <TextInput
               key="oneTimeCodeInput"
-              style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
+              style={[styles.input, {color: Colors[theme].text, backgroundColor: Colors[theme].inputBackgroundColor, borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
               inputMode="numeric"
               placeholder={ i18n?.t('oneTimeCode') }
               onChangeText={setOneTimeCode}
@@ -120,9 +138,9 @@ export default function Signup() {
               <>
                 { !emailSent ?
                   <Pressable
-                    disabled={!email.includes('@')}
+                    disabled={!email.includes('@') || !termsChecked}
                     onPress={onEmailSignUp}
-                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') ? 0.5 : 1}]}
+                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') || !termsChecked ? 0.5 : 1}]}
                   >
                     <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('send') }</Text>
                   </Pressable>
@@ -161,7 +179,9 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 20
+    gap: 20,
+    maxWidth: 500,
+    width: '100%'
   },
   title: {
     fontSize: 30,
@@ -170,7 +190,29 @@ const styles = StyleSheet.create({
   explanation: {
     fontSize: 18,
     textAlign: 'center',
-    width: '70%',
+    maxWidth: 300,
+    opacity: 0.7
+  },
+  acceptTerms: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 5,
+    marginBottom: 10
+  },
+  acceptTermsCheckbox: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10
+  },
+  acceptTermsCheckboxInput: {
+    width: 21,
+    height: 21
+  },
+  termsActionLink: {
+    fontSize: 16,
+    textDecorationLine: 'underline',
+    textAlign: 'center'
   },
   email: {
     fontSize: 25
@@ -185,7 +227,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     marginTop: 20,
     alignItems: 'center',
-    paddingHorizontal: 25,
+    width: '100%',
     gap: 15
   },
   input: {

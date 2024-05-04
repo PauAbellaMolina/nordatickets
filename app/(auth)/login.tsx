@@ -35,7 +35,7 @@ export default function Login() {
     signInWithOTP({
       email: email,
       options: {
-        shouldCreateUser: true,
+        shouldCreateUser: false,
         data: langMetaData
       }
     })
@@ -84,7 +84,7 @@ export default function Login() {
           { !emailSent ?
             <TextInput
               key="emailInput"
-              style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
+              style={[styles.input, {color: Colors[theme].text, backgroundColor: Colors[theme].inputBackgroundColor, borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
               textContentType="emailAddress"
               autoComplete="email"
               inputMode="email"
@@ -102,7 +102,7 @@ export default function Login() {
             </View>
             <TextInput
               key="oneTimeCodeInput"
-              style={[styles.input, {color: Colors[theme].text, borderColor: emailErrorMessage === undefined ? Colors[theme].text : '#ff3737'}]}
+              style={[styles.input, {color: Colors[theme].text, backgroundColor: Colors[theme].inputBackgroundColor, borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
               inputMode="numeric"
               placeholder={ i18n?.t('oneTimeCode') }
               onChangeText={setOneTimeCode}
@@ -161,7 +161,9 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 20
+    gap: 20,
+    maxWidth: 500,
+    width: '100%'
   },
   title: {
     fontSize: 30,
@@ -170,7 +172,8 @@ const styles = StyleSheet.create({
   explanation: {
     fontSize: 18,
     textAlign: 'center',
-    width: '70%',
+    maxWidth: 300,
+    opacity: 0.8
   },
   email: {
     fontSize: 25
@@ -185,7 +188,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     marginTop: 20,
     alignItems: 'center',
-    paddingHorizontal: 25,
+    width: '100%',
     gap: 15
   },
   input: {

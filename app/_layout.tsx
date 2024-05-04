@@ -36,7 +36,7 @@ export default function RootLayout() {
       setTimeout(() => {  
         SplashScreen.hideAsync();
         setAppIsReady(true);
-      }, 800);
+      }, 500);
     }
   }, [loaded]);
 
@@ -62,12 +62,14 @@ function RootLayoutNav() {
           <Stack.Screen name="(auth)/welcome" options={{ title: 'ElTeuTikt', headerShown: false }} />
           <Stack.Screen name="(auth)/login" options={{ title: i18n?.t('logIn'), headerShown: false }} />
           <Stack.Screen name="(auth)/signup" options={{ title: i18n?.t('accountCreation'), headerShown: false }} />
+          <Stack.Screen name="(auth)/terms" options={{ title: i18n?.t('termsAndPrivacy'), headerShown: false }} />
           <Stack.Screen name="(screens)/event/[id]" options={{ title: i18n?.t('event'), headerShown: false }} />
           <Stack.Screen name="(screens)/event/paymentModal/index" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: i18n?.t('payment'), headerShown: false }} />
           <Stack.Screen name="(screens)/wallet/activateTicket/[id]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: i18n?.t('activateTicket'), headerShown: false }} />
           <Stack.Screen name="(screens)/profile/receipts/index" options={{ title: i18n?.t('purchaseReceipts'), headerShown: false }} />
           <Stack.Screen name="(screens)/profile/receipts/[id]" options={{ title: i18n?.t('purchaseReceiptsDetails'), headerShown: false }} />
-          <Stack.Screen name="(screens)/profile/helpAndTerms/index" options={{ title: i18n?.t('helpAndTermsOfUse'), headerShown: false }} />
+          <Stack.Screen name="(screens)/profile/help/index" options={{ title: i18n?.t('helpAndFaqs'), headerShown: false }} />
+          <Stack.Screen name="(screens)/profile/terms/index" options={{ title: i18n?.t('termsAndPrivacy'), headerShown: false }} />
         </Stack>
       </ThemeProvider>
     </SupabaseProvider>

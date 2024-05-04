@@ -28,7 +28,7 @@ export default function TabThreeScreen() {
   useEffect(() => {
     if (!user) return;
     setSelectedLanguage(i18n?.locale as AvailableLocales);
-  }, [i18n]);
+  }, [user, i18n]);
 
   const fetchUser = (unmounted: boolean) => {
     if (!user) return;
@@ -72,7 +72,8 @@ export default function TabThreeScreen() {
         <View style={[styles.separator, {backgroundColor: Colors[theme].separatorBackgroundColor}]} />
         <View style={styles.entriesContainer}>
           <Pressable style={styles.entryButton} onPress={() => router.navigate('/profile/receipts')}><FeatherIcon name="file-text" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('purchaseReceipts') }</Text></Pressable>
-          <Pressable style={styles.entryButton} onPress={() => router.navigate('/profile/helpAndTerms')}><FeatherIcon name="help-circle" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('helpAndTermsOfUse') }</Text></Pressable>
+          <Pressable style={styles.entryButton} onPress={() => router.navigate('/profile/help')}><FeatherIcon name="help-circle" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('helpAndFaqs') }</Text></Pressable>
+          <Pressable style={styles.entryButton} onPress={() => router.navigate('/profile/terms')}><FeatherIcon name="info" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('termsAndPrivacy') }</Text></Pressable>
           <View>
             <Pressable style={styles.entryButton}><FeatherIcon name="globe" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('changeLanguage') }</Text></Pressable>
             <Picker
