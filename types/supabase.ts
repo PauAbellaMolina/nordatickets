@@ -204,6 +204,7 @@ export type Database = {
           order_id: string | null
           price: number | null
           used: boolean | null
+          used_at: string | null
           user_id: string | null
         }
         Insert: {
@@ -215,6 +216,7 @@ export type Database = {
           order_id?: string | null
           price?: number | null
           used?: boolean | null
+          used_at?: string | null
           user_id?: string | null
         }
         Update: {
@@ -226,6 +228,7 @@ export type Database = {
           order_id?: string | null
           price?: number | null
           used?: boolean | null
+          used_at?: string | null
           user_id?: string | null
         }
         Relationships: [

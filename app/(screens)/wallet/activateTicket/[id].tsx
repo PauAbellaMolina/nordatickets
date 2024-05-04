@@ -17,6 +17,8 @@ export default function ActivateTicketScreen() {
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>();
   const [eventName, setEventName] = useState<string>('');
   const [ticketName, setTicketName] = useState<string>('');
+  const [ticketUsedAt, setTicketUsedAt] = useState<string>(null);
+  const [ticketUsedTimeAgo, setTicketUsedTimeAgo] = useState<string>();
 
   const { id } = useLocalSearchParams<{ id: string }>();
 
@@ -28,7 +30,42 @@ export default function ActivateTicketScreen() {
     return () => {
       unmounted = true;
     };
-  }, []);
+  }, [user]);
+
+  useEffect(() => {
+    if (!user || !ticketUsedAt) return;
+    calculateTimeAgo();
+    const i = setInterval(calculateTimeAgo, 1000);
+
+    return () => clearInterval(i);
+  }, [ticketUsedAt]);
+
+  const calculateTimeAgo = () => {
+    const usedAt = new Date(ticketUsedAt);
+    const now = new Date();
+    const diff = now.getTime() - usedAt.getTime();
+    const seconds = Math.floor(diff / 1000) % 60;
+    const minutes = Math.floor(diff / 1000 / 60) % 60;
+    const hours = Math.floor(diff / 1000 / 60 / 60) % 24;
+    const days = Math.floor(diff / 1000 / 60 / 60 / 24);
+
+    let timeAgo = '';
+    if (days > 0) {
+      timeAgo += `${days} ${i18n?.t('days')} `;
+    }
+    if (hours > 0) {
+      timeAgo += `${hours} ${i18n?.t('hours')} `;
+    }
+    if (minutes > 0) {
+      timeAgo += `${minutes} ${i18n?.t('minutes')} `;
+    }
+    if (seconds >= 0) {
+      timeAgo += `${seconds} ${i18n?.t('seconds')}`;
+    }
+
+    setTicketUsedTimeAgo(timeAgo.trim());
+  };
+
 
   const fetchWalletTickets = (unmounted: boolean) => {
     supabase.from('wallet_tickets').select().eq('id', id).single()
@@ -36,6 +73,7 @@ export default function ActivateTicketScreen() {
       if (error || !wallet_ticket) return;
       setTicketActive(!wallet_ticket.used);
       setTicketName(wallet_ticket.event_tickets_name);
+      setTicketUsedAt(wallet_ticket.used_at);
 
       supabase.from('event_tickets').select().eq('id', wallet_ticket.event_tickets_id)
       .then(({ data: event_tickets, error }) => {
@@ -97,10 +135,11 @@ export default function ActivateTicketScreen() {
     }
 
     setLoading(true);
-    supabase.from('wallet_tickets').update({ used: true }).eq('id', id).select().single()
+    supabase.from('wallet_tickets').update({ used: true, used_at: new Date().toISOString() }).eq('id', id).select().single()
     .then(({ data: wallet_ticket, error }) => {
       if (error || !wallet_ticket) return;
       setTicketActive(!wallet_ticket.used);
+      setTicketUsedAt(wallet_ticket.used_at);
       setLoading(false);
     });
   };
@@ -122,7 +161,7 @@ export default function ActivateTicketScreen() {
             <View style={[styles.ticketRightCutout, {backgroundColor: Colors[theme].background}]}></View>
           </View>
           <View style={styles.ticketBottomContainer}>
-            <View style={[styles.statusContainer, {backgroundColor: ticketActive === undefined ? 'transparent' : ticketActive ? '#3fde7a' : '#ff3737'}]}>
+            <View style={[styles.statusContainer, {backgroundColor: ticketActive === undefined ? 'transparent' : ticketActive ? '#3fde7a' : '#ff3737', paddingVertical: ticketActive !== undefined && ticketActive ? 30 : 21.25}]}>
               { ticketActive === undefined ? <>
                 <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('loading') } ticket...</Text>
                 <Text style={styles.statusInfoText}> </Text>
@@ -131,7 +170,14 @@ export default function ActivateTicketScreen() {
                   <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('deactivateTicketOnDrinkExplanation') }</Text>
                 </> : <>
                   <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUnactive') }</Text>
-                  <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketAlreadyUsedExplanation') }</Text>
+                  <View style={{ alignItems: 'center' }}>
+                    { !ticketUsedTimeAgo ?
+                      <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketAlreadyUsedExplanation') }</Text>
+                    : <>
+                      <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUsedTimeAgoExplanation') }</Text>
+                      <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ ticketUsedTimeAgo }</Text>
+                    </>}
+                  </View>
                 </>}</>
               }
             </View>
@@ -267,7 +313,6 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     gap: 10,
-    paddingVertical: 30,
     borderRadius: 40
   },
   statusText: {
