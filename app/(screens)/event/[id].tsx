@@ -338,7 +338,7 @@ export default function EventDetailScreen() {
                       : null }
                     <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground}]} onPress={onBuyCart}>
                     { loading ?
-                      <ActivityIndicator style={{marginVertical: 1.5}} size="small" />
+                      <ActivityIndicator style={{marginVertical: 1.75}} size="small" />
                     :
                       <Text style={styles.buyButtonText}>{(cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)) / 100 + '€  ·  '}{ i18n?.t('buy') }</Text>
                     }

@@ -115,7 +115,7 @@ export default function Login() {
           }
           <View>
             { loading ?
-              <ActivityIndicator style={{marginTop: 12}} size="small" />
+              <ActivityIndicator style={{marginVertical: 12.3}} size="small" />
             : 
               <>
                 { !emailSent ?

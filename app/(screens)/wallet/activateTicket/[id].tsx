@@ -145,13 +145,13 @@ export default function ActivateTicketScreen() {
   };
   
   return (
-    <View style={[styles.container, eventBackgroundColor && eventName && ticketName ? {marginTop: 75} : null]}>
+    <View style={styles.container}>
       { Platform.OS !== 'web' ? <View style={styles.expanderNotch}></View> : <></> }
       { !eventBackgroundColor || !eventName || !ticketName ? <>
         <ActivityIndicator size="large" />
       </> : <>
         <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
-          <View style={styles.ticketTopContainer}>
+          <View style={styles.ticketInfoContainer}>
             <Text style={styles.title}>{ ticketName }</Text>
             <Text style={styles.subtitle}>{ eventName }</Text>
           </View>
@@ -160,27 +160,25 @@ export default function ActivateTicketScreen() {
             <View style={[styles.ticketDivider, {backgroundColor: Colors[theme].background}]}></View>
             <View style={[styles.ticketRightCutout, {backgroundColor: Colors[theme].background}]}></View>
           </View>
-          <View style={styles.ticketBottomContainer}>
-            <View style={[styles.statusContainer, {backgroundColor: ticketActive === undefined ? 'transparent' : ticketActive ? '#3fde7a' : '#ff3737', paddingVertical: ticketActive !== undefined && ticketActive ? 30 : 21.25}]}>
-              { ticketActive === undefined ? <>
-                <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('loading') } ticket...</Text>
-                <Text style={styles.statusInfoText}> </Text>
-              </> : <>{ ticketActive ? <>
-                  <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketActive') }</Text>
-                  <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('deactivateTicketOnDrinkExplanation') }</Text>
-                </> : <>
-                  <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUnactive') }</Text>
-                  <View style={{ alignItems: 'center' }}>
-                    { !ticketUsedTimeAgo ?
-                      <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketAlreadyUsedExplanation') }</Text>
-                    : <>
-                      <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUsedTimeAgoExplanation') }</Text>
-                      <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ ticketUsedTimeAgo }</Text>
-                    </>}
-                  </View>
-                </>}</>
-              }
-            </View>
+          <View style={[styles.ticketStatusContainer, {backgroundColor: ticketActive === undefined ? 'transparent' : ticketActive ? '#3fde7a' : '#ff3737', paddingVertical: (ticketActive !== undefined && ticketActive) || !ticketUsedTimeAgo ? 30 : 21.25}]}>
+            { ticketActive === undefined ? <>
+              <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('loading') } ticket...</Text>
+              <Text style={styles.statusInfoText}> </Text>
+            </> : <>{ ticketActive ? <>
+                <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketActive') }</Text>
+                <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('deactivateTicketOnDrinkExplanation') }</Text>
+              </> : <>
+                <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUnactive') }</Text>
+                <View style={{ alignItems: 'center' }}>
+                  { !ticketUsedTimeAgo ?
+                    <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketAlreadyUsedExplanation') }</Text>
+                  : <>
+                    <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUsedTimeAgoExplanation') }</Text>
+                    <Text style={[styles.statusInfoText, {color: Colors['light'].text, fontWeight: 'bold'}]}>{ ticketUsedTimeAgo }</Text>
+                  </>}
+                </View>
+              </>}</>
+            }
           </View>
         </View>
         <View style={styles.actionsContainer}>
@@ -210,10 +208,10 @@ const ticketContainerMobileShadow = {
   shadowColor: "#000",
   shadowOffset: {
     width: 0,
-    height: 3,
+    height: 1,
   },
   shadowOpacity: 0.12,
-  shadowRadius: 2
+  shadowRadius: 5
 };
 
 const buttonMobileShadow = {
@@ -223,7 +221,7 @@ const buttonMobileShadow = {
     height: 2,
   },
   shadowOpacity: 0.2,
-  shadowRadius: 2.5
+  shadowRadius: 5
 };
 
 const styles = StyleSheet.create({
@@ -234,7 +232,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 25,
-    paddingBottom: 40
+    paddingBottom: 15
   },
   expanderNotch: {
     position: 'absolute',
@@ -249,29 +247,22 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     width: '100%',
     borderRadius: 50,
-    marginBottom: 25,
+    marginBottom: 15,
     ...Platform.select({
       web: {
-        boxShadow: '0px 3px 2px rgba(0, 0, 0, 0.12)'
+        boxShadow: '0px 1px 5px rgba(0, 0, 0, 0.12)'
       },
       ios: {...ticketContainerMobileShadow},
       android: {...ticketContainerMobileShadow, elevation: 7}
     })
   },
-  ticketTopContainer: {
+  ticketInfoContainer: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    width: '100%'
-  },
-  ticketBottomContainer: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
     width: '100%',
-    paddingHorizontal: 20,
-    paddingVertical: 20
+    marginTop: 25
   },
   ticketDecorContainer: {
     flexDirection: 'row',
@@ -281,10 +272,17 @@ const styles = StyleSheet.create({
   },
   ticketLeftCutout: {
     height: 40,
-    width: 38,
-    marginLeft: -5,
+    width: 53,
+    marginLeft: -20,
     borderTopRightRadius: 50,
-    borderBottomRightRadius: 50
+    borderBottomRightRadius: 50,
+    ...Platform.select({
+      web: {
+        boxShadow: 'inset -8px 0 15px -10px rgba(0, 0, 0, 0.12)'
+      },
+      ios: {},
+      android: {}
+    })
   },
   ticketDivider: {
     height: 2,
@@ -292,10 +290,17 @@ const styles = StyleSheet.create({
   },
   ticketRightCutout: {
     height: 40,
-    width: 38,
-    marginRight: -5,
+    width: 53,
+    marginRight: -20,
     borderTopLeftRadius: 50,
-    borderBottomLeftRadius: 50
+    borderBottomLeftRadius: 50,
+    ...Platform.select({
+      web: {
+        boxShadow: 'inset 8px 0 15px -10px rgba(0, 0, 0, 0.12)'
+      },
+      ios: {},
+      android: {}
+    })
   },
   title: {
     fontSize: 45,
@@ -309,11 +314,13 @@ const styles = StyleSheet.create({
     gap: 100,
     width: '100%'
   },
-  statusContainer: {
-    width: '100%',
+  ticketStatusContainer: {
     alignItems: 'center',
     gap: 10,
-    borderRadius: 40
+    borderRadius: 40,
+    marginTop: 10,
+    marginBottom: 20,
+    marginHorizontal: 20
   },
   statusText: {
     fontSize: 30,
@@ -333,21 +340,21 @@ const styles = StyleSheet.create({
   },
   button: {
     verticalAlign: 'bottom',
-    borderRadius: 30,
+    borderRadius: 28,
     borderWidth: 5,
     borderColor: '#0000001A',
     alignItems: 'center',
     flex: 3,
     ...Platform.select({
       web: {
-        boxShadow: '1px 2px 2.5px rgba(0, 0, 0, 0.2)'
+        boxShadow: '1px 2px 5px rgba(0, 0, 0, 0.2)'
       },
       ios: {...buttonMobileShadow},
       android: {...buttonMobileShadow, elevation: 5}
     })
   },
   buttonLoading: {
-    paddingVertical: 18
+    paddingVertical: 19
   },
   buttonText: {
     fontSize: 20,

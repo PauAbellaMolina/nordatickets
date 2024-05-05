@@ -103,8 +103,8 @@ export default function Signup() {
                   style={styles.acceptTermsCheckboxInput}
                   value={termsChecked}
                   onValueChange={setTermsChecked}
-                  color={termsChecked ? '#613AC5' : undefined}
                 />
+                {/* can define checked color like this above: color={termsChecked ? '#613AC5' : undefined} */}
                 <Text>{ i18n?.t('haveReadAndAcceptTermsAndPrivacy') }</Text>
               </View>
               <Pressable onPress={onGoToTerms}><Text style={styles.termsActionLink}>{ i18n?.t('termsAndPrivacy') }</Text></Pressable>
@@ -133,7 +133,7 @@ export default function Signup() {
           }
           <View>
             { loading ?
-              <ActivityIndicator style={{marginTop: 12}} size="small" />
+              <ActivityIndicator style={{marginVertical: 12.3}} size="small" />
             :
               <>
                 { !emailSent ?

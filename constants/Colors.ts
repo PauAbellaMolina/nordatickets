@@ -2,10 +2,9 @@ export default {
   light: {
     text: '#202228',
     oppositeThemeText: '#FCFCFC',
-    background: '#ffffff',
+    background: '#f2f2f2',
     backgroundHalfOpacity: '#ffffff40',
     oppositeBackgroundHalfOpacity: '#9C9C9C40',
-    // background: '#EFEFEF', //PAU info react default background color. Or maybe f2f2f2?
     backgroundContrast: '#ffffff',
     tabBarBackground: '#613AC5',
     tabIconInactive: '#CDC2EE',
