@@ -267,7 +267,7 @@ export default function EventDetailScreen() {
       { !event ? <>
         <ActivityIndicator size="large" />
       </> : <>
-        <View style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor}]}>
+        <View style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor, paddingBottom: event.more_info_content ? 40 : 10}]}>
           <GoBackArrow />
           <View style={styles.stopFollowingButton}>
             <FeatherIcon name="more-horizontal" size={35} color={Colors['light'].text} />
@@ -281,22 +281,24 @@ export default function EventDetailScreen() {
             </Picker>
           </View>
           <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
-          <ScrollView horizontal>
-            <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
-          </ScrollView>
-          { event.more_info_content ? <>
+          { !event.more_info_content ?
+            <ScrollView horizontal>
+              <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
+            </ScrollView>
+          : <>
             <Pressable style={styles.moreEventInfo} onPress={onMoreInfo}>
               <FeatherIcon name={moreInfoExpanded ? 'chevron-up' : 'chevron-down'} size={21} color={Colors['light'].text} />
               <Text style={[styles.moreEventInfoActionable, {color: Colors['light'].text}]}>More info</Text>
             </Pressable>
             <CollapsableMoreInfoComponent expanded={moreInfoExpanded}>
+              <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
               <Text style={[styles.moreEventInfoText, {color: Colors['light'].text}]}>{event.more_info_content}</Text>
             </CollapsableMoreInfoComponent>
-          </> : null }
+          </> }
         </View>
         { eventTickets ?
           <>
-            <View style={styles.ticketsContainer}>
+            <View style={[styles.ticketsContainer, {marginTop: event.more_info_content ? 170 : 180}]}>
               <View style={styles.sellingStatusContainer}>
                 <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
                 <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{ i18n?.t(event.selling ? 'selling': 'notSelling') }</Text>
@@ -399,9 +401,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    minHeight: 180,
     paddingTop: 71,
-    paddingBottom: 40,
     paddingHorizontal: 20,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
@@ -440,28 +440,26 @@ const styles = StyleSheet.create({
   },
   eventDescription: {
     fontSize: 16,
-    marginTop: 10
+    marginVertical: 10
   },
   moreEventInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'center',
     gap: 3,
     position: 'absolute',
-    bottom: 10,
-    alignSelf: 'center'
+    bottom: 10
   },
   moreEventInfoActionable: {
     fontSize: 14,
     fontWeight: '500'
   },
   moreEventInfoText: {
-    fontSize: 16,
-    marginTop: 10
+    fontSize: 16
   },
   ticketsContainer: {
     flex: 1,
-    marginTop: 205,
     marginHorizontal: 30,
     borderRadius: 35
   },
@@ -519,13 +517,14 @@ const styles = StyleSheet.create({
     fontWeight: '800'
   },
   cartContainer: {
+    gap: 7,
     position: 'relative',
     marginBottom: 25,
     alignSelf: 'center',
     width: '95%',
-    paddingTop: 15,
-    paddingBottom: 23,
-    paddingHorizontal: 20,
+    paddingTop: 13,
+    paddingBottom: 18,
+    paddingHorizontal: 16,
     borderRadius: 35,
     ...Platform.select({
       web: {
@@ -541,15 +540,13 @@ const styles = StyleSheet.create({
     gap: 5
   },
   cartList: {
-    marginVertical: 8,
-    marginHorizontal: 15
+    marginHorizontal: 18
   },
   cartItemsList: {
     fontSize: 18
   },
   usingCreditCardContainer: {
     marginHorizontal: 8,
-    marginTop: 8,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5
@@ -562,7 +559,6 @@ const styles = StyleSheet.create({
   },
   buyButton: {
     width: '100%',
-    marginTop: 10,
     paddingVertical: 10,
     borderRadius: 10
   },
@@ -573,7 +569,6 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   emptyCard: {
-    textAlign: 'center',
-    marginTop: 10
+    textAlign: 'center'
   }
 });

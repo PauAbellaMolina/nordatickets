@@ -8,7 +8,7 @@ import { supabase } from '../../../../supabase';
 import { useSupabase } from '../../../../context/SupabaseProvider';
 
 export default function ReceiptDetailScreen() {
-  const { user, i18n} = useSupabase();
+  const { user, i18n } = useSupabase();
   const { id } = useLocalSearchParams<{ id: string }>(); //TODO PAU make sure that the user will only be able to retrieve their own receipts. With the correct fetch and also RLS config!!!!
   const { width, height } = Dimensions.get('window');
   const vwpDimension = width < height/1.414 ? width : height/1.414;
@@ -32,7 +32,7 @@ export default function ReceiptDetailScreen() {
   useEffect(() => {
     if (!user) return;
     let unmounted = false;
-    if (!unmounted && paginatedGroupedWalletTickets.length && eventName && eventTicketFee && receiptDate && !loaded) {
+    if (!unmounted && paginatedGroupedWalletTickets.length && eventName && receiptDate && !loaded) {
       setLoaded(true);
     }
 
@@ -166,12 +166,16 @@ export default function ReceiptDetailScreen() {
                   </View>
                   <View style={styles.tableCell}>
                   </View>
-                  <View style={[styles.tableCell, styles.tableCellTitleFooter]}>
-                    <Text style={[styles.receiptText, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>{ i18n?.t('serviceFee') }:</Text>
-                  </View>
-                  <View style={[styles.tableCell]}>
-                    <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ eventTicketFee * paginatedGroupedWalletTickets.reduce((acc, page) => acc + page.reduce((acc, walletTickets) => acc + walletTickets.length, 0), 0) / 100 }€</Text>
-                  </View>
+                  { eventTicketFee ?
+                    <View style={[styles.tableCell, styles.tableCellTitleFooter]}>
+                      <Text style={[styles.receiptText, styles.tableTextEnd, {fontSize: vwpDimension/48}]}>{ i18n?.t('serviceFee') }:</Text>
+                    </View>
+                  : null }
+                  { eventTicketFee ?
+                    <View style={[styles.tableCell]}>
+                      <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ eventTicketFee * paginatedGroupedWalletTickets.reduce((acc, page) => acc + page.reduce((acc, walletTickets) => acc + walletTickets.length, 0), 0) / 100 }€</Text>
+                    </View>
+                  : null }
                 </View>
                 <View style={styles.tableFooter}>
                   <View style={[styles.tableCell, styles.firstCol]}>
@@ -191,7 +195,7 @@ export default function ReceiptDetailScreen() {
         />
       </View>
     </View>
-  ), [receiptDate]);
+  ), [user, paginatedGroupedWalletTickets, eventName, eventTicketFee, receiptDate]);
   
   return !loaded ? 
   (

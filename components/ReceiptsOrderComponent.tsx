@@ -37,7 +37,9 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
           renderItem={renderItem}
         />
         <View>
-          <Text>{ i18n?.t('serviceFee') }: { eventTicketFee ? eventTicketFee * order.length / 100 : '...' }€</Text>
+          { eventTicketFee ?
+            <Text>{ i18n?.t('serviceFee') }: { eventTicketFee * order.length / 100 }€</Text>
+          : null }
           <Text style={{fontWeight: 'bold'}}>{ i18n?.t('total') }: { (order.reduce((acc, ticket) => acc + ticket.price, 0) + eventTicketFee * order.length) / 100 || '...' }€</Text>
         </View>
       </View>

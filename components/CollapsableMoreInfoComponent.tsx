@@ -30,7 +30,7 @@ export const CollapsableMoreInfoComponent = ({ children, expanded }: { children:
   }, [expanded]);
 
   return (
-    <Animated.View style={[collapsableStyle, { overflow: "scroll", marginTop: 10 }]}>
+    <Animated.View style={[collapsableStyle, { overflow: "scroll" }]}>
       <View style={{ position: "absolute" }} onLayout={onLayout}>
         {children}
       </View>
