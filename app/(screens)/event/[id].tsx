@@ -392,7 +392,8 @@ const cartContainerMobileShadow = {
 const styles = StyleSheet.create({
   container: {
     display: 'flex',
-    height: '100%'
+    height: '100%',
+    overflow: 'hidden',
   },
   eventInfoContainer: {
     position: 'absolute',
