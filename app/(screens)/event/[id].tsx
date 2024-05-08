@@ -423,10 +423,11 @@ const styles = StyleSheet.create({
   },
   optionsPicker: {
     position: 'absolute',
-    top: 20,
-    right: -165,
+    top: 5,
+    right: -8,
     height: 30,
-    opacity: 0
+    width: 50,
+    opacity: 0.5
   },
   title: {
     fontSize: 32,
