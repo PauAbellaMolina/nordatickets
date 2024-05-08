@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
   container: {
     display: 'flex',
     height: '100%',
-    overflow: 'hidden',
+    overflow: 'hidden'
   },
   eventInfoContainer: {
     position: 'absolute',
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
     right: -8,
     height: 30,
     width: 50,
-    opacity: 0.5
+    opacity: 0
   },
   title: {
     fontSize: 32,
