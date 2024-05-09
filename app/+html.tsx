@@ -41,10 +41,10 @@ html {
   overscroll-behavior: none;
 }
 body {
-  background-color: #fff;
+  background-color: #f2f2f2;
 }
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: #000;
+    background-color: #000000;
   }
 }`;
