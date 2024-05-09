@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, TextInput, useColorScheme, ActivityIndicator, Pressable, ScrollView } from "react-native";
+import { StyleSheet, TextInput, ActivityIndicator, Pressable, ScrollView } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
 import Checkbox from 'expo-checkbox';
 import Colors from "../../constants/Colors";
@@ -11,8 +11,7 @@ import { AvailableLocales } from "../../assets/translations/translation";
 import { authEmailsTranslations } from "../../assets/translations/email";
 
 export default function Signup() {
-  const theme = useColorScheme() ?? 'light';
-  const { signInWithOTP, verifyOTP, i18n } = useSupabase();
+  const { signInWithOTP, verifyOTP, i18n, theme } = useSupabase();
   const params = useGlobalSearchParams();
 
   const [termsChecked, setTermsChecked] = useState(false);

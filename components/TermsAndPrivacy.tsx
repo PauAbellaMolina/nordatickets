@@ -1,11 +1,10 @@
 import { Text, View } from './Themed';
 import GoBackArrow from './GoBackArrow';
-import { StyleSheet, useColorScheme } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useSupabase } from '../context/SupabaseProvider';
 
 export default function TermsAndPrivacy() {
-  const theme = useColorScheme() ?? 'light';
-  const { i18n } = useSupabase();
+  const { i18n, theme } = useSupabase();
 
   return (
     <View style={styles.container}>
@@ -39,7 +38,7 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     marginTop: 30,
-    marginHorizontal: 2,
+    marginHorizontal: 5,
     display: 'flex',
     gap: 10
   },

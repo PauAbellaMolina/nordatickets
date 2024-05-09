@@ -62,7 +62,12 @@ export default function TabTwoScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Wallet</Text>
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.title}>Wallet</Text>
+          <Text style={styles.infoLabel}>{ i18n?.t('ticketsBoughtWillShowHereExplanation') }</Text>
+        </View>
+      </View>
       <View style={styles.ticketsContainer}>
         <Text style={styles.ticketsTitle}>Tickets</Text>
         { eventGroupedWalletTickets?.length ?
@@ -82,24 +87,35 @@ export default function TabTwoScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 30,
+    paddingTop: 10,
     paddingBottom: 5,
     paddingHorizontal: 15,
     flex: 1,
     overflow: 'scroll'
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginRight: 10
+  },
   title: {
     fontSize: 30,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+  },
+  infoLabel: {
+    fontSize: 13,
+    marginLeft: 2,
+    color: '#8C90A3'
+  },
+  ticketsContainer: {
+    marginTop: 20,
+    marginHorizontal: 5
   },
   ticketsTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     lineHeight: 20
-  },
-  ticketsContainer: {
-    marginTop: 30,
-    marginHorizontal: 10
   },
   walletTicketList: {
     marginTop: 10

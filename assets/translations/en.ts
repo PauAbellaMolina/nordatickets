@@ -8,6 +8,7 @@ export const en: { [key: string]: string } = {
   addEventByQrExplanation: 'Add an event by scanning its QR code',
   stopFollowingEventQuestion: 'Stop following this event?',
   stopFollowingEventConfirmation: 'Yes, stop following',
+  ticketsBoughtWillShowHereExplanation: 'Tickets bought will show here',
   noTicketsInWallet: 'No tickets in wallet',
   profile: 'Profile',
   savedCreditCard: 'Saved credit card',
@@ -72,5 +73,6 @@ export const en: { [key: string]: string } = {
   ticketUsedTimeAgoExplanation: 'Time passed since ticket used',
   yourOneTimeCode: 'Your one-time code',
   yourOneTimeCodeGreeting: 'Hello! This is your one-time code:',
-  yourOneTimeCodeExplanation: 'Use this code to log into ElTeuTikt'
+  yourOneTimeCodeExplanation: 'Use this code to log into ElTeuTikt',
+  moreInfo: 'More info'
 };

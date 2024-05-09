@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import Colors from '../../../../constants/Colors';
@@ -10,10 +10,11 @@ import { useSupabase } from '../../../../context/SupabaseProvider';
 import { getThemeRandomColor } from '../../../../utils/chooseRandomColor';
 
 export default function ActivateTicketScreen() {
-  const theme = useColorScheme() ?? 'light';
-  const { i18n, user } = useSupabase();
+  const { i18n, user, theme } = useSupabase();
   const [loading, setLoading] = useState<boolean>(false);
   const [ticketActive, setTicketActive] = useState<boolean>(undefined);
+  const [lightEventBackgroundColor, setLightEventBackgroundColor] = useState<string>();
+  const [darkEventBackgroundColor, setDarkEventBackgroundColor] = useState<string>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>();
   const [eventName, setEventName] = useState<string>('');
   const [ticketName, setTicketName] = useState<string>('');
@@ -39,6 +40,10 @@ export default function ActivateTicketScreen() {
 
     return () => clearInterval(i);
   }, [ticketUsedAt]);
+
+  useEffect(() => {
+    setEventBackgroundColor(theme === 'dark' ? darkEventBackgroundColor : lightEventBackgroundColor);
+  }, [theme]);
 
   const calculateTimeAgo = () => {
     const usedAt = new Date(ticketUsedAt);
@@ -80,8 +85,14 @@ export default function ActivateTicketScreen() {
         if (unmounted || error || !event_tickets.length) return;
         if ((theme === 'dark' && !event_tickets[0]?.color_code_dark) || (theme === 'light' && !event_tickets[0]?.color_code_light)) {
           setEventBackgroundColor(getThemeRandomColor(theme));
+          setDarkEventBackgroundColor(getThemeRandomColor('dark'));
+          setLightEventBackgroundColor(getThemeRandomColor('light'));
           return;
         };
+
+        setDarkEventBackgroundColor(event_tickets[0]?.color_code_dark ? event_tickets[0].color_code_dark : getThemeRandomColor('dark'));
+        setLightEventBackgroundColor(event_tickets[0]?.color_code_light ? event_tickets[0].color_code_light : getThemeRandomColor('light'));
+
         if (theme === 'dark') {
           setEventBackgroundColor(event_tickets[0].color_code_dark);
         } else {

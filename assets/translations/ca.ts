@@ -8,6 +8,7 @@ export const ca: { [key: string]: string } = {
   addEventByQrExplanation: 'Afegeix un esdeveniment escanejant el seu codi QR',
   stopFollowingEventQuestion: 'Deixar de seguir aquest esdeveniment?',
   stopFollowingEventConfirmation: 'Sí, deixar de seguir',
+  ticketsBoughtWillShowHereExplanation: 'Els tickets comprats es mostraran aquí',
   noTicketsInWallet: 'No tens tickets a la wallet',
   profile: 'Perfil',
   savedCreditCard: 'Targeta de crèdit guardada',
@@ -72,5 +73,6 @@ export const ca: { [key: string]: string } = {
   ticketUsedTimeAgoExplanation: 'Aquest ticket ha estat utilitzat fa',
   yourOneTimeCode: "El teu codi per un sol ús",
   yourOneTimeCodeGreeting: "Hola! Aquest és el teu codi d'un sol ús:",
-  yourOneTimeCodeExplanation: "Utilitza'l per iniciar sessió a ElTeuTikt"
+  yourOneTimeCodeExplanation: "Utilitza'l per iniciar sessió a ElTeuTikt",
+  moreInfo: 'Més informació'
 };

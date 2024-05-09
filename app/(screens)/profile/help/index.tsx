@@ -1,12 +1,11 @@
 import { Text, View } from '../../../../components/Themed';
 import GoBackArrow from '../../../../components/GoBackArrow';
-import { StyleSheet, useColorScheme } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useSupabase } from '../../../../context/SupabaseProvider';
 import Colors from '../../../../constants/Colors';
 
 export default function HelpAndTermsScreen() {
-  const theme = useColorScheme() ?? 'light';
-  const { i18n } = useSupabase();
+  const { i18n, theme } = useSupabase();
 
   return (
     <View style={styles.container}>

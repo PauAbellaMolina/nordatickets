@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { Pressable, StyleSheet} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Platform } from 'react-native';
 // import { WebView } from 'react-native-webview'; // Install package when adding support to ios and android
@@ -9,8 +9,7 @@ import Colors from '../../../../constants/Colors';
 import { useSupabase } from '../../../../context/SupabaseProvider';
 
 export default function PaymentModalScreen() {
-  const theme = useColorScheme() ?? 'light';
-  const { i18n } = useSupabase();
+  const { i18n, theme } = useSupabase();
   const { eventId, bg, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } = useLocalSearchParams<{ eventId: string, bg: string, formUrl: string, Ds_MerchantParameters: string, Ds_Signature: string, Ds_SignatureVersion: string }>();
   const parsedFormUrl = formUrl.replace(/%2F/g, '/');
   const parsedDs_MerchantParameters = Ds_MerchantParameters.replace(/%2F/g, '/');

@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { useEffect, useState } from 'react';
 import { FeatherIcon } from '../../components/CustomIcons';
@@ -10,8 +10,7 @@ import { AvailableLocales } from '../../assets/translations/translation';
 import { Picker } from '@react-native-picker/picker';
 
 export default function TabThreeScreen() {
-  const theme = useColorScheme() ?? 'light';
-  const { user, signOut, i18n, setLanguage } = useSupabase();
+  const { user, signOut, i18n, setLanguage, theme } = useSupabase();
   const [card, setCard] = useState<string>();
   const [selectedLanguage, setSelectedLanguage] = useState<AvailableLocales>();
 
@@ -64,7 +63,7 @@ export default function TabThreeScreen() {
       <Text style={styles.title}>{ i18n?.t('profile') }</Text>
       <View style={styles.wrapper}>
         <View style={styles.userInfo}>
-          <View style={styles.singleLineContainer}><Text>{user?.email}</Text></View>
+          <View style={styles.singleLineContainer}><Text>Email: {user?.email}</Text></View>
           { card ?
             <View style={styles.singleLineContainer}><Text>{ i18n?.t('savedCreditCard') }: {card.slice(9, card.length)}  ·  </Text><Pressable onPress={onDeleteUserCard}><Text style={{color: '#ff3737'}}>{ i18n?.t('delete') }</Text></Pressable></View>
           : null }
@@ -95,7 +94,7 @@ export default function TabThreeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 30,
+    paddingTop: 10,
     paddingBottom: 5,
     paddingHorizontal: 15,
     flex: 1
@@ -106,7 +105,7 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     marginTop: 30,
-    marginHorizontal: 10,
+    marginHorizontal: 5,
     alignItems: 'flex-start',
     gap: 30
   },

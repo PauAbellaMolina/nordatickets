@@ -8,6 +8,7 @@ export const es: { [key: string]: string } = {
   addEventByQrExplanation: 'Añade un evento escaneando su código QR',
   stopFollowingEventQuestion: '¿Dejar de seguir este evento?',
   stopFollowingEventConfirmation: 'Sí, dejar de seguir',
+  ticketsBoughtWillShowHereExplanation: 'Los tickets comprados se mostrarán aquí',
   noTicketsInWallet: 'No tienes tickets en la wallet',
   profile: 'Perfil',
   savedCreditCard: 'Tarjeta de crédito guardada',
@@ -72,5 +73,6 @@ export const es: { [key: string]: string } = {
   ticketUsedTimeAgoExplanation: 'Este ticket ha sido utilizado hace',
   yourOneTimeCode: 'Tu codigo de un solo uso',
   yourOneTimeCodeGreeting: '¡Hola! Este es tu código de un solo uso:',
-  yourOneTimeCodeExplanation: 'Usa este código para iniciar sesión en ElTeuTikt'
+  yourOneTimeCodeExplanation: 'Usa este código para iniciar sesión en ElTeuTikt',
+  moreInfo: 'Más información'
 };

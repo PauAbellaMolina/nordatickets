@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, TextInput, useColorScheme, ActivityIndicator, Pressable, ScrollView } from "react-native";
+import { StyleSheet, TextInput, ActivityIndicator, Pressable, ScrollView } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
@@ -10,8 +10,7 @@ import { AvailableLocales } from "../../assets/translations/translation";
 import { authEmailsTranslations } from "../../assets/translations/email";
 
 export default function Login() {
-  const theme = useColorScheme() ?? 'light';
-  const { signInWithOTP, verifyOTP, i18n } = useSupabase();
+  const { signInWithOTP, verifyOTP, i18n, theme } = useSupabase();
   const params = useGlobalSearchParams();
 
   const [email, setEmail] = useState<string>('');

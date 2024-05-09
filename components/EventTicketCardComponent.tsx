@@ -1,4 +1,4 @@
-import { Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { Platform, Pressable, StyleSheet } from 'react-native';
 import { EventTicket } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
@@ -14,8 +14,7 @@ export interface TicketCardComponentProps {
 }
 
 export default function EventTicketCardComponent({eventSelling, quantityInCart, onRemoveTicket, onAddTicket, ticket}: TicketCardComponentProps) {
-  const theme = useColorScheme() ?? 'light';
-  const { i18n } = useSupabase();
+  const { i18n, theme } = useSupabase();
 
   const onRemove = () => {
     if (quantityInCart === 0) {

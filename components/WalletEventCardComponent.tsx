@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, useColorScheme } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { supabase } from "../supabase";
 import { Event, WalletTicket } from '../types/supabaseplain';
 import WalletTicketCardComponent from './WalletTicketCardComponent';
 import { getThemeRandomColor } from '../utils/chooseRandomColor';
+import { useSupabase } from '../context/SupabaseProvider';
 
 export default function WalletEventCardComponent({ eventWalletTickets }: { eventWalletTickets: WalletTicket[] }) {
-  const theme = useColorScheme() ?? 'light';
+  const { theme } = useSupabase();
   const [event, setEvent] = useState<Event>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>();
 
@@ -76,8 +77,11 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
 const styles = StyleSheet.create({
   eventContainer: {
     paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 10
+    paddingHorizontal: 10,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20
   },
   eventHeaderContainer: {
     flexDirection: 'row',

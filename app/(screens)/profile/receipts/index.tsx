@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, StyleSheet, useColorScheme } from 'react-native';
+import { FlatList, StyleSheet} from 'react-native';
 import { Text, View } from '../../../../components/Themed';
 import GoBackArrow from '../../../../components/GoBackArrow';
 import { useSupabase } from '../../../../context/SupabaseProvider';
@@ -8,8 +8,7 @@ import { supabase } from '../../../../supabase';
 import ReceiptsOrderComponent from '../../../../components/ReceiptsOrderComponent';
 
 export default function ReceiptsScreen() {
-  const theme = useColorScheme() ?? 'light';
-  const { user, i18n } = useSupabase();
+  const { user, i18n, theme } = useSupabase();
 
   const [orderIdGroupedWalletTickets, setOrderIdGroupedWalletTickets] = useState<WalletTicket[][]>([]);
   const [eventIdsNames, setEventIdsNames] = useState<{ id: number, name: string }[]>([]);

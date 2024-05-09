@@ -5,11 +5,13 @@ import { supabase } from "../supabase";
 import { I18n } from 'i18n-js';
 import { AvailableLocales, dict } from "../assets/translations/translation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Appearance, ColorSchemeName } from "react-native";
 
 type SupabaseContextProps = {
   user: User | null;
   session: Session | null;
   initialized?: boolean;
+  theme: ColorSchemeName;
   i18n: I18n | null;
   followingEventsChanged?: boolean;
   swapFollowingEventsChanged: () => void;
@@ -27,6 +29,7 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
   user: null,
   session: null,
   initialized: false,
+  theme: Appearance.getColorScheme() ?? 'light',
   i18n: null,
   followingEventsChanged: false,
   swapFollowingEventsChanged: () => {},
@@ -43,6 +46,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   const [session, setSession] = useState<Session | null>(null);
   const [realSession, setRealSession] = useState<Session | null>(null);
   const [initialized, setInitialized] = useState<boolean>(false);
+  const [theme, setTheme] = useState<ColorSchemeName>(Appearance.getColorScheme() ?? 'light');
   const [i18n, setI18n] = useState<I18n | null>(null);
   const [auxFollowingEventsChanged, setAuxFollowingEventsChanged] = useState<boolean>(false);
 
@@ -109,6 +113,14 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   };
 
   useEffect(() => {
+    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
+      setTheme(colorScheme);
+    });
+
+    return () => subscription.remove();
+   }, []);
+
+  useEffect(() => {
     getLocaleFromCookie();
 
     const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -168,6 +180,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
         user,
         session,
         initialized,
+        theme,
         i18n,
         followingEventsChanged: auxFollowingEventsChanged,
         swapFollowingEventsChanged,

@@ -1,4 +1,4 @@
-import { StyleSheet, useColorScheme, Pressable } from "react-native";
+import { StyleSheet, Pressable } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
@@ -12,8 +12,7 @@ import { useEffect, useState } from "react";
 import { AvailableLocales } from "../../assets/translations/translation";
 
 export default function Welcome() {
-  const theme = useColorScheme() ?? 'light';
-  const { i18n, setLanguage } = useSupabase();
+  const { i18n, setLanguage, theme } = useSupabase();
   const params = useGlobalSearchParams();
 
   const [selectedLanguage, setSelectedLanguage] = useState<AvailableLocales>();

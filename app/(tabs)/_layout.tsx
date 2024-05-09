@@ -1,21 +1,21 @@
-import { useColorScheme } from 'react-native';
 import { Tabs } from 'expo-router';
 import Colors from '../../constants/Colors';
 import TabBarIcon from '../../components/CustomIcons';
+import { useSupabase } from '../../context/SupabaseProvider';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { theme } = useSupabase();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabIconActive,
-        tabBarActiveBackgroundColor: Colors[colorScheme ?? 'light'].tabIconActiveBackground,
-        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconInactive,
+        tabBarActiveTintColor: Colors[theme].tabIconActive,
+        tabBarActiveBackgroundColor: Colors[theme].tabIconActiveBackground,
+        tabBarInactiveTintColor: Colors[theme].tabIconInactive,
         tabBarStyle: {
           height: 65,
           borderRadius: 35,
-          backgroundColor: Colors[colorScheme ?? 'light'].tabBarBackground,
+          backgroundColor: Colors[theme].tabBarBackground,
           marginHorizontal: 20,
           marginBottom: 25,
           paddingBottom: 0

@@ -1,4 +1,4 @@
-import { FlatList, Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { FlatList, Platform, Pressable, StyleSheet } from 'react-native';
 import { View, Text } from "./Themed";
 import { WalletTicket } from "../types/supabaseplain";
 import Colors from '../constants/Colors';
@@ -8,8 +8,7 @@ import { useSupabase } from '../context/SupabaseProvider';
 import { useCallback } from 'react';
 
 export default function ReceiptsOrderComponent({ order, eventName, eventTicketFee }: { order: WalletTicket[], eventName: string, eventTicketFee: number}) {
-  const theme = useColorScheme() ?? 'light';
-  const { i18n } = useSupabase();
+  const { i18n, theme } = useSupabase();
 
   const onGoToReceiptDetail = () => {
     router.navigate(`/profile/receipts/${order[0].order_id}`);

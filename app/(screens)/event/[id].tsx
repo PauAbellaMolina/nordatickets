@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Platform, Pressable, ScrollView, StyleSheet, useColorScheme } from 'react-native';
+import { ActivityIndicator, FlatList, Platform, Pressable, ScrollView, StyleSheet, Appearance} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text, View } from '../../../components/Themed';
 import EventTicketCardComponent from '../../../components/EventTicketCardComponent';
@@ -17,9 +17,8 @@ type CartItem = { eventTicket: EventTicket, quantity: number };
 type Cart = CartItem[] | null;
 
 export default function EventDetailScreen() {
-  const theme = useColorScheme() ?? 'light';
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { user, session, i18n, swapFollowingEventsChanged } = useSupabase();
+  const { user, session, i18n, swapFollowingEventsChanged, theme } = useSupabase();
   const [cardNumber, setCardNumber] = useState<string>();
   const [redsysToken, setRedsysToken] = useState<string>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
@@ -288,7 +287,7 @@ export default function EventDetailScreen() {
           : <>
             <Pressable style={styles.moreEventInfo} onPress={onMoreInfo}>
               <FeatherIcon name={moreInfoExpanded ? 'chevron-up' : 'chevron-down'} size={21} color={Colors['light'].text} />
-              <Text style={[styles.moreEventInfoActionable, {color: Colors['light'].text}]}>More info</Text>
+              <Text style={[styles.moreEventInfoActionable, {color: Colors['light'].text}]}>{ i18n?.t('moreInfo') }</Text>
             </Pressable>
             <CollapsableMoreInfoComponent expanded={moreInfoExpanded}>
               <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>

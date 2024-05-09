@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Platform, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { Platform, Pressable, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { Event } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
@@ -9,8 +9,7 @@ import { useSupabase } from '../context/SupabaseProvider';
 import { getThemeRandomColor } from '../utils/chooseRandomColor';
 
 export default function EventCardComponent(event: Event) {
-  const theme = useColorScheme() ?? 'light';
-  const { i18n } = useSupabase();
+  const { i18n, theme } = useSupabase();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
 
   const goToEventDetail = () => {
@@ -64,8 +63,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingTop: 15,
     paddingBottom: 25,
-    paddingHorizontal: 15,
-    borderRadius: 35,
+    paddingRight: 15,
+    paddingLeft: 20,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 30,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
     ...Platform.select({
       web: {
         boxShadow: '0px 1px 1.5px rgba(0, 0, 0, 0.10)'
@@ -76,10 +79,9 @@ const styles = StyleSheet.create({
   },
   eventInfoContainer: {
     width: '84%',
-    marginHorizontal: 10,
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    gap: 8
+    gap: 10
   },
   eventTitle: {
     width: '85%',
@@ -87,16 +89,13 @@ const styles = StyleSheet.create({
     fontWeight: '500'
   },
   eventDescription: {
-    marginTop: 5,
+    marginLeft: 5,
     fontSize: 13
   },
   sellingStatusContainer: {
     position: 'absolute',
-    right: 15,
-    top: 10,
-    paddingVertical: 3,
-    paddingLeft: 5,
-    paddingRight: 5,
+    right: 18,
+    top: 13,
     borderRadius: 50,
     flexDirection: 'row',
     alignItems: 'center',

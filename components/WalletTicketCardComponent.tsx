@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
@@ -10,8 +10,7 @@ import { RealtimeChannel } from '@supabase/supabase-js';
 import { useSupabase } from '../context/SupabaseProvider';
 
 export default function WalletTicketCardComponent({ walletTicket }: { walletTicket: WalletTicket}) {
-  const theme = useColorScheme() ?? 'light';
-  const { i18n } = useSupabase();
+  const { i18n, theme } = useSupabase();
   const [eventTicketOrderStatus, setEventTicketOrderStatus] = useState<string>();
   const [eventTicketUsed, setEventTicketUsed] = useState<boolean>();
 
@@ -167,7 +166,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
 const styles = StyleSheet.create({
   singleTicketContainer: {
     flex: 1,
-    borderRadius: 10,
+    borderRadius: 12,
     borderWidth: 2,
     flexDirection: 'row',
     alignItems: 'center'
@@ -176,7 +175,7 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     paddingHorizontal: 12,
     borderWidth: 2,
-    borderRadius: 10,
+    borderRadius: 12,
     margin: -2,
     borderStyle: 'dashed'
   },

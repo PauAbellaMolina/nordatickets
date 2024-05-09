@@ -66,11 +66,11 @@ export default function TabOneScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 30,
+    paddingTop: 10,
     paddingBottom: 5,
     paddingHorizontal: 15,
     flex: 1,
-    gap: 20
+    gap: 25
   },
   header: {
     flexDirection: 'row',
