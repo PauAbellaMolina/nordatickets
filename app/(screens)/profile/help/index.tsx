@@ -1,11 +1,39 @@
 import { Text, View } from '../../../../components/Themed';
 import GoBackArrow from '../../../../components/GoBackArrow';
-import { StyleSheet } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 import { useSupabase } from '../../../../context/SupabaseProvider';
 import Colors from '../../../../constants/Colors';
+import { useCallback, useEffect, useState } from 'react';
+import { supabase } from '../../../../supabase';
+
+type Faq = {
+  question: string;
+  answer: string;
+};
 
 export default function HelpAndTermsScreen() {
-  const { i18n, theme } = useSupabase();
+  const { i18n, theme, user } = useSupabase();
+  const [faqs, setFaqs] = useState<Faq[] | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    let unmounted = false;
+    supabase.from('faqs').select('question, answer').eq('language', i18n.locale).order('order').then(({ data, error }) => {
+      if (error || unmounted) return;
+      setFaqs(data as Faq[]);
+    });
+
+    return () => {
+      unmounted = true;
+    };
+  }, [user]);
+
+  const renderItemFaqs = useCallback(({item}: {item: Faq}) => (
+    <>
+      <Text style={styles.question}>{item.question}</Text>
+      <Text style={styles.answer}>{item.answer}</Text>
+    </>
+  ), [faqs]);
 
   return (
     <View style={styles.container}>
@@ -16,10 +44,15 @@ export default function HelpAndTermsScreen() {
         <View style={{display: 'flex', flexDirection: 'row'}}><Text>{ i18n?.t('sendAnEmailTo') } </Text><Text style={{textDecorationLine: 'underline'}}>help@elteutikt.com</Text></View>
         <View style={[styles.separator, {backgroundColor: Colors[theme].separatorBackgroundColor}]} />
         <Text style={styles.subtitle}>FAQs:</Text>
-        <Text style={styles.question}>How do I buy a ticket?</Text>
-        <Text style={styles.answer}>To buy a ticket, you must first create an account. Once you have an account, you can add tickets to your cart and proceed to checkout.</Text>
-        <Text style={styles.question}>How do I activate a ticket?</Text>
-        <Text style={styles.answer}>To activate a ticket, you must first buy it. Once you have bought a ticket, you can activate it from the wallet screen.</Text>
+        { !faqs ? 
+          <ActivityIndicator size="small" style={{marginTop: 50}} />
+        :
+          <FlatList
+            data={faqs}
+            keyExtractor={(_, index) => index.toString()}
+            renderItem={renderItemFaqs}
+          />
+        }
       </View>
     </View>
   );
@@ -44,10 +77,13 @@ const styles = StyleSheet.create({
   question: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginTop: 10
+    marginTop: 18,
+    marginBottom: 8
   },
   answer: {
-    marginHorizontal: 10,
+    marginLeft: 8,
+    marginRight: 14,
+    textAlign: 'justify'
   },
   wrapper: {
     marginTop: 30,
@@ -58,5 +94,5 @@ const styles = StyleSheet.create({
   separator: {
     marginVertical: 5,
     height: 1
-  },
+  }
 });
