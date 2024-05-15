@@ -5,10 +5,18 @@ import Colors from '../constants/Colors';
 import { router } from 'expo-router';
 import { FeatherIcon } from './CustomIcons';
 import { useSupabase } from '../context/SupabaseProvider';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function ReceiptsOrderComponent({ order, eventName, eventTicketFee }: { order: WalletTicket[], eventName: string, eventTicketFee: number}) {
   const { i18n, theme } = useSupabase();
+  const [total, setTotal] = useState<number>(null);
+
+  useEffect(() => {
+    if (!order.length) return;
+    const totalTickets = order.reduce((acc, ticket) => acc + ticket.price, 0);
+    const totalFees = eventTicketFee ? eventTicketFee * order.length : 0;
+    setTotal((totalTickets + totalFees) / 100);
+  }, [order]);
 
   const onGoToReceiptDetail = () => {
     router.navigate(`/profile/receipts/${order[0].order_id}`);
@@ -27,7 +35,9 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
         </View>
         <View>
           <Text style={styles.orderInfo}>{ new Date(order[0].created_at).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) }h</Text>
-          <Text style={styles.orderInfo}>{ eventName ? eventName : '...' }</Text>
+          { eventName ?
+            <Text style={styles.orderInfo}>{ eventName }</Text>
+          : null }
         </View>
       </View>
       <View style={styles.orderContent}>
@@ -39,7 +49,9 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
           { eventTicketFee ?
             <Text>{ i18n?.t('serviceFee') }: { eventTicketFee * order.length / 100 }€</Text>
           : null }
-          <Text style={{fontWeight: 'bold'}}>{ i18n?.t('total') }: { (order.reduce((acc, ticket) => acc + ticket.price, 0) + eventTicketFee * order.length) / 100 || '...' }€</Text>
+          { total !== null && total !== undefined ?
+            <Text style={{fontWeight: 'bold'}}>{ i18n?.t('total') }: { total }€</Text>
+          : null }
         </View>
       </View>
       <Pressable style={styles.goToReceiptContainer} onPress={onGoToReceiptDetail}>

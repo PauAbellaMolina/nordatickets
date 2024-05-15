@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import Colors from '../../../../constants/Colors';
 import { Text, View } from '../../../../components/Themed';
 import { FeatherIcon } from '../../../../components/CustomIcons';
@@ -209,7 +208,7 @@ export default function ActivateTicketScreen() {
       </> }
 
       {/* Use a light status bar on iOS to account for the black space above the modal */}
-      {/* TODO PAU try if uncommenting this makes web crash, if not, leave it on */}
+      {/* PAU info might sometime need this for iOS native app; and everywhere the screen is a modal */}
       {/* <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} /> */}
     </View> 
   );

@@ -150,7 +150,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   useEffect(() => {
     if (!initialized) return;
     
-     //TODO PAU this seems to work, but test deeply and make sure theres no security issues
+    //TODO PAU this seems to work, but test deeply and make sure theres no security issues
     const cleanParamsId = params.id && typeof params.id === "string" ? params.id : null;
     const cleanParamsEventId = params.event && typeof params.event === "string" ? params.event : null;
 

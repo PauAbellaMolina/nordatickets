@@ -30,7 +30,6 @@ export default function EventDetailScreen() {
   const [cartTotalQuantity, setCartTotalQuantity] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
-  const [lastBuyAttempt, setLastBuyAttempt] = useState<Date | null>(null);
   const [selectedOption, setSelectedOption] = useState<string>('misc');
 
   useEffect(() => {
@@ -151,16 +150,11 @@ export default function EventDetailScreen() {
   };
   
   const onBuyCart = () => {
-    if (loading || lastBuyAttempt && (new Date().getTime() - lastBuyAttempt.getTime()) < 20000) { //PAU info 20 seconds between buy attempts
+    if (loading) {
       return;
     }
     setLoading(true);
-    setLastBuyAttempt(new Date());
     getPaymentFormInfo();
-    setTimeout(() => {
-      setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
-      setCart(null);
-    }, 5000);
   };
 
   const getPaymentFormInfo = () => {
@@ -191,9 +185,8 @@ export default function EventDetailScreen() {
       addPendingTicketsToUser(data.orderId);
 
       router.navigate({ pathname: '/event/paymentModal', params: { eventId: +event?.id, bg: eventBackgroundColor, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } });
-      setLoading(false);
     })
-    .catch((err) => {
+    .catch(() => {
       setLoading(false);
     });
   }
@@ -209,7 +202,7 @@ export default function EventDetailScreen() {
   };
 
   const addPendingTicketsToUser = (orderId: string) => {
-    if (!cart?.length || !cartTotalPrice || !event || !user) {
+    if (!cart?.length || !event || !user) {
       return;
     }
 
@@ -220,6 +213,12 @@ export default function EventDetailScreen() {
         .select().then();
       }
     });
+
+    setTimeout(() => {
+      setLoading(false);
+      setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
+      setCart(null);
+    }, 5000);
   };
 
   const onGoToWallet = () => {
@@ -355,7 +354,7 @@ export default function EventDetailScreen() {
           <></>
         }
       </>}
-      {/* <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} /> */}
+
     </View> 
   );
 }
