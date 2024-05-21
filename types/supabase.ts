@@ -41,6 +41,7 @@ export type Database = {
           created_at: string
           event_id: number | null
           id: number
+          iva: number
           name: string | null
           price: number | null
           selling: boolean | null
@@ -51,6 +52,7 @@ export type Database = {
           created_at?: string
           event_id?: number | null
           id?: number
+          iva?: number
           name?: string | null
           price?: number | null
           selling?: boolean | null
@@ -61,6 +63,7 @@ export type Database = {
           created_at?: string
           event_id?: number | null
           id?: number
+          iva?: number
           name?: string | null
           price?: number | null
           selling?: boolean | null
@@ -84,6 +87,7 @@ export type Database = {
           id: number
           more_info_content: string | null
           name: string | null
+          organizer_id: number | null
           selling: boolean | null
           ticket_fee: number | null
         }
@@ -95,6 +99,7 @@ export type Database = {
           id?: number
           more_info_content?: string | null
           name?: string | null
+          organizer_id?: number | null
           selling?: boolean | null
           ticket_fee?: number | null
         }
@@ -106,8 +111,83 @@ export type Database = {
           id?: number
           more_info_content?: string | null
           name?: string | null
+          organizer_id?: number | null
           selling?: boolean | null
           ticket_fee?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_organizer_id_fkey"
+            columns: ["organizer_id"]
+            isOneToOne: false
+            referencedRelation: "organizers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      faqs: {
+        Row: {
+          answer: string | null
+          created_at: string
+          id: number
+          language: string
+          order: number
+          question: string | null
+        }
+        Insert: {
+          answer?: string | null
+          created_at?: string
+          id?: number
+          language?: string
+          order: number
+          question?: string | null
+        }
+        Update: {
+          answer?: string | null
+          created_at?: string
+          id?: number
+          language?: string
+          order?: number
+          question?: string | null
+        }
+        Relationships: []
+      }
+      organizers: {
+        Row: {
+          address: string | null
+          cif: string | null
+          created_at: string
+          email: string | null
+          id: number
+          legal_name: string | null
+          name: string | null
+          nif: string | null
+          phone: string | null
+          zipcode_city_country: string | null
+        }
+        Insert: {
+          address?: string | null
+          cif?: string | null
+          created_at?: string
+          email?: string | null
+          id?: number
+          legal_name?: string | null
+          name?: string | null
+          nif?: string | null
+          phone?: string | null
+          zipcode_city_country?: string | null
+        }
+        Update: {
+          address?: string | null
+          cif?: string | null
+          created_at?: string
+          email?: string | null
+          id?: number
+          legal_name?: string | null
+          name?: string | null
+          nif?: string | null
+          phone?: string | null
+          zipcode_city_country?: string | null
         }
         Relationships: []
       }
@@ -201,6 +281,7 @@ export type Database = {
           event_tickets_id: number | null
           event_tickets_name: string | null
           id: number
+          iva: number
           order_id: string | null
           price: number | null
           used: boolean | null
@@ -213,6 +294,7 @@ export type Database = {
           event_tickets_id?: number | null
           event_tickets_name?: string | null
           id?: number
+          iva?: number
           order_id?: string | null
           price?: number | null
           used?: boolean | null
@@ -225,6 +307,7 @@ export type Database = {
           event_tickets_id?: number | null
           event_tickets_name?: string | null
           id?: number
+          iva?: number
           order_id?: string | null
           price?: number | null
           used?: boolean | null
