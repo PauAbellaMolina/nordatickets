@@ -17,13 +17,14 @@ export default function TabOneScreen() {
     supabase.from('users').select().eq('id', user?.id).single()
     .then(({ data: user, error }) => {
       if (unmounted || error || !user) return;
-      if (userEventIdsFollowing.length && !user?.event_ids_following?.length) {
+      if (userEventIdsFollowing.length && !user.event_ids_following?.length) {
         setUserEventIdsFollowing([]);
         setEvents([]);
         return;
       }
-      const auxUserEventIdsFollowing = user.event_ids_following;
+      const auxUserEventIdsFollowing = user.event_ids_following ?? [];
       setUserEventIdsFollowing(auxUserEventIdsFollowing);
+      if (!auxUserEventIdsFollowing.length) return;
       supabase.from('events').select().in('id', auxUserEventIdsFollowing)
       .then(({ data: events, error }) => {
         if (unmounted || error) return;

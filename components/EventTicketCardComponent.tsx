@@ -13,7 +13,7 @@ export interface TicketCardComponentProps {
   ticket: EventTicket
 }
 
-export default function EventTicketCardComponent({eventSelling, quantityInCart, onRemoveTicket, onAddTicket, ticket}: TicketCardComponentProps) {
+export default function EventTicketCardComponent({ticket, eventSelling, quantityInCart, onRemoveTicket, onAddTicket}: TicketCardComponentProps) {
   const { i18n, theme } = useSupabase();
 
   const onRemove = () => {
@@ -23,6 +23,9 @@ export default function EventTicketCardComponent({eventSelling, quantityInCart, 
     onRemoveTicket(ticket);
   }
   const onAdd = () => {
+    if (quantityInCart === 5) {
+      return;
+    }
     onAddTicket(ticket);
   }
   
@@ -37,11 +40,11 @@ export default function EventTicketCardComponent({eventSelling, quantityInCart, 
           { eventSelling ? <>
             { ticket.selling ? <>
               <Pressable onPress={onRemove}>
-                <FeatherIcon name="minus-circle" size={28} color={Colors[theme].text} />
+                <FeatherIcon name="minus-circle" size={28} color={quantityInCart === 0 ? Colors[theme].text+'60' : Colors[theme].text} />
               </Pressable>
               <Text style={styles.quantityInCart}>{quantityInCart}</Text>
               <Pressable onPress={onAdd}>
-                <FeatherIcon name="plus-circle" size={28} color={Colors[theme].text} />
+                <FeatherIcon name="plus-circle" size={28} color={quantityInCart === 5 ? Colors[theme].text+'60' : Colors[theme].text} />
               </Pressable>
             </> :
               <Text style={styles.notAvailable}>{ i18n?.t('notAvailable') }</Text>

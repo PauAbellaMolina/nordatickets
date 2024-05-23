@@ -24,7 +24,7 @@ export default function PaymentModalScreen() {
             <GoBackArrow />
           </View>
         </View>
-        <Pressable onPress={() => router.navigate(`/event/${eventId}`)} style={styles.closeBttnWeb}>
+        <Pressable onPress={() => router.back()} style={styles.closeBttnWeb}>
           <FeatherIcon name="x" size={30} color={Colors[theme].text} />
         </Pressable>
         <iframe 

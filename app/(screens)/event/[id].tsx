@@ -254,7 +254,7 @@ export default function EventDetailScreen() {
   };
 
   const renderItemTickets = useCallback(({item}: {item: EventTicket}) => (
-    <EventTicketCardComponent eventSelling={event?.selling} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} ticket={item} />
+    <EventTicketCardComponent ticket={item} eventSelling={event?.selling} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} />
   ), [cart, event]);
 
   const renderItemCartTicket = useCallback(({item}: {item: CartItem}) => (

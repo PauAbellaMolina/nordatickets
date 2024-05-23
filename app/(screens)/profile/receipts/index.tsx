@@ -27,7 +27,7 @@ export default function ReceiptsScreen() {
   const fetchWalletTickets = (unmounted: boolean) => { //TODO PAU the same useFocusEffect() stuff on WalletTicketCardComponent could be used here to optimize, but it's not as crucial as there
     supabase.from('wallet_tickets').select().eq('user_id', user.id).order('created_at', { ascending: false })
     .then(async ({ data: wallet_tickets, error }) => {
-      if (unmounted || error) return;
+      if (unmounted || error || !wallet_tickets.length) return;
       const eventIds = [...new Set(wallet_tickets.map(ticket => ticket.event_id))];
       const orderIdGroupedWalletTickets: WalletTicket[][] = 
       Object.values(
