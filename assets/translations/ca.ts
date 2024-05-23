@@ -11,7 +11,8 @@ export const ca: { [key: string]: string } = {
   ticketsBoughtWillShowHereExplanation: 'Els tickets comprats es mostraran aquí',
   noTicketsInWallet: 'No tens tickets a la wallet',
   profile: 'Perfil',
-  savedCreditCard: 'Targeta de crèdit guardada',
+  infoAboutYou: 'Informació sobre tu',
+  emailAndPaymentMethods: 'Email i mètode de pagament',
   delete: 'Esborrar',
   purchaseReceipts: 'Rebuts de compra',
   purchaseReceiptsDetails: 'Detalls del rebut de compra',
@@ -73,5 +74,6 @@ export const ca: { [key: string]: string } = {
   yourOneTimeCode: "El teu codi per un sol ús",
   yourOneTimeCodeGreeting: "Hola! Aquest és el teu codi d'un sol ús:",
   yourOneTimeCodeExplanation: "Utilitza'l per iniciar sessió a ElTeuTikt",
-  moreInfo: 'Més informació'
+  moreInfo: 'Més informació',
+  noEventsInList: 'No hi ha esdeveniments a la teva llista'
 };

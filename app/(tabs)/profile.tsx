@@ -60,12 +60,29 @@ export default function TabThreeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{ i18n?.t('profile') }</Text>
-      <View style={styles.wrapper}>
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.title}>{ i18n?.t('profile') }</Text>
+          <Text style={styles.infoLabel}>{ i18n?.t('infoAboutYou') }</Text>
+        </View>
+      </View>
+      <View style={styles.profileContainer}>
+        <Text style={styles.infoTitle}>{ i18n?.t('emailAndPaymentMethod') }</Text>
         <View style={styles.userInfo}>
-          <View style={styles.singleLineContainer}><Text>Email: {user?.email}</Text></View>
+          <View style={styles.singleLineContainer}>
+            <FeatherIcon name="at-sign" size={18} color={Colors[theme].text} />
+            <Text>{user?.email}</Text>
+          </View>
           { card ?
-            <View style={styles.singleLineContainer}><Text>{ i18n?.t('savedCreditCard') }: {card.slice(9, card.length)}  ·  </Text><Pressable onPress={onDeleteUserCard}><Text style={{color: '#ff3737'}}>{ i18n?.t('delete') }</Text></Pressable></View>
+            <View style={styles.singleLineContainer}>
+              <FeatherIcon name="credit-card" size={18} color={Colors[theme].text} />
+              <View style={styles.cardLineContainer}>
+                <Text>{card}  ·  </Text>
+                <Pressable onPress={onDeleteUserCard}>
+                  <Text style={{color: '#ff3737'}}>{ i18n?.t('delete') }</Text>
+                </Pressable>
+              </View>
+            </View>
           : null }
         </View>
         <View style={[styles.separator, {backgroundColor: Colors[theme].separatorBackgroundColor}]} />
@@ -97,32 +114,55 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 5,
     paddingHorizontal: 15,
-    flex: 1
+    flex: 1,
+    overflow: 'scroll'
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginRight: 10
   },
   title: {
     fontSize: 30,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
-  wrapper: {
-    marginTop: 30,
+  infoLabel: {
+    fontSize: 13,
+    marginLeft: 2,
+    color: '#8C90A3'
+  },
+  profileContainer: {
+    marginTop: 20,
     marginHorizontal: 5,
-    alignItems: 'flex-start',
-    gap: 30
+    alignItems: 'flex-start'
+  },
+  infoTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    lineHeight: 20
   },
   userInfo: {
     width: '100%',
-    gap: 15
+    gap: 10,
+    marginTop: 15,
+    marginHorizontal: 5
   },
   separator: {
-    marginVertical: 5,
+    marginTop: 22,
+    marginBottom: 25,
     height: 1,
     width: '80%'
   },
   singleLineContainer: {
+    flexDirection: 'row',
+    gap: 8
+  },
+  cardLineContainer: {
     flexDirection: 'row'
   },
   entriesContainer: {
-    gap: 30
+    gap: 25
   },
   entryButton: {
     display: 'flex',

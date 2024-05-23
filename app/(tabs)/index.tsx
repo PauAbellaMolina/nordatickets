@@ -60,7 +60,9 @@ export default function TabOneScreen() {
             ItemSeparatorComponent={() => <View style={{height: 10}} />}
           />
         }
-      </> : null }
+      </> : 
+        <Text style={styles.emptyList}>{ i18n?.t('noEventsInList') }</Text>
+      }
     </View>
   );
 }
@@ -90,5 +92,11 @@ const styles = StyleSheet.create({
   },
   eventList: {
     gap: 10
+  },
+  emptyList: {
+    textAlign: 'center',
+    color: 'grey',
+    marginTop: 50,
+    fontStyle: 'italic'
   }
 });

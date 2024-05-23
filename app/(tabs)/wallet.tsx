@@ -123,6 +123,7 @@ const styles = StyleSheet.create({
   emptyWallet: {
     textAlign: 'center',
     color: 'grey',
-    marginTop: 10
+    marginTop: 50,
+    fontStyle: 'italic'
   }
 });

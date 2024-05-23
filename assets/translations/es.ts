@@ -11,7 +11,8 @@ export const es: { [key: string]: string } = {
   ticketsBoughtWillShowHereExplanation: 'Los tickets comprados se mostrarán aquí',
   noTicketsInWallet: 'No tienes tickets en la wallet',
   profile: 'Perfil',
-  savedCreditCard: 'Tarjeta de crédito guardada',
+  infoAboutYou: 'Información sobre ti',
+  emailAndPaymentMethods: 'Email y método de pago',
   delete: 'Borrar',
   purchaseReceipts: 'Recibos de compra',
   purchaseReceiptsDetails: 'Detalles del recibo de compra',
@@ -73,5 +74,6 @@ export const es: { [key: string]: string } = {
   yourOneTimeCode: 'Tu codigo de un solo uso',
   yourOneTimeCodeGreeting: '¡Hola! Este es tu código de un solo uso:',
   yourOneTimeCodeExplanation: 'Usa este código para iniciar sesión en ElTeuTikt',
-  moreInfo: 'Más información'
+  moreInfo: 'Más información',
+  noEventsInList: 'No hay eventos en tu lista'
 };

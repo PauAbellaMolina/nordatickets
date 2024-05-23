@@ -11,7 +11,8 @@ export const en: { [key: string]: string } = {
   ticketsBoughtWillShowHereExplanation: 'Tickets bought will show here',
   noTicketsInWallet: 'No tickets in wallet',
   profile: 'Profile',
-  savedCreditCard: 'Saved credit card',
+  infoAboutYou: 'Info about you',
+  emailAndPaymentMethods: 'Email and payment method',
   delete: 'Delete',
   purchaseReceipts: 'Purchase receipts',
   purchaseReceiptsDetails: 'Purchase receipt details',
@@ -73,5 +74,6 @@ export const en: { [key: string]: string } = {
   yourOneTimeCode: 'Your one-time code',
   yourOneTimeCodeGreeting: 'Hello! This is your one-time code:',
   yourOneTimeCodeExplanation: 'Use this code to log into ElTeuTikt',
-  moreInfo: 'More info'
+  moreInfo: 'More info',
+  noEventsInList: 'No events in your list'
 };
