@@ -67,7 +67,7 @@ export default function TabThreeScreen() {
         </View>
       </View>
       <View style={styles.profileContainer}>
-        <Text style={styles.infoTitle}>{ i18n?.t('emailAndPaymentMethod') }</Text>
+        <Text style={styles.infoTitle}>{ i18n?.t('emailAndPaymentMethods') }</Text>
         <View style={styles.userInfo}>
           <View style={styles.singleLineContainer}>
             <FeatherIcon name="at-sign" size={18} color={Colors[theme].text} />
