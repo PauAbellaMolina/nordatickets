@@ -253,6 +253,10 @@ export default function EventDetailScreen() {
     setMoreInfoExpanded(!moreInfoExpanded);
   };
 
+  const onDismissAddedToWallet = () => {
+    setOrderConfirmed(false);
+  };
+
   const renderItemTickets = useCallback(({item}: {item: EventTicket}) => (
     <EventTicketCardComponent ticket={item} eventSelling={event?.selling} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} />
   ), [cart, event]);
@@ -311,6 +315,9 @@ export default function EventDetailScreen() {
             </View>
             { orderConfirmed ?
               <Pressable style={[styles.orderConfirmedContainer, {backgroundColor: Colors[theme].cartContainerBackground}]} onPress={onGoToWallet}>
+                <Pressable onPress={onDismissAddedToWallet} style={styles.dismissAddedToWallet}>
+                  <FeatherIcon name="x" size={25} color={Colors[theme].text} />
+                </Pressable>
                 <FeatherIcon name="check-circle" size={40} color={Colors[theme].text} />
                 <View style={styles.orderConfirmedTextContainer}><Text style={styles.orderConfirmedSubtitle}>{ i18n?.t('ticketsAddedToWallet') }</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
               </Pressable>
@@ -337,7 +344,7 @@ export default function EventDetailScreen() {
                           <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCreditCard') } {cardNumber.slice(-7)}</Text>
                         </View>
                       : null }
-                    <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground}]} onPress={onBuyCart}>
+                    <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground, marginTop: !cardNumber ? 5 : 3}]} onPress={onBuyCart}>
                     { loading ?
                       <ActivityIndicator style={{marginVertical: 1.75}} size="small" />
                     :
@@ -505,6 +512,12 @@ const styles = StyleSheet.create({
       ios: {...orderConfirmedContainerMobileShadow},
       android: {...orderConfirmedContainerMobileShadow, elevation: 3}
     })
+  },
+  dismissAddedToWallet: {
+    opacity: .7,
+    position: 'absolute',
+    top: 10,
+    right: 14
   },
   orderConfirmedTextContainer: {
     flexDirection: 'row',

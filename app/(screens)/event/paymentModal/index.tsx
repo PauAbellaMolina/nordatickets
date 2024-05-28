@@ -17,7 +17,7 @@ export default function PaymentModalScreen() {
   const parsedDs_SignatureVersion = Ds_SignatureVersion.replace(/%2F/g, '/');
   
   return (
-    <View style={[styles.container, Platform.OS !== 'web' ? {marginTop: 50} : {paddingHorizontal: 15, paddingVertical: 20}]}>
+    <View style={[styles.container, Platform.OS !== 'web' ? {marginTop: 50} : {paddingHorizontal: 10, paddingVertical: 11}]}>
       { Platform.OS === 'web' ? <>
         <View style={styles.fakeBackground}>
           <View style={[styles.eventInfoContainer, {backgroundColor: bg}]}>
