@@ -61,7 +61,6 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
             <FlatList
               columnWrapperStyle={{flexWrap: 'wrap', gap: 10}}
               numColumns={2}
-              style={styles.ticketsList}
               getItemLayout={getItemLayout}
               data={eventWalletTickets}
               renderItem={renderItem}
@@ -92,9 +91,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5
-  },
-  ticketsList: {
-    marginTop: 10,
-    gap: 10
   }
 });

@@ -12,6 +12,7 @@ import { useSupabase } from '../context/SupabaseProvider';
 export default function WalletTicketCardComponent({ walletTicket }: { walletTicket: WalletTicket}) {
   const { i18n, theme } = useSupabase();
   const [eventTicketOrderStatus, setEventTicketOrderStatus] = useState<string>();
+  const [shouldDisplayPendingTicket, setShouldDisplayPendingTicket] = useState<boolean>(false);
 
   let insertsRedsysOrdersChannel = useRef<RealtimeChannel>();
   let updatesRedsysOrdersChannel = useRef<RealtimeChannel>();
@@ -24,6 +25,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
         if (!walletTicket || walletTicket?.used_at != null) return;
         fetchTicketOrderStatus();
       }
+
       return () => {
         triggerNextFocus.current = false;
         if (insertsRedsysOrdersChannel.current) {
@@ -52,11 +54,14 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
       }
       const status = redsysOrder.order_status;
       setEventTicketOrderStatus(status);
-      if (status === 'PENDING_PAYMENT') {
+      const createdAt = new Date(walletTicket.created_at);
+      const fiveSecondsAgo = new Date(new Date().getTime() - 5000);
+      if (status === 'PENDING_PAYMENT' && createdAt > fiveSecondsAgo) {
         if (updatesRedsysOrdersChannel.current) {
           supabase.removeChannel(updatesRedsysOrdersChannel.current);
           updatesRedsysOrdersChannel.current = null;
         }
+        setShouldDisplayPendingTicket(true);
         subscribeRedsysOrdersUpdates();
       }
       if (updatesRedsysOrdersChannel.current && (redsysOrder.order_status === 'PAYMENT_SUCCEDED' || redsysOrder.order_status === 'PAYMENT_FAILED')) {
@@ -109,6 +114,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
       if (updatesRedsysOrdersChannel.current) {
         supabase.removeChannel(updatesRedsysOrdersChannel.current);
         updatesRedsysOrdersChannel.current = null;
+        setShouldDisplayPendingTicket(false);
         clearInterval(unsubscribeInterval);
       }
     }, 5000);
@@ -122,8 +128,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
   };
 
   return (
-    // TODO PAU don't show ticket if pending and 5 seconds have passed from it's created_at, cause means it's a failed (not completed) payment
-    <>{ walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEDED' || eventTicketOrderStatus === 'PENDING_PAYMENT') ?
+    <>{ walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEDED' || (eventTicketOrderStatus === 'PENDING_PAYMENT' && shouldDisplayPendingTicket)) ?
       <>{ eventTicketOrderStatus === 'PENDING_PAYMENT' ?
         <Pressable disabled style={[styles.singleTicketContainer, {opacity: .6, backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
           <View style={styles.ticketIconWrapper}>
@@ -154,6 +159,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
 const styles = StyleSheet.create({
   singleTicketContainer: {
     flex: 1,
+    marginTop: 10,
     borderRadius: 12,
     borderWidth: 2,
     flexDirection: 'row',
