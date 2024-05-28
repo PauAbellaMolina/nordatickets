@@ -284,7 +284,6 @@ export type Database = {
           iva: number
           order_id: string | null
           price: number | null
-          used: boolean | null
           used_at: string | null
           user_id: string | null
         }
@@ -297,7 +296,6 @@ export type Database = {
           iva?: number
           order_id?: string | null
           price?: number | null
-          used?: boolean | null
           used_at?: string | null
           user_id?: string | null
         }
@@ -310,7 +308,6 @@ export type Database = {
           iva?: number
           order_id?: string | null
           price?: number | null
-          used?: boolean | null
           used_at?: string | null
           user_id?: string | null
         }
@@ -350,7 +347,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      count_users_following_event: {
+        Args: {
+          event_id: number
+        }
+        Returns: number
+      }
+      organizer_email_exists: {
+        Args: {
+          email_to_check: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

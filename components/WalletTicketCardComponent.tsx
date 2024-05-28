@@ -12,7 +12,6 @@ import { useSupabase } from '../context/SupabaseProvider';
 export default function WalletTicketCardComponent({ walletTicket }: { walletTicket: WalletTicket}) {
   const { i18n, theme } = useSupabase();
   const [eventTicketOrderStatus, setEventTicketOrderStatus] = useState<string>();
-  const [eventTicketUsed, setEventTicketUsed] = useState<boolean>();
 
   let insertsRedsysOrdersChannel = useRef<RealtimeChannel>();
   let updatesRedsysOrdersChannel = useRef<RealtimeChannel>();
@@ -22,8 +21,8 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
   useFocusEffect(
     useCallback(() => {
       if (triggerNextFocus.current) {
-        if (!walletTicket) return;
-        fetchTicketUsed();
+        if (!walletTicket || walletTicket?.used_at != null) return;
+        fetchTicketOrderStatus();
       }
       return () => {
         triggerNextFocus.current = false;
@@ -38,18 +37,6 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
       };
     }, [])
   );
-
-  const fetchTicketUsed = () => {
-    supabase.from('wallet_tickets').select().eq('id', walletTicket.id).single()
-    .then(({ data: walletTicket, error }) => {
-      if (error || !walletTicket) return;
-      const used = walletTicket.used;
-      setEventTicketUsed(used);
-      if (!used) {
-        fetchTicketOrderStatus();
-      }
-    });
-  };
 
   const fetchTicketOrderStatus = () => {
     supabase.from('redsys_orders').select().eq('order_id', walletTicket.order_id).single()
@@ -135,7 +122,8 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
   };
 
   return (
-    <>{ !eventTicketUsed && (eventTicketOrderStatus === 'PAYMENT_SUCCEDED' || eventTicketOrderStatus === 'PENDING_PAYMENT') ?
+    // TODO PAU don't show ticket if pending and 5 seconds have passed from it's created_at, cause means it's a failed (not completed) payment
+    <>{ walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEDED' || eventTicketOrderStatus === 'PENDING_PAYMENT') ?
       <>{ eventTicketOrderStatus === 'PENDING_PAYMENT' ?
         <Pressable disabled style={[styles.singleTicketContainer, {opacity: .6, backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
           <View style={styles.ticketIconWrapper}>

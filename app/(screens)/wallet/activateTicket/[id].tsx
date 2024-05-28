@@ -11,13 +11,12 @@ import { getThemeRandomColor } from '../../../../utils/chooseRandomColor';
 export default function ActivateTicketScreen() {
   const { i18n, user, theme } = useSupabase();
   const [loading, setLoading] = useState<boolean>(false);
-  const [ticketActive, setTicketActive] = useState<boolean>(undefined);
   const [lightEventBackgroundColor, setLightEventBackgroundColor] = useState<string>();
   const [darkEventBackgroundColor, setDarkEventBackgroundColor] = useState<string>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>();
   const [eventName, setEventName] = useState<string>('');
   const [ticketName, setTicketName] = useState<string>('');
-  const [ticketUsedAt, setTicketUsedAt] = useState<string>(null);
+  const [ticketUsedAt, setTicketUsedAt] = useState<string>(undefined);
   const [ticketUsedTimeAgo, setTicketUsedTimeAgo] = useState<string>();
 
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -75,7 +74,6 @@ export default function ActivateTicketScreen() {
     supabase.from('wallet_tickets').select().eq('id', id).single()
     .then(({ data: wallet_ticket, error }) => {
       if (error || !wallet_ticket) return;
-      setTicketActive(!wallet_ticket.used);
       setTicketName(wallet_ticket.event_tickets_name);
       setTicketUsedAt(wallet_ticket.used_at);
 
@@ -145,10 +143,9 @@ export default function ActivateTicketScreen() {
     }
 
     setLoading(true);
-    supabase.from('wallet_tickets').update({ used: true, used_at: new Date().toISOString() }).eq('id', id).select().single()
+    supabase.from('wallet_tickets').update({ used_at: new Date().toISOString() }).eq('id', id).select().single()
     .then(({ data: wallet_ticket, error }) => {
       if (error || !wallet_ticket) return;
-      setTicketActive(!wallet_ticket.used);
       setTicketUsedAt(wallet_ticket.used_at);
       setLoading(false);
     });
@@ -170,11 +167,11 @@ export default function ActivateTicketScreen() {
             <View style={[styles.ticketDivider, {backgroundColor: Colors[theme].background}]}></View>
             <View style={[styles.ticketRightCutout, {backgroundColor: Colors[theme].background}]}></View>
           </View>
-          <View style={[styles.ticketStatusContainer, {backgroundColor: ticketActive === undefined ? 'transparent' : ticketActive ? '#3fde7a' : '#ff3737', paddingVertical: (ticketActive !== undefined && ticketActive) || !ticketUsedTimeAgo ? 30 : 21.25}]}>
-            { ticketActive === undefined ? <>
+          <View style={[styles.ticketStatusContainer, {backgroundColor: ticketUsedAt === undefined ? 'transparent' : ticketUsedAt != null ? '#ff3737' : '#3fde7a', paddingVertical: ticketUsedAt === undefined || !ticketUsedTimeAgo ? 30 : 21.25}]}>
+            { ticketUsedAt === undefined ? <>
               <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('loading') } ticket...</Text>
               <Text style={styles.statusInfoText}> </Text>
-            </> : <>{ ticketActive ? <>
+            </> : <>{ ticketUsedAt === null ? <>
                 <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketActive') }</Text>
                 <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('deactivateTicketOnDrinkExplanation') }</Text>
               </> : <>
@@ -197,7 +194,7 @@ export default function ActivateTicketScreen() {
               <FeatherIcon name="arrow-left" size={38} color={Colors[theme].text} />
             </Pressable>
           </> : <></> }
-          <Pressable disabled={!ticketActive} onPress={deactivateTicket} style={[styles.button, !ticketActive ? {opacity: .7} : {}, {backgroundColor: eventBackgroundColor}]}>
+          <Pressable disabled={ticketUsedAt === undefined || ticketUsedAt != null} onPress={deactivateTicket} style={[styles.button, ticketUsedAt === undefined || ticketUsedAt != null ? {opacity: .7} : {}, {backgroundColor: eventBackgroundColor}]}>
             {loading ?
               <ActivityIndicator style={styles.buttonLoading} size="large" />
             :

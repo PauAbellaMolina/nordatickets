@@ -197,7 +197,7 @@ export default function EventDetailScreen() {
     event_tickets_name: WalletTicket['event_tickets_name'];
     order_id: WalletTicket['order_id'];
     price: WalletTicket['price'];
-    used: WalletTicket['used'];
+    used_at: WalletTicket['used_at'];
     user_id: WalletTicket['user_id'];
     iva: WalletTicket['iva'];
   };
@@ -209,7 +209,7 @@ export default function EventDetailScreen() {
 
     cart.forEach((cartItem) => {
       for (let i = 0; i < cartItem.quantity; i++) {
-        const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, event_tickets_name: cartItem.eventTicket.name, order_id: orderId, price: cartItem.eventTicket.price, used: false, user_id: user.id, iva: cartItem.eventTicket.iva };
+        const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, event_tickets_name: cartItem.eventTicket.name, order_id: orderId, price: cartItem.eventTicket.price, used_at: null, user_id: user.id, iva: cartItem.eventTicket.iva };
         supabase.from('wallet_tickets').insert(ticketToInsert)
         .select().then();
       }

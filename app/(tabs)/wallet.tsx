@@ -24,7 +24,7 @@ export default function TabTwoScreen() {
   }, [user]);
 
   const fetchWalletTickets = (unmounted: boolean) => {
-    supabase.from('wallet_tickets').select().eq('user_id', user.id).eq('used', false)
+    supabase.from('wallet_tickets').select().eq('user_id', user.id).is('used_at', null)
     .then(({ data: wallet_tickets, error }) => {
       if (unmounted || error) return;
       const eventGroupedWalletTickets: WalletTicket[][] = 
