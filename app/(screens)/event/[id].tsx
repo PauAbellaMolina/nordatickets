@@ -181,7 +181,7 @@ export default function EventDetailScreen() {
 
       addPendingTicketsToUser(data.orderId);
 
-      router.navigate({ pathname: '/event/paymentModal', params: { eventId: +event?.id, bg: eventBackgroundColor, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } });
+      router.navigate({ pathname: '/event/paymentModal', params: { bg: eventBackgroundColor, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } });
     })
     .catch(() => {
       setLoading(false);

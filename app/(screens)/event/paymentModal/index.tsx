@@ -10,7 +10,7 @@ import { useSupabase } from '../../../../context/SupabaseProvider';
 
 export default function PaymentModalScreen() {
   const { i18n, theme } = useSupabase();
-  const { eventId, bg, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } = useLocalSearchParams<{ eventId: string, bg: string, formUrl: string, Ds_MerchantParameters: string, Ds_Signature: string, Ds_SignatureVersion: string }>();
+  const { bg, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } = useLocalSearchParams<{ bg: string, formUrl: string, Ds_MerchantParameters: string, Ds_Signature: string, Ds_SignatureVersion: string }>();
   const parsedFormUrl = formUrl.replace(/%2F/g, '/');
   const parsedDs_MerchantParameters = Ds_MerchantParameters.replace(/%2F/g, '/');
   const parsedDs_Signature = Ds_Signature.replace(/%2F/g, '/');
