@@ -1,4 +1,4 @@
-import { Platform, Pressable, StyleSheet } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { EventTicket } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
@@ -32,9 +32,14 @@ export default function EventTicketCardComponent({ticket, eventSelling, quantity
   return (
     <View style={[styles.ticketCard, {backgroundColor: Colors[theme].backgroundContrast}]}>
       <View style={styles.ticketContents}>
-        <View style={{flexDirection: 'row', gap: 10}}>
+        <View style={styles.ticketInfo}>
           <FontAwesomeIcon name="ticket" size={23} color={Colors[theme].text} />
-          <Text style={styles.eventTitle}>{ticket.name} · {ticket.price/100}€</Text>
+          <View style={styles.ticketInfoText}>
+            <ScrollView horizontal>
+              <Text style={styles.ticketName}>{ticket.name}</Text>
+            </ScrollView>
+            <Text style={styles.ticketPrice}> · {ticket.price/100}€</Text>
+          </View>
         </View>
         <View style={styles.ticketActions}>
           { eventSelling ? <>
@@ -68,9 +73,7 @@ const eventCardMobileShadow = {
 
 const styles = StyleSheet.create({
   ticketCard: {
-    paddingVertical: 15,
-    paddingLeft: 10,
-    paddingRight: 15,
+    padding: 15,
     marginBottom: 10,
     borderRadius: 10,
     ...Platform.select({
@@ -84,7 +87,8 @@ const styles = StyleSheet.create({
   ticketContents: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
+    gap: 15
   },
   ticketActions: {
     flexDirection: 'row',
@@ -97,25 +101,31 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   notAvailable: {
+    textAlign: 'center',
     fontSize: 13,
-    color: '#606175'
+    color: '#606175',
+    width: 101
   },
-  roundedSquare: {
-    backgroundColor: '#ff7f50',
-    borderRadius: 10,
-    width: 90,
-    height: 90
+  ticketInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: 10
   },
-  eventInfo: {
-    width: '70%',
-    marginTop: 5,
-    marginHorizontal: 10
+  ticketInfoText: {
+    maxWidth: '90%',
+    flexDirection: 'row',
+    alignItems: 'center'
   },
-  eventTitle: {
+  ticketName: {
     fontSize: 20,
     fontWeight: 'bold'
   },
-  eventDescription: {
+  ticketPrice: {
+    minWidth: 50,
+    fontSize: 20,
+    fontWeight: 'bold'
+  },
+  ticketDescription: {
     marginTop: 5
   }
 });
