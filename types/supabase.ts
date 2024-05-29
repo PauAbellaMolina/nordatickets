@@ -246,7 +246,6 @@ export type Database = {
           event_ids_following: number[] | null
           expiry_date: number | null
           id: string
-          redsys_token: string | null
         }
         Insert: {
           card_number?: string | null
@@ -254,7 +253,6 @@ export type Database = {
           event_ids_following?: number[] | null
           expiry_date?: number | null
           id: string
-          redsys_token?: string | null
         }
         Update: {
           card_number?: string | null
@@ -262,7 +260,6 @@ export type Database = {
           event_ids_following?: number[] | null
           expiry_date?: number | null
           id?: string
-          redsys_token?: string | null
         }
         Relationships: [
           {
@@ -353,11 +350,30 @@ export type Database = {
         }
         Returns: number
       }
+      delete_secret: {
+        Args: {
+          secret_name: string
+        }
+        Returns: string
+      }
+      insert_secret: {
+        Args: {
+          name: string
+          secret: string
+        }
+        Returns: string
+      }
       organizer_email_exists: {
         Args: {
           email_to_check: string
         }
         Returns: boolean
+      }
+      read_secret: {
+        Args: {
+          secret_name: string
+        }
+        Returns: string
       }
     }
     Enums: {

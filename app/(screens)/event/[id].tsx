@@ -20,7 +20,6 @@ export default function EventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user, session, i18n, swapFollowingEventsChanged, theme } = useSupabase();
   const [cardNumber, setCardNumber] = useState<string>();
-  const [redsysToken, setRedsysToken] = useState<string>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
   const [event, setEvent] = useState<Event>();
   const [eventTickets, setEventTickets] = useState<EventTicket[]>();
@@ -83,7 +82,6 @@ export default function EventDetailScreen() {
       if (error || !users.length) return;
       if (!unmounted) {
         setCardNumber(users[0].card_number);
-        setRedsysToken(users[0].redsys_token);
       }
       
       const userEventIdsFollowing = users[0].event_ids_following ?? [];
@@ -168,7 +166,6 @@ export default function EventDetailScreen() {
       body: JSON.stringify({
         amount: finalAmount,
         userId: user.id,
-        userRedsysToken: redsysToken,
         eventId: event.id
       })
     })

@@ -39,16 +39,20 @@ export default function TabThreeScreen() {
   };
 
   const onDeleteUserCard = () => {
-    supabase.from('users')
-    .update({
-      redsys_token: null,
-      card_number: null,
-      expiry_date: null
-    })
-    .eq('id', user?.id)
-    .then(({ error }) => {
-      if (error) return;
-      setCard(undefined);
+    supabase.rpc('delete_secret', { secret_name: user?.id })
+    .then(({ data: secretUuid, error }) => {
+      if (!error && secretUuid) {
+        supabase.from('users')
+        .update({
+          card_number: null,
+          expiry_date: null
+        })
+        .eq('id', user?.id)
+        .then(({ error }) => {
+          if (error) return;
+          setCard(undefined);
+        });
+      }
     });
   };
 
