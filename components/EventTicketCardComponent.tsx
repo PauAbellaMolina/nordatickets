@@ -29,6 +29,24 @@ export default function EventTicketCardComponent({ticket, eventSelling, quantity
     onAddTicket(ticket);
   }
   
+  const getTicketPriceMinWidth = () => {
+    if (!ticket.price) return;
+    switch ((ticket.price/100).toString().length) {
+      case 1:
+        return 60;
+      case 2:
+      case 3:
+      case 4:
+        return 80;
+      case 5:
+        return 103;
+      case 6:
+        return 115;
+      default:
+        return 103;
+    }
+  }
+  
   return (
     <View style={[styles.ticketCard, {backgroundColor: Colors[theme].backgroundContrast}]}>
       <View style={styles.ticketContents}>
@@ -38,7 +56,7 @@ export default function EventTicketCardComponent({ticket, eventSelling, quantity
             <ScrollView horizontal>
               <Text style={styles.ticketName}>{ticket.name}</Text>
             </ScrollView>
-            <Text style={styles.ticketPrice}> · {ticket.price/100}€</Text>
+            <Text style={[styles.ticketPrice, {minWidth: getTicketPriceMinWidth()}]}> · {ticket.price/100}€</Text>
           </View>
         </View>
         <View style={styles.ticketActions}>
@@ -87,8 +105,7 @@ const styles = StyleSheet.create({
   ticketContents: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 15
+    alignItems: 'center'
   },
   ticketActions: {
     flexDirection: 'row',
@@ -121,7 +138,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   ticketPrice: {
-    minWidth: 50,
     fontSize: 20,
     fontWeight: 'bold'
   },
