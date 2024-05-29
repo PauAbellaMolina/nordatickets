@@ -159,8 +159,8 @@ export default function ActivateTicketScreen() {
       </> : <>
         <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
           <View style={styles.ticketInfoContainer}>
-            <Text style={styles.title}>{ ticketName }</Text>
-            <Text style={styles.subtitle}>{ eventName }</Text>
+            <Text style={styles.ticketName} numberOfLines={4}>{ ticketName }</Text>
+            <Text style={styles.eventName}>{ eventName }</Text>
           </View>
           <View style={styles.ticketDecorContainer}>
             <View style={[styles.ticketLeftCutout, {backgroundColor: Colors[theme].background}]}></View>
@@ -309,11 +309,13 @@ const styles = StyleSheet.create({
       android: {}
     })
   },
-  title: {
+  ticketName: {
     fontSize: 45,
-    fontWeight: '900'
+    fontWeight: '900',
+    textAlign: 'center',
+    marginHorizontal: 15
   },
-  subtitle: {
+  eventName: {
     fontSize: 20
   },
   topContainer: {
@@ -334,7 +336,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   statusInfoText: {
-    fontSize: 15
+    fontSize: 15,
+    textAlign: 'center',
+    marginHorizontal: 7
   },
   infoContainer: {
     alignItems: 'center'
