@@ -9,7 +9,7 @@ import { WalletTicket } from '../types/supabaseplain';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { useSupabase } from '../context/SupabaseProvider';
 
-export default function WalletTicketCardComponent({ walletTicket }: { walletTicket: WalletTicket}) {
+export default function WalletTicketCardComponent({ walletTicket }: { walletTicket: WalletTicket }) {
   const { i18n, theme } = useSupabase();
   const [eventTicketOrderStatus, setEventTicketOrderStatus] = useState<string>();
   const [shouldDisplayPendingTicket, setShouldDisplayPendingTicket] = useState<boolean>(false);
@@ -128,7 +128,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
   };
 
   return (
-    <>{ walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEDED' || (eventTicketOrderStatus === 'PENDING_PAYMENT' && shouldDisplayPendingTicket)) ?
+    <>{ walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEDED' || (eventTicketOrderStatus === 'PENDING_PAYMENT')) ?
       <>{ eventTicketOrderStatus === 'PENDING_PAYMENT' ?
         <Pressable disabled style={[styles.singleTicketContainer, {opacity: .6, backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
           <View style={styles.ticketIconWrapper}>
@@ -136,7 +136,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
           </View>
           <View style={styles.ticketNameWrapper}>
             <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
-            <Text style={[styles.ticketSubtitle, {fontSize: 10, color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ i18n?.t('paymentProcessing') }...</Text>
+            <Text style={[styles.ticketSubtitle, {fontSize: 10, color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ shouldDisplayPendingTicket ? i18n?.t('paymentProcessing')+'...' : i18n?.t('paymentFailed') }</Text>
           </View>
         </Pressable>
         :

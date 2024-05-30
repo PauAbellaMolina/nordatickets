@@ -48,6 +48,7 @@ export const ca: { [key: string]: string } = {
   identifier: 'Identificador',
   total: 'Total',
   paymentProcessing: 'Processant pagament',
+  paymentFailed: 'Pagament fallit',
   activable: 'Activable',
   payment: 'Pagament',
   activateTicket: 'Activar ticket',

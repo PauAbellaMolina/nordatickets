@@ -216,7 +216,7 @@ export default function EventDetailScreen() {
       setLoading(false);
       setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
       setCart(null);
-    }, 5000);
+    }, 3000);
   };
 
   const onGoToWallet = () => {

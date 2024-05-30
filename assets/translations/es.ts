@@ -48,6 +48,7 @@ export const es: { [key: string]: string } = {
   identifier: 'Identificador',
   total: 'Total',
   paymentProcessing: 'Procesando pago',
+  paymentFailed: 'Pago fallido',
   activable: 'Activable',
   payment: 'Pago',
   activateTicket: 'Activar ticket',

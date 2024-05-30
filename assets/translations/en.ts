@@ -48,6 +48,7 @@ export const en: { [key: string]: string } = {
   identifier: 'Identifier',
   total: 'Total',
   paymentProcessing: 'Payment processing',
+  paymentFailed: 'Payment failed',
   activable: 'Activable',
   payment: 'Payment',
   activateTicket: 'Activate ticket',
