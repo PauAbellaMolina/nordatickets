@@ -16,6 +16,7 @@ export default function ReceiptDetailScreen() {
   const [loaded, setLoaded] = useState<boolean>(false);
   const [paginatedGroupedWalletTickets, setPaginatedGroupedWalletTickets] = useState<WalletTicket[][][]>([]);
   const [receiptDate, setReceiptDate] = useState<Date>(null);
+  const [orderStatus, setOrderStatus] = useState<string>(null);
   const [eventName, setEventName] = useState<string>(null);
   const [eventTicketFee, setEventTicketFee] = useState<number>(null);
   const [organizer, setOrganizer] = useState<Organizer>(null);
@@ -23,6 +24,7 @@ export default function ReceiptDetailScreen() {
   useEffect(() => {
     if (!user) return;
     let unmounted = false;
+    fetchRedsysOrder(unmounted);
     fetchWalletTickets(unmounted);
 
     return () => {
@@ -33,14 +35,23 @@ export default function ReceiptDetailScreen() {
   useEffect(() => {
     if (!user) return;
     let unmounted = false;
-    if (!unmounted && paginatedGroupedWalletTickets.length && eventName && receiptDate && organizer && !loaded) {
+    if (!unmounted && paginatedGroupedWalletTickets.length && eventName && receiptDate && orderStatus && organizer && !loaded) {
       setLoaded(true);
     }
 
     return () => {
       unmounted = true;
     };
-  }, [user, paginatedGroupedWalletTickets, eventName, eventTicketFee, receiptDate, organizer]);
+  }, [user, paginatedGroupedWalletTickets, eventName, eventTicketFee, receiptDate, orderStatus, organizer]);
+
+  const fetchRedsysOrder = (unmounted: boolean) => {
+    supabase.from('redsys_orders').select().eq('order_id', id).single()
+    .then(({ data: redsys_order, error }) => {
+      if (unmounted || error || !redsys_order) return;
+      const formattedStatus = redsys_order.order_status.replace(/_/g, ' ').toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+      setOrderStatus(formattedStatus);
+    });
+  }
 
   const fetchWalletTickets = (unmounted: boolean) => { //TODO PAU the same useFocusEffect() stuff on WalletTicketCardComponent could be used here to optimize, but it's not as crucial as there
     supabase.from('wallet_tickets').select().eq('user_id', user.id).eq('order_id', id).order('created_at', { ascending: false })
@@ -119,6 +130,10 @@ export default function ReceiptDetailScreen() {
           </View>
           <View style={[styles.generalInfoContainer, {gap: vwpDimension/120}]}>
             <View style={[styles.generalInfoEntry, styles.alignedRight]}>
+              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('event') }</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ eventName }</Text>
+            </View>
+            <View style={[styles.generalInfoEntry, styles.alignedRight]}>
               <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('invoiceNumber') }</Text>
               <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ id }</Text>
             </View>
@@ -127,8 +142,8 @@ export default function ReceiptDetailScreen() {
               <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ receiptDate?.toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) }h</Text>
             </View>
             <View style={[styles.generalInfoEntry, styles.alignedRight]}>
-              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('event') }</Text>
-              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ eventName }</Text>
+              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('receiptOrderStatus') }</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ orderStatus }</Text>
             </View>
           </View>
         </View>

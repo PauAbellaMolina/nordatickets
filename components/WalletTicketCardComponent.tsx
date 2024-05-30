@@ -64,7 +64,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
         setShouldDisplayPendingTicket(true);
         subscribeRedsysOrdersUpdates();
       }
-      if (updatesRedsysOrdersChannel.current && (redsysOrder.order_status === 'PAYMENT_SUCCEDED' || redsysOrder.order_status === 'PAYMENT_FAILED')) {
+      if (updatesRedsysOrdersChannel.current && (redsysOrder.order_status === 'PAYMENT_SUCCEEDED' || redsysOrder.order_status === 'PAYMENT_FAILED')) {
         supabase.removeChannel(updatesRedsysOrdersChannel.current);
         updatesRedsysOrdersChannel.current = null;
       }
@@ -121,14 +121,14 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
   };
 
   const onActivateTicket = () => {
-    if (eventTicketOrderStatus !== 'PAYMENT_SUCCEDED') {
+    if (eventTicketOrderStatus !== 'PAYMENT_SUCCEEDED') {
       return;
     }
     router.navigate(`/wallet/activateTicket/${walletTicket.id}`);
   };
 
   return (
-    <>{ walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEDED' || (eventTicketOrderStatus === 'PENDING_PAYMENT')) ?
+    <>{ walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEEDED' || (eventTicketOrderStatus === 'PENDING_PAYMENT')) ?
       <>{ eventTicketOrderStatus === 'PENDING_PAYMENT' ?
         <Pressable disabled style={[styles.singleTicketContainer, {opacity: .6, backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
           <View style={styles.ticketIconWrapper}>

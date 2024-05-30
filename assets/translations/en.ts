@@ -61,6 +61,7 @@ export const en: { [key: string]: string } = {
   contact: 'Contact',
   invoiceNumber: 'Invoice number',
   transactionDate: 'Transaction date',
+  receiptOrderStatus: 'Order status (TPV)',
   description: 'Description',
   amount: 'Amount',
   quantity: 'Quantity',

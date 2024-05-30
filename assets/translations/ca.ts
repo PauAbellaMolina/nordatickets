@@ -61,6 +61,7 @@ export const ca: { [key: string]: string } = {
   contact: 'Contacte',
   invoiceNumber: 'Número de factura',
   transactionDate: 'Data de la compra',
+  receiptOrderStatus: 'Order status (TPV)',
   description: 'Descripció',
   amount: 'Import',
   quantity: 'Quantitat',
