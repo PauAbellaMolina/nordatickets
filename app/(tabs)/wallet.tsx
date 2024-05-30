@@ -114,8 +114,7 @@ const styles = StyleSheet.create({
   },
   ticketsTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    lineHeight: 20
+    fontWeight: 'bold'
   },
   walletTicketList: {
     marginTop: 10

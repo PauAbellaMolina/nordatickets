@@ -62,7 +62,7 @@ export default function EventDetailScreen() {
   useEffect(() => {
     if (!user) return;
     let unmounted = false;
-    supabase.from('event_tickets').select().eq('event_id', id as string)
+    supabase.from('event_tickets').select().eq('event_id', id as string).order('name')
     .then(({ data: event_tickets, error }) => {
       if (unmounted || error || !event_tickets.length) return;
       setEventTickets(event_tickets);

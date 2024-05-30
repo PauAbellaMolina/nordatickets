@@ -143,8 +143,7 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    lineHeight: 20
+    fontWeight: 'bold'
   },
   userInfo: {
     width: '100%',
