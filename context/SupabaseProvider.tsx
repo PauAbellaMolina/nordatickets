@@ -100,6 +100,9 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
         setI18n(i18n);
       } else {
         i18n.locale = AvailableLocales.CA;
+        try {
+          await AsyncStorage.setItem('locale', AvailableLocales.CA);
+        } catch (e) { }
         setI18n(i18n);
       }
     } catch (e) {
@@ -141,7 +144,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
       setRealSession(session)
       setUser(session.user);
     }
-    if (session && session?.access_token !== realSession?.access_token) {
+    if (realSession && session && session?.access_token !== realSession?.access_token) { //TODO PAU check if checking the realSession is needed at the beginning of the if
       setRealSession(session)
       setUser(session.user);
     }

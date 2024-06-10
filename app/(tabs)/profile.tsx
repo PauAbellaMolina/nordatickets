@@ -60,7 +60,7 @@ export default function TabThreeScreen() {
     if (!i18n) return;
     setSelectedLanguage(language);
     setLanguage(language);
-  }
+  };
 
   return (
     <View style={styles.container}>
