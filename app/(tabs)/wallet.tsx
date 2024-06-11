@@ -1,32 +1,46 @@
 import { FlatList, StyleSheet } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import WalletEventCardComponent from '../../components/WalletEventCardComponent';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from "../../supabase";
 import { useSupabase } from '../../context/SupabaseProvider';
 import { WalletTicket } from '../../types/supabaseplain';
 import { RealtimeChannel } from '@supabase/realtime-js';
+import { useFocusEffect } from 'expo-router';
 
 export default function TabTwoScreen() {
   const { user, i18n } = useSupabase();
   const [eventGroupedWalletTickets, setEventGroupedWalletTickets] = useState<WalletTicket[][]>([]);
 
-  useEffect(() => {
-    if (!user) return;
-    let unmounted = false;
-    fetchWalletTickets(unmounted);
-    const subscription = subscribeWalletTickets(unmounted);
+  // let listenWalletTicketsChannel = useRef<RealtimeChannel>();
 
-    return () => {
-      unmounted = true;
-      subscription?.unsubscribe();
-    };
-  }, [user]);
+  let triggerNextFocus = useRef<boolean>(true);
 
-  const fetchWalletTickets = (unmounted: boolean) => {
+  useFocusEffect( //TODO PAU test this change deeply
+    useCallback(() => {
+      if (triggerNextFocus.current) {
+        if (!user) return;
+        fetchWalletTickets();
+        // subscribeWalletTickets(); //TODO PAU make super sure we don't need to subscribe for any use case and then remove the subscription code (commented out for now). If needed, activate wallet_tickets table realtime on supabase back on again.
+      }
+
+      return () => {
+        triggerNextFocus.current = false;
+        // if (listenWalletTicketsChannel.current) {
+        //   supabase.removeChannel(listenWalletTicketsChannel.current);
+        //   listenWalletTicketsChannel.current = null;
+        // }
+        setTimeout(() => {
+          triggerNextFocus.current = true;
+        }, 8000); //This is to prevent fetching every time we focus, just fetching when focused and after every 8 seconds
+      };
+    }, [user])
+  );
+
+  const fetchWalletTickets = () => {
     supabase.from('wallet_tickets').select().eq('user_id', user.id).is('used_at', null)
     .then(({ data: wallet_tickets, error }) => {
-      if (unmounted || error) return;
+      if (error) return;
       const eventGroupedWalletTickets: WalletTicket[][] = 
       Object.values(
         wallet_tickets.reduce((groups, ticket) => {
@@ -42,19 +56,21 @@ export default function TabTwoScreen() {
     });
   };
 
-  const subscribeWalletTickets = (unmounted: boolean): RealtimeChannel => {
-    return supabase
-    .channel('wallet_tickets')
-    .on('postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'wallet_tickets',
-        filter: `user_id=eq.${user.id}`
-      },
-      (payload) => fetchWalletTickets(unmounted))
-    .subscribe();
-  };
+  // const subscribeWalletTickets = () => {
+  //   const walletTicketsChannel = supabase
+  //   .channel('wallet_tickets')
+  //   .on('postgres_changes',
+  //     {
+  //       event: '*',
+  //       schema: 'public',
+  //       table: 'wallet_tickets',
+  //       filter: `user_id=eq.${user.id}`
+  //     },
+  //     (payload) => fetchWalletTickets())
+  //   .subscribe();
+
+  //   listenWalletTicketsChannel.current = walletTicketsChannel
+  // };
 
   const renderItem = useCallback(({item}: {item: WalletTicket[]}) => (
     <WalletEventCardComponent eventWalletTickets={item} />
