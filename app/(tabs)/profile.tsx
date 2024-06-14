@@ -12,6 +12,7 @@ import { Picker } from '@react-native-picker/picker';
 export default function TabThreeScreen() {
   const { user, signOut, i18n, setLanguage, theme } = useSupabase();
   const [card, setCard] = useState<string>();
+  const [expiryDate, setExpiryDate] = useState<string>();
   const [selectedLanguage, setSelectedLanguage] = useState<AvailableLocales>();
 
   useEffect(() => {
@@ -35,6 +36,7 @@ export default function TabThreeScreen() {
     .then(({ data: user, error }) => {
       if (unmounted || error) return;
       setCard(user.card_number);
+      setExpiryDate(user.expiry_date.toString().slice(0, 2) + '/' + user.expiry_date.toString().slice(2));
     });
   };
 
@@ -51,6 +53,7 @@ export default function TabThreeScreen() {
         .then(({ error }) => {
           if (error) return;
           setCard(undefined);
+          setExpiryDate(undefined);
         });
       }
     });
@@ -82,6 +85,16 @@ export default function TabThreeScreen() {
               <FeatherIcon name="credit-card" size={18} color={Colors[theme].text} />
               <View style={styles.cardLineContainer}>
                 <Text>{card}  ·  </Text>
+                <Pressable onPress={onDeleteUserCard}>
+                  <Text style={{color: '#ff3737'}}>{ i18n?.t('delete') }</Text>
+                </Pressable>
+              </View>
+            </View>
+          : expiryDate ?
+            <View style={styles.singleLineContainer}>
+              <FeatherIcon name="credit-card" size={18} color={Colors[theme].text} />
+              <View style={styles.cardLineContainer}>
+                <Text>{ i18n?.t('cardWithExpiryDate') }: {expiryDate}  ·  </Text>
                 <Pressable onPress={onDeleteUserCard}>
                   <Text style={{color: '#ff3737'}}>{ i18n?.t('delete') }</Text>
                 </Pressable>

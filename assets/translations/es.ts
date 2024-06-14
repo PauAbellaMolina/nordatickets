@@ -13,6 +13,7 @@ export const es: { [key: string]: string } = {
   profile: 'Perfil',
   infoAboutYou: 'Información sobre ti',
   emailAndPaymentMethods: 'Email y método de pago',
+  cardWithExpiryDate: 'Tarjeta con fecha de caducidad',
   delete: 'Borrar',
   purchaseReceipts: 'Recibos de compra',
   purchaseReceiptsDetails: 'Detalles del recibo de compra',

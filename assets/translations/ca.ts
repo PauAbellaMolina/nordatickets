@@ -13,6 +13,7 @@ export const ca: { [key: string]: string } = {
   profile: 'Perfil',
   infoAboutYou: 'Informació sobre tu',
   emailAndPaymentMethods: 'Email i mètode de pagament',
+  cardWithExpiryDate: 'Targeta amb data de caducitat',
   delete: 'Esborrar',
   purchaseReceipts: 'Rebuts de compra',
   purchaseReceiptsDetails: 'Detalls del rebut de compra',

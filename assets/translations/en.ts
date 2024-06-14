@@ -13,6 +13,7 @@ export const en: { [key: string]: string } = {
   profile: 'Profile',
   infoAboutYou: 'Info about you',
   emailAndPaymentMethods: 'Email and payment method',
+  cardWithExpiryDate: 'Card with expiry date',
   delete: 'Delete',
   purchaseReceipts: 'Purchase receipts',
   purchaseReceiptsDetails: 'Purchase receipt details',
