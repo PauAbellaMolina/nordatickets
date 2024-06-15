@@ -34,9 +34,11 @@ export default function TabThreeScreen() {
     if (!user) return;
     supabase.from('users').select().eq('id', user?.id).single()
     .then(({ data: user, error }) => {
-      if (unmounted || error) return;
+      if (unmounted || error || !user) return;
       setCard(user.card_number);
-      setExpiryDate(user.expiry_date.toString().slice(0, 2) + '/' + user.expiry_date.toString().slice(2));
+      if (user.expiry_date) {
+        setExpiryDate(user.expiry_date.toString().slice(2) + '/' + user.expiry_date.toString().slice(0, 2));
+      }
     });
   };
 

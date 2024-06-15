@@ -43,6 +43,7 @@ export const en: { [key: string]: string } = {
   cart: 'Cart',
   serviceFee: 'Service fee',
   usingCreditCard: 'Using credit card',
+  usingCardWithExpiryDate: 'Using card with expiry date',
   noTicketsInCart: 'No tickets in cart',
   notAvailable: 'Not available',
   buy: 'Buy',

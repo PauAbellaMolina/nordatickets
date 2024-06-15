@@ -20,6 +20,7 @@ export default function EventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user, session, i18n, swapFollowingEventsChanged, theme } = useSupabase();
   const [cardNumber, setCardNumber] = useState<string>();
+  const [expiryDate, setExpiryDate] = useState<string>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
   const [event, setEvent] = useState<Event>();
   const [eventTickets, setEventTickets] = useState<EventTicket[]>();
@@ -77,14 +78,17 @@ export default function EventDetailScreen() {
     if (!user) return;
     let unmounted = false;
     if (!user || !event) return;
-    supabase.from('users').select().eq('id', user?.id)
-    .then(({ data: users, error }) => {
-      if (error || !users.length) return;
+    supabase.from('users').select().eq('id', user?.id).single()
+    .then(({ data: user, error }) => {
+      if (error || !user) return;
       if (!unmounted) {
-        setCardNumber(users[0].card_number);
+        setCardNumber(user.card_number);
+        if (user.expiry_date) {
+          setExpiryDate(user.expiry_date.toString().slice(2) + '/' + user.expiry_date.toString().slice(0, 2));
+        }
       }
       
-      const userEventIdsFollowing = users[0].event_ids_following ?? [];
+      const userEventIdsFollowing = user.event_ids_following ?? [];
       if (userEventIdsFollowing.includes(+id)) {
         return;
       }
@@ -339,6 +343,11 @@ export default function EventDetailScreen() {
                         <View style={styles.usingCreditCardContainer}>
                           <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
                           <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCreditCard') } {cardNumber.slice(-7)}</Text>
+                        </View>
+                      : expiryDate ?
+                        <View style={styles.usingCreditCardContainer}>
+                          <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
+                          <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCardWithExpiryDate') } {expiryDate}</Text>
                         </View>
                       : null }
                     <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground, marginTop: !cardNumber ? 5 : 3}]} onPress={onBuyCart}>

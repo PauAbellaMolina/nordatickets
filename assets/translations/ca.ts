@@ -43,6 +43,7 @@ export const ca: { [key: string]: string } = {
   cart: 'Carretó',
   serviceFee: 'Comissió de servei',
   usingCreditCard: 'Utilitzant la targeta de crèdit',
+  usingCardWithExpiryDate: 'Utilitzant la targeta amb data de caducitat',
   noTicketsInCart: 'No hi ha tickets al carretó',
   notAvailable: 'No disponible',
   buy: 'Comprar',

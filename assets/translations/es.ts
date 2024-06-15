@@ -43,6 +43,7 @@ export const es: { [key: string]: string } = {
   cart: 'Carrito',
   serviceFee: 'Comisión de servicio',
   usingCreditCard: 'Utilizando la tarjeta de crédito',
+  usingCardWithExpiryDate: 'Utilizando la tarjeta con fecha de caducidad',
   noTicketsInCart: 'No hay tickets en el carrito',
   notAvailable: 'No disponible',
   buy: 'Comprar',
