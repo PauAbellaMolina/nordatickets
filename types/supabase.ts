@@ -41,6 +41,7 @@ export type Database = {
           created_at: string
           event_id: number | null
           id: number
+          is_addon: boolean
           iva: number
           name: string | null
           price: number | null
@@ -52,6 +53,7 @@ export type Database = {
           created_at?: string
           event_id?: number | null
           id?: number
+          is_addon?: boolean
           iva?: number
           name?: string | null
           price?: number | null
@@ -63,6 +65,7 @@ export type Database = {
           created_at?: string
           event_id?: number | null
           id?: number
+          is_addon?: boolean
           iva?: number
           name?: string | null
           price?: number | null
@@ -278,6 +281,7 @@ export type Database = {
           event_tickets_id: number | null
           event_tickets_name: string | null
           id: number
+          is_addon: boolean
           iva: number
           order_id: string | null
           price: number | null
@@ -290,6 +294,7 @@ export type Database = {
           event_tickets_id?: number | null
           event_tickets_name?: string | null
           id?: number
+          is_addon?: boolean
           iva?: number
           order_id?: string | null
           price?: number | null
@@ -302,6 +307,7 @@ export type Database = {
           event_tickets_id?: number | null
           event_tickets_name?: string | null
           id?: number
+          is_addon?: boolean
           iva?: number
           order_id?: string | null
           price?: number | null
@@ -344,17 +350,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      count_users_following_event: {
-        Args: {
-          event_id: number
-        }
-        Returns: number
-      }
       delete_secret: {
         Args: {
           secret_name: string
         }
         Returns: string
+      }
+      email_is_admin: {
+        Args: {
+          email_to_check: string
+        }
+        Returns: boolean
       }
       insert_secret: {
         Args: {

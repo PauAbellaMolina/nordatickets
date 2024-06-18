@@ -7,6 +7,7 @@ import { Event, WalletTicket } from '../types/supabaseplain';
 import WalletTicketCardComponent from './WalletTicketCardComponent';
 import { getThemeRandomColor } from '../utils/chooseRandomColor';
 import { useSupabase } from '../context/SupabaseProvider';
+import WalletTicketAddonCardComponent from './WalletTicketAddonCardComponent';
 
 export default function WalletEventCardComponent({ eventWalletTickets }: { eventWalletTickets: WalletTicket[] }) {
   const { theme } = useSupabase();
@@ -47,9 +48,12 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
     {length: 56, offset: 56 * index, index}
   );
 
-  const renderItem = useCallback(({item}: {item: WalletTicket}) => (
-    <WalletTicketCardComponent walletTicket={item} />
-  ), []);
+  const renderItem = useCallback(({item}: {item: WalletTicket}) => {
+    if (item.is_addon) {
+      return <WalletTicketAddonCardComponent walletTicket={item} />;
+    }
+    return <WalletTicketCardComponent walletTicket={item} />;
+  }, []);
   
   return (
     <>
@@ -59,7 +63,7 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
               <Text style={[styles.eventName, {color: Colors['light'].text}]}>{event.name}</Text>
             </View>
             <FlatList
-              columnWrapperStyle={{flexWrap: 'wrap', gap: 10}}
+              columnWrapperStyle={{flexWrap: 'wrap', columnGap: 10}}
               numColumns={2}
               getItemLayout={getItemLayout}
               data={eventWalletTickets}
