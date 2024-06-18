@@ -3,10 +3,11 @@ import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet} from 'react-
 import { router, useLocalSearchParams } from 'expo-router';
 import Colors from '../../../../constants/Colors';
 import { Text, View } from '../../../../components/Themed';
-import { FeatherIcon } from '../../../../components/CustomIcons';
+import { EntypoIcon, FeatherIcon } from '../../../../components/CustomIcons';
 import { supabase } from "../../../../supabase";
 import { useSupabase } from '../../../../context/SupabaseProvider';
 import { getThemeRandomColor } from '../../../../utils/chooseRandomColor';
+import { WalletTicket } from '../../../../types/supabaseplain';
 
 export default function ActivateTicketScreen() {
   const { i18n, user, theme } = useSupabase();
@@ -18,6 +19,7 @@ export default function ActivateTicketScreen() {
   const [ticketName, setTicketName] = useState<string>('');
   const [ticketUsedAt, setTicketUsedAt] = useState<string>(undefined);
   const [ticketUsedTimeAgo, setTicketUsedTimeAgo] = useState<string>();
+  const [addonTicket, setAddonTicket] = useState<WalletTicket>(undefined);
 
   const { id } = useLocalSearchParams<{ id: string }>();
 
@@ -25,6 +27,7 @@ export default function ActivateTicketScreen() {
     if (!user) return;
     let unmounted = false;
     fetchWalletTickets(unmounted);
+    fetchAddonWalletTickets(unmounted);
 
     return () => {
       unmounted = true;
@@ -105,6 +108,17 @@ export default function ActivateTicketScreen() {
     });
   };
 
+  const fetchAddonWalletTickets = (unmounted: boolean) => {
+    supabase.from('wallet_tickets').select().eq('user_id', user.id).eq('is_addon', true).is('used_at', null).limit(1).single()
+    .then(({ data: addon_wallet_ticket, error }) => {
+      if (unmounted || error) {
+        setAddonTicket(null);
+        return;
+      };
+      setAddonTicket(addon_wallet_ticket);
+    });
+  };
+
   const deactivateTicket = async () => {
     if (loading) {
       return;
@@ -143,20 +157,44 @@ export default function ActivateTicketScreen() {
     }
 
     setLoading(true);
+    if (addonTicket) {
+      supabase.from('wallet_tickets').update({ used_at: new Date().toISOString() }).eq('id', addonTicket.id).select().single()
+      .then(({ data: wallet_ticket, error }) => {
+        supabase.from('wallet_tickets').update({ used_at: new Date().toISOString() }).eq('id', id).select().single()
+        .then(({ data: wallet_ticket, error }) => {
+          if (error || !wallet_ticket) return;
+          deactivateWalletTicket();
+        });
+      });
+      return;
+    }
+    deactivateWalletTicket();
+  };
+
+  const deactivateWalletTicket = () => {
     supabase.from('wallet_tickets').update({ used_at: new Date().toISOString() }).eq('id', id).select().single()
     .then(({ data: wallet_ticket, error }) => {
       if (error || !wallet_ticket) return;
       setTicketUsedAt(wallet_ticket.used_at);
       setLoading(false);
     });
-  };
+  }
   
   return (
     <View style={styles.container}>
       { Platform.OS !== 'web' ? <View style={styles.expanderNotch}></View> : <></> }
-      { !eventBackgroundColor || !eventName || !ticketName ? <>
+      { !eventBackgroundColor || !eventName || !ticketName || addonTicket === undefined ? <>
         <ActivityIndicator size="large" />
       </> : <>
+        { addonTicket ?
+          <View style={styles.addonTicketContainer}>
+            <EntypoIcon name="cup" size={42} color={Colors[theme].text} />
+            <View style={styles.addonTicketTextContainer}>
+              <Text style={styles.addonTicketTitle}>{ addonTicket.event_tickets_name }</Text>
+              <Text style={styles.addonTicketSubtitle}>{ i18n?.t('activateTicketRefundableAddonExplanation') }</Text>
+            </View>
+          </View>
+        : null }
         <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
           <View style={styles.ticketInfoContainer}>
             <Text style={styles.ticketName} numberOfLines={4}>{ ticketName }</Text>
@@ -248,6 +286,30 @@ const styles = StyleSheet.create({
     height: 5,
     borderRadius: 10,
     backgroundColor: 'lightgray',
+  },
+  addonTicketContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    borderRadius: 20,
+    marginBottom: 15,
+    backgroundColor: '#f0f0f033',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    gap: 17
+  },
+  addonTicketTextContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    gap: 1
+  },
+  addonTicketTitle: {
+    fontSize: 24,
+    fontWeight: 'bold'
+  },
+  addonTicketSubtitle: {
+    fontSize: 14,
+    color: '#606175'
   },
   ticketContainer: {
     flex: 1,

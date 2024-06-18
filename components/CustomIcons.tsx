@@ -14,7 +14,7 @@ export function EntypoIcon(props: {
   size: number;
   opacity?: number;
 }) {
-  return <Entypo {...props} style={{ opacity: props.opacity ?? 1 }} />;
+  return <Entypo {...props} style={{ opacity: props.opacity ?? 1, alignContent: 'center' }} />;
 }
 
 export function FontAwesomeIcon(props: {
@@ -23,7 +23,7 @@ export function FontAwesomeIcon(props: {
   size: number;
   opacity?: number;
 }) {
-  return <FontAwesome {...props} style={{ opacity: props.opacity ?? 1 }} />;
+  return <FontAwesome {...props} style={{ opacity: props.opacity ?? 1, alignContent: 'center' }} />;
 }
 
 export function FeatherIcon(props: {
@@ -32,5 +32,5 @@ export function FeatherIcon(props: {
   size: number;
   opacity?: number;
 }) {
-  return <Feather {...props} style={{ opacity: props.opacity ?? 1 }} />;
+  return <Feather {...props} style={{ opacity: props.opacity ?? 1, alignContent: 'center' }} />;
 }

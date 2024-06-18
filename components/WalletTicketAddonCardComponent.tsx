@@ -129,27 +129,15 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
 
   return (
     <>{ walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEEDED' || (eventTicketOrderStatus === 'PENDING_PAYMENT')) ?
-      <>{ eventTicketOrderStatus === 'PENDING_PAYMENT' ?
-        <Pressable disabled style={[styles.singleTicketContainer, {opacity: .6, backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
-          <View style={styles.ticketIconWrapper}>
-            <EntypoIcon name="cup" size={30} color={Colors['light'].text} />
-          </View>
-          <View style={styles.ticketNameWrapper}>
-            <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
-            <Text style={[styles.ticketSubtitle, {fontSize: 10, color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ shouldDisplayPendingTicket ? i18n?.t('paymentProcessing')+'...' : i18n?.t('paymentFailed') }</Text>
-          </View>
-        </Pressable>
-        :
-        <Pressable style={[styles.singleTicketContainer, {backgroundColor: Colors[theme].backgroundHalfOpacity}]} onPress={onActivateTicket}>
-          <View style={styles.ticketIconWrapper}>
+      <View style={[styles.singleTicketContainer, {opacity: eventTicketOrderStatus === 'PENDING_PAYMENT' ? .6 : 1 , backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
+        <View style={styles.ticketIconWrapper}>
           <EntypoIcon name="cup" size={30} color={Colors['light'].text} />
         </View>
         <View style={styles.ticketNameWrapper}>
           <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
-          <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ i18n?.t('activable') }</Text>
+          <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ eventTicketOrderStatus === 'PENDING_PAYMENT' ? shouldDisplayPendingTicket ? i18n?.t('paymentProcessing')+'...' : i18n?.t('paymentFailed') : i18n?.t('walletTicketAddonExplanation') }</Text>
         </View>
-      </Pressable>
-      }</>
+      </View>
     :
       null
     }</>

@@ -130,7 +130,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
   return (
     <>{ walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEEDED' || (eventTicketOrderStatus === 'PENDING_PAYMENT')) ?
       <>{ eventTicketOrderStatus === 'PENDING_PAYMENT' ?
-        <Pressable disabled style={[styles.singleTicketContainer, {opacity: .6, backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
+        <View style={[styles.singleTicketContainer, {opacity: .6, backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
           <View style={styles.ticketIconWrapper}>
             <FontAwesomeIcon name="ticket" size={30} color={Colors['light'].text} />
           </View>
@@ -138,7 +138,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
             <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
             <Text style={[styles.ticketSubtitle, {fontSize: 10, color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ shouldDisplayPendingTicket ? i18n?.t('paymentProcessing')+'...' : i18n?.t('paymentFailed') }</Text>
           </View>
-        </Pressable>
+        </View>
         :
         <Pressable style={[styles.singleTicketContainer, {backgroundColor: Colors[theme].backgroundHalfOpacity}]} onPress={onActivateTicket}>
           <View style={styles.ticketIconWrapper}>

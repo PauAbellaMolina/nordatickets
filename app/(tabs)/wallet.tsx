@@ -32,7 +32,7 @@ export default function TabTwoScreen() {
         // }
         setTimeout(() => {
           triggerNextFocus.current = true;
-        }, 8000); //This is to prevent fetching every time we focus, just fetching when focused and after every 8 seconds
+        }, 3000); //This is to prevent fetching every time we focus, just fetching when focused and after every 8 seconds
       };
     }, [user])
   );

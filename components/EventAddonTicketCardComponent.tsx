@@ -2,7 +2,7 @@ import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { EventTicket } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
-import { EntypoIcon } from './CustomIcons';
+import { EntypoIcon, FeatherIcon } from './CustomIcons';
 import { useSupabase } from '../context/SupabaseProvider';
 
 export interface TicketCardComponentProps {
@@ -38,22 +38,15 @@ export default function EventAddonTicketCardComponent({ticket, eventSelling, qua
             <ScrollView horizontal>
               <Text style={styles.ticketName}>{ticket.name} · {ticket.price/100}€</Text>
             </ScrollView>
-            <Text style={styles.ticketSubtitle}>El pots tornar abans que acabi la festa</Text>
+            <Text style={styles.ticketSubtitle}>{ i18n?.t('eventTicketRefundableAddonExplanation') }</Text>
           </View>
         </View>
         <View style={styles.ticketActions}>
           { eventSelling ? <>
             { ticket.selling ? <>
               <Pressable onPress={quantityInCart === 1 ? onRemove : onAdd}>
-                <Text style={styles.quantityInCart}>{quantityInCart === 1 ? 'Treure' : 'Afegir'}</Text>
+                <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={28} color={quantityInCart === 5 ? Colors[theme].text+'60' : Colors[theme].text} />
               </Pressable>
-              {/* <Pressable onPress={onRemove}>
-                <FeatherIcon name="minus-circle" size={28} color={quantityInCart === 0 ? Colors[theme].text+'60' : Colors[theme].text} />
-              </Pressable>
-              <Text style={styles.quantityInCart}>{quantityInCart}</Text>
-              <Pressable onPress={onAdd}>
-                <FeatherIcon name="plus-circle" size={28} color={quantityInCart === 5 ? Colors[theme].text+'60' : Colors[theme].text} />
-              </Pressable> */}
             </> :
               <Text style={styles.notAvailable}>{ i18n?.t('notAvailable') }</Text>
             }
@@ -115,7 +108,8 @@ const styles = StyleSheet.create({
   },
   ticketInfoText: {
     flexDirection: 'column',
-    maxWidth: '90%'
+    maxWidth: '90%',
+    gap: 3
   },
   ticketName: {
     fontSize: 20,
