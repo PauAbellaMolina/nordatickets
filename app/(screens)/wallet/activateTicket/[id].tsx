@@ -186,19 +186,26 @@ export default function ActivateTicketScreen() {
       { !eventBackgroundColor || !eventName || !ticketName || addonTicket === undefined ? <>
         <ActivityIndicator size="large" />
       </> : <>
-        { addonTicket ?
-          <View style={styles.addonTicketContainer}>
-            <EntypoIcon name="cup" size={42} color={Colors[theme].text} />
-            <View style={styles.addonTicketTextContainer}>
-              <Text style={styles.addonTicketTitle}>{ addonTicket.event_tickets_name }</Text>
-              <Text style={styles.addonTicketSubtitle}>{ i18n?.t('activateTicketRefundableAddonExplanation') }</Text>
-            </View>
-          </View>
-        : null }
         <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
           <View style={styles.ticketInfoContainer}>
-            <Text style={styles.ticketName} numberOfLines={4}>{ ticketName }</Text>
-            <Text style={styles.eventName}>{ eventName }</Text>
+            <View style={[styles.ticketInfoTextsContainer, addonTicket ? {justifyContent: 'flex-end'} : {justifyContent: 'center'}]}>
+              <Text style={styles.ticketName} numberOfLines={4}>{ ticketName }</Text>
+              <Text style={styles.eventName}>{ eventName }</Text>
+            </View>
+            { addonTicket ?
+              <View style={styles.plusAddonTicketContainer}>
+                <FeatherIcon name="plus" size={26} color={Colors['light'].text} />
+                <View style={[styles.addonTicketContainer, {backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
+                  <View style={styles.addonTicketIconWrapper}>
+                    <EntypoIcon name="cup" size={30} color={Colors['light'].text} />
+                  </View>
+                  <View style={styles.addonTicketNameWrapper}>
+                    <Text style={[styles.addonTicketName, {color: Colors['light'].text}]} numberOfLines={1}>{addonTicket.event_tickets_name}</Text>
+                    <Text style={[styles.addonTicketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ i18n?.t('activateTicketRefundableAddonExplanation') }</Text>
+                  </View>
+                </View>
+              </View>
+            : null }
           </View>
           <View style={styles.ticketDecorContainer}>
             <View style={[styles.ticketLeftCutout, {backgroundColor: Colors[theme].background}]}></View>
@@ -287,30 +294,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: 'lightgray',
   },
-  addonTicketContainer: {
-    flexDirection: 'row',
-    width: '100%',
-    borderRadius: 20,
-    marginBottom: 15,
-    backgroundColor: '#f0f0f033',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-    gap: 17
-  },
-  addonTicketTextContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    gap: 1
-  },
-  addonTicketTitle: {
-    fontSize: 24,
-    fontWeight: 'bold'
-  },
-  addonTicketSubtitle: {
-    fontSize: 14,
-    color: '#606175'
-  },
   ticketContainer: {
     flex: 1,
     flexDirection: 'column',
@@ -327,11 +310,50 @@ const styles = StyleSheet.create({
   },
   ticketInfoContainer: {
     flex: 1,
+    gap: 8,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
     marginTop: 25
+  },
+  ticketInfoTextsContainer: {
+    flex: 1.2,
+    alignItems: 'center'
+  },
+  plusAddonTicketContainer: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 8
+  },
+  addonTicketContainer: {
+    marginHorizontal: 30,
+    borderRadius: 16,
+    borderWidth: 2,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  addonTicketIconWrapper: {
+    paddingVertical: 20,
+    paddingHorizontal: 23,
+    borderWidth: 2,
+    borderRadius: 16,
+    margin: -2
+  },
+  addonTicketNameWrapper: {
+    flex: 1,
+    paddingHorizontal: 5
+  },
+  addonTicketName: {
+    fontSize: 19,
+    textAlign: 'center',
+    fontWeight: '400',
+    overflow: 'hidden'
+  },
+  addonTicketSubtitle: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginHorizontal: 14
   },
   ticketDecorContainer: {
     flexDirection: 'row',
@@ -378,7 +400,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 15
   },
   eventName: {
-    fontSize: 20
+    fontSize: 20,
+    textAlign: 'center'
   },
   topContainer: {
     flex: 1,

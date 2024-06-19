@@ -129,22 +129,32 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
 
   return (
     <>{ walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEEDED' || (eventTicketOrderStatus === 'PENDING_PAYMENT')) ?
-      <View style={[styles.singleTicketContainer, {opacity: eventTicketOrderStatus === 'PENDING_PAYMENT' ? .6 : 1 , backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
-        <View style={styles.ticketIconWrapper}>
-          <EntypoIcon name="cup" size={30} color={Colors['light'].text} />
+      <View style={styles.wrapperContainer}>
+        <View style={[styles.singleTicketContainer, {opacity: eventTicketOrderStatus === 'PENDING_PAYMENT' ? .6 : 1 , backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
+          <View style={styles.ticketIconWrapper}>
+            <EntypoIcon name="cup" size={30} color={Colors['light'].text} />
+          </View>
+          <View style={styles.ticketNameWrapper}>
+            <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
+            <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ eventTicketOrderStatus === 'PENDING_PAYMENT' ? shouldDisplayPendingTicket ? i18n?.t('paymentProcessing')+'...' : i18n?.t('paymentFailed') : i18n?.t('walletTicketAddonExplanation') }</Text>
+          </View>
         </View>
-        <View style={styles.ticketNameWrapper}>
-          <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
-          <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ eventTicketOrderStatus === 'PENDING_PAYMENT' ? shouldDisplayPendingTicket ? i18n?.t('paymentProcessing')+'...' : i18n?.t('paymentFailed') : i18n?.t('walletTicketAddonExplanation') }</Text>
-        </View>
+        <View style={[styles.separator, {backgroundColor: Colors[theme].contrastSeparatorBackgroundColor}]} />
       </View>
-    :
-      null
-    }</>
+    : null }</>
   );
 };
 
 const styles = StyleSheet.create({
+  wrapperContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  separator: {
+    marginTop: 10,
+    height: 1,
+    width: '96%'
+  },
   singleTicketContainer: {
     width: '100%',
     marginTop: 10,
@@ -155,11 +165,10 @@ const styles = StyleSheet.create({
   },
   ticketIconWrapper: {
     paddingVertical: 20,
-    paddingHorizontal: 20,
+    paddingHorizontal: 23,
     borderWidth: 2,
     borderRadius: 12,
-    margin: -2,
-    borderStyle: 'dashed'
+    margin: -2
   },
   ticketNameWrapper: {
     flex: 1,

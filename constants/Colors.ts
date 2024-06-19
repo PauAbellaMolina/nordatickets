@@ -14,6 +14,7 @@ export default {
     cartContainerBackgroundContrast: '#7761C4',
     cartContainerButtonBackground: '#613AC5',
     separatorBackgroundColor: '#0000001A',
+    contrastSeparatorBackgroundColor: '#00000040',
     inputBackgroundColor: '#E8E8E8BF',
     inputBorderColor: '#20222833'
   },
@@ -32,6 +33,7 @@ export default {
     cartContainerBackgroundContrast: '#CDC2EE',
     cartContainerButtonBackground: '#613AC5',
     separatorBackgroundColor: '#FFFFFF1A',
+    contrastSeparatorBackgroundColor: '#00000040',
     inputBackgroundColor: '#181818BF',
     inputBorderColor: '#FCFCFC33'
   },
