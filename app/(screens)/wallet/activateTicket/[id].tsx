@@ -27,7 +27,6 @@ export default function ActivateTicketScreen() {
     if (!user) return;
     let unmounted = false;
     fetchWalletTickets(unmounted);
-    fetchAddonWalletTickets(unmounted);
 
     return () => {
       unmounted = true;
@@ -105,17 +104,15 @@ export default function ActivateTicketScreen() {
         if (unmounted || error || !event) return;
         setEventName(event.name);
       });
-    });
-  };
 
-  const fetchAddonWalletTickets = (unmounted: boolean) => {
-    supabase.from('wallet_tickets').select().eq('user_id', user.id).eq('is_addon', true).is('used_at', null).limit(1).single()
-    .then(({ data: addon_wallet_ticket, error }) => {
-      if (unmounted || error) {
-        setAddonTicket(null);
-        return;
-      };
-      setAddonTicket(addon_wallet_ticket);
+      supabase.from('wallet_tickets').select().eq('event_id', wallet_ticket.event_id).eq('user_id', user.id).eq('is_addon', true).is('used_at', null).limit(1).single()
+      .then(({ data: addon_wallet_ticket, error }) => {
+        if (unmounted || error) {
+          setAddonTicket(null);
+          return;
+        };
+        setAddonTicket(addon_wallet_ticket);
+      });
     });
   };
 
