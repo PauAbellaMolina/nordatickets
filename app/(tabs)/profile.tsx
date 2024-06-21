@@ -131,7 +131,7 @@ export default function TabThreeScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingTop: 10,
-    paddingBottom: 5,
+    paddingBottom: 95,
     paddingHorizontal: 15,
     flex: 1,
     overflow: 'scroll'

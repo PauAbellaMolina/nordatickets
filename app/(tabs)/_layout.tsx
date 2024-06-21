@@ -13,11 +13,13 @@ export default function TabLayout() {
         tabBarActiveBackgroundColor: Colors[theme].tabIconActiveBackground,
         tabBarInactiveTintColor: Colors[theme].tabIconInactive,
         tabBarStyle: {
+          position: 'absolute',
           height: 65,
           borderRadius: 35,
           backgroundColor: Colors[theme].tabBarBackground,
           marginHorizontal: 20,
-          marginBottom: 25,
+          marginTop: 5,
+          marginBottom: 15,
           paddingBottom: 0
         },
         tabBarLabelStyle: {

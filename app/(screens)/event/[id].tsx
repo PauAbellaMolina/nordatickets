@@ -542,7 +542,7 @@ const styles = StyleSheet.create({
   cartContainer: {
     gap: 7,
     position: 'relative',
-    marginBottom: 25,
+    marginBottom: 15,
     alignSelf: 'center',
     width: '95%',
     paddingTop: 13,

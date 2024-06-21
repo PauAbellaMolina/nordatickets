@@ -70,10 +70,10 @@ export default function TabOneScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingTop: 10,
-    paddingBottom: 5,
+    paddingBottom: 95,
     paddingHorizontal: 15,
     flex: 1,
-    gap: 25
+    overflow: 'scroll'
   },
   header: {
     flexDirection: 'row',
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     color: '#8C90A3'
   },
   eventList: {
-    gap: 10
+    marginTop: 25
   },
   emptyList: {
     textAlign: 'center',
