@@ -16,6 +16,7 @@ export default function TabLayout() {
           position: 'absolute',
           height: 65,
           borderRadius: 35,
+          borderWidth: 0,
           backgroundColor: Colors[theme].tabBarBackground,
           marginHorizontal: 20,
           marginTop: 5,

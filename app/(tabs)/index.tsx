@@ -49,20 +49,21 @@ export default function TabOneScreen() {
           <Text style={styles.infoLabel}>{ i18n?.t('addEventByQrExplanation') }</Text>
         </View>
       </View>
-      { userEventIdsFollowing?.length ? <>
-        { !events ?
-          <ActivityIndicator style={{marginTop: '25%'}} size="large" />
-          :
-          <FlatList
-            style={styles.eventList}
-            data={events}
-            renderItem={renderItem}
-            ItemSeparatorComponent={() => <View style={{height: 10}} />}
-          />
+      <View style={styles.eventsContainer}>
+        { userEventIdsFollowing?.length ? <>
+          { !events ?
+            <ActivityIndicator style={{marginTop: '25%'}} size="large" />
+            :
+            <FlatList
+              data={events}
+              renderItem={renderItem}
+              ItemSeparatorComponent={() => <View style={{height: 10}} />}
+            />
+          }
+        </> : 
+          <Text style={styles.emptyList}>{ i18n?.t('noEventsInList') }</Text>
         }
-      </> : 
-        <Text style={styles.emptyList}>{ i18n?.t('noEventsInList') }</Text>
-      }
+      </View>
     </View>
   );
 }
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
     marginLeft: 2,
     color: '#8C90A3'
   },
-  eventList: {
+  eventsContainer: {
     marginTop: 25
   },
   emptyList: {
