@@ -18,8 +18,8 @@ export default function TabLayout() {
           borderRadius: 35,
           borderWidth: 0,
           backgroundColor: Colors[theme].tabBarBackground,
-          marginHorizontal: 20,
           marginTop: 5,
+          marginHorizontal: 15,
           marginBottom: 15,
           paddingBottom: 0
         },
