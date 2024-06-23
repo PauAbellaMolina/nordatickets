@@ -1,6 +1,5 @@
-import { Pressable, StyleSheet} from 'react-native';
+import { Pressable, StyleSheet, Platform } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Platform } from 'react-native';
 // import { WebView } from 'react-native-webview'; // Install package when adding support to ios and android
 import { View } from '../../../../components/Themed';
 import GoBackArrow from '../../../../components/GoBackArrow';

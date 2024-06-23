@@ -63,6 +63,7 @@ function RootLayoutNav() {
           <Stack.Screen name="(auth)/login" options={{ title: i18n?.t('logIn'), headerShown: false }} />
           <Stack.Screen name="(auth)/signup" options={{ title: i18n?.t('accountCreation'), headerShown: false }} />
           <Stack.Screen name="(auth)/terms" options={{ title: i18n?.t('termsAndPrivacy'), headerShown: false }} />
+          <Stack.Screen name="(screens)/age/index" options={{ title: 'Age', headerShown: false }} /> //TODO PAU new translation
           <Stack.Screen name="(screens)/event/[id]" options={{ title: i18n?.t('event'), headerShown: false }} />
           <Stack.Screen name="(screens)/event/paymentModal/index" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: i18n?.t('payment'), headerShown: false }} />
           <Stack.Screen name="(screens)/wallet/activateTicket/[id]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: i18n?.t('activateTicket'), headerShown: false }} />

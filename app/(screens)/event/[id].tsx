@@ -20,6 +20,7 @@ type Cart = CartItem[] | null;
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user, session, i18n, swapFollowingEventsChanged, theme } = useSupabase();
+  const [userIsMinor, setUserIsMinor] = useState<boolean>(undefined);
   const [cardNumber, setCardNumber] = useState<string>();
   const [expiryDate, setExpiryDate] = useState<string>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
@@ -42,6 +43,13 @@ export default function EventDetailScreen() {
       setEvent(event);
     });
 
+    supabase.from('users').select().eq('id', user?.id).single()
+    .then(({ data: user, error }) => {
+      if (error || !user) return;
+      const userBirthdate = new Date(user.birthdate);
+      setUserIsMinor(new Date(Date.now() - userBirthdate.getTime()).getUTCFullYear() - 1970 < 18);
+    });
+
     return () => {
       setCart(null);
       unmounted = true;
@@ -62,18 +70,26 @@ export default function EventDetailScreen() {
   }, [user, event, theme]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || userIsMinor === undefined) return;
     let unmounted = false;
-    supabase.from('event_tickets').select().eq('event_id', id as string).order('is_addon', { ascending: false }).order('name')
-    .then(({ data: event_tickets, error }) => {
-      if (unmounted || error || !event_tickets.length) return;
-      setEventTickets(event_tickets);
-    });
+    if (userIsMinor) {
+      supabase.from('event_tickets').select().eq('event_id', id as string).is('minor_restricted', false).order('is_addon', { ascending: false }).order('name')
+      .then(({ data: event_tickets, error }) => {
+        if (unmounted || error || !event_tickets.length) return;
+        setEventTickets(event_tickets);
+      });
+    } else {
+      supabase.from('event_tickets').select().eq('event_id', id as string).order('is_addon', { ascending: false }).order('name')
+      .then(({ data: event_tickets, error }) => {
+        if (unmounted || error || !event_tickets.length) return;
+        setEventTickets(event_tickets);
+      });
+    }
 
     return () => {
       unmounted = true;
     };
-  }, [user, event]);
+  }, [user, event, userIsMinor]);
 
   useEffect(() => {
     if (!user) return;
@@ -273,7 +289,7 @@ export default function EventDetailScreen() {
 
   return (
     <View style={[styles.container, !event ? { justifyContent: 'center' } : null]}>
-      { !event ? <>
+      { !event || userIsMinor === undefined ? <>
         <ActivityIndicator size="large" />
       </> : <>
         <View style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor, paddingBottom: event.more_info_content ? 40 : 10}]}>

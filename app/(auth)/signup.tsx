@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   wrapper: {
     paddingVertical: 30,

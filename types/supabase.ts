@@ -244,6 +244,7 @@ export type Database = {
       }
       users: {
         Row: {
+          birthdate: string | null
           card_number: string | null
           created_at: string
           event_ids_following: number[] | null
@@ -251,6 +252,7 @@ export type Database = {
           id: string
         }
         Insert: {
+          birthdate?: string | null
           card_number?: string | null
           created_at?: string
           event_ids_following?: number[] | null
@@ -258,6 +260,7 @@ export type Database = {
           id: string
         }
         Update: {
+          birthdate?: string | null
           card_number?: string | null
           created_at?: string
           event_ids_following?: number[] | null
