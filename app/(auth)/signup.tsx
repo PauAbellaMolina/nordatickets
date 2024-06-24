@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, TextInput, ActivityIndicator, Pressable, ScrollView } from "react-native";
+import { StyleSheet, TextInput, ActivityIndicator, Pressable, ScrollView, Platform } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
 import Checkbox from 'expo-checkbox';
 import Colors from "../../constants/Colors";
@@ -14,6 +14,7 @@ export default function Signup() {
   const { signInWithOTP, verifyOTP, i18n, theme } = useSupabase();
   const params = useGlobalSearchParams();
 
+  const [birthdate, setBirthdate] = useState<string>(null);
   const [termsChecked, setTermsChecked] = useState(false);
   const [email, setEmail] = useState<string>('');
   const [emailSent, setEmailSent] = useState<boolean>(false);
@@ -37,7 +38,7 @@ export default function Signup() {
       email: email,
       options: {
         shouldCreateUser: true,
-        data: langMetaData
+        data: {emailData: langMetaData, birthdate: birthdate}
       }
     })
     .then(() => {
@@ -96,6 +97,12 @@ export default function Signup() {
               placeholder={ i18n?.t('email') }
               onChangeText={setEmail}
             />
+            { Platform.OS === 'web' ?
+              <View style={styles.datepickerWrapper}>
+                <Text style={styles.datepickerTitle}>{ i18n?.t('birthdate') }:</Text>
+                <input style={theme === 'light' ? styles.datepickerLight : styles.datepickerDark} type="date" id="birthday" name="birthday" value={birthdate || ''} onChange={(e) => setBirthdate(e.target.value)} />
+              </View>
+            : null } {/* native date picker not implemented */}
             <View style={styles.acceptTerms}>
               <View style={styles.acceptTermsCheckbox}>
                 <Checkbox
@@ -104,7 +111,7 @@ export default function Signup() {
                   onValueChange={setTermsChecked}
                 />
                 {/* can define checked color like this above: color={termsChecked ? '#613AC5' : undefined} */}
-                <Text>{ i18n?.t('haveReadAndAcceptTermsAndPrivacy') }</Text>
+                <Text style={styles.acceptTermsCheckboxText}>{ i18n?.t('haveReadAndAcceptTermsAndPrivacy') }</Text>
               </View>
               <Pressable onPress={onGoToTerms}><Text style={styles.termsActionLink}>{ i18n?.t('termsAndPrivacy') }</Text></Pressable>
             </View>
@@ -137,9 +144,9 @@ export default function Signup() {
               <>
                 { !emailSent ?
                   <Pressable
-                    disabled={!email.includes('@') || !termsChecked}
+                    disabled={!email.includes('@') || !termsChecked || !birthdate}
                     onPress={onEmailSignUp}
-                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') || !termsChecked ? 0.5 : 1}]}
+                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') || !termsChecked || !birthdate ? 0.5 : 1}]}
                   >
                     <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('send') }</Text>
                   </Pressable>
@@ -178,7 +185,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 20,
+    gap: 15,
     maxWidth: 500,
     width: '100%'
   },
@@ -192,21 +199,56 @@ const styles = StyleSheet.create({
     maxWidth: 300,
     opacity: 0.7
   },
+  datepickerWrapper: {
+    width: '100%',
+    maxWidth: 300,
+    gap: 2
+  },
+  datepickerTitle: {
+    fontSize: 16,
+    opacity: 0.7,
+    marginHorizontal: 10
+  },
+  datepickerLight: {
+    fontSize: 16,
+    padding: 10,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    backgroundColor: '#E8E8E8BF',
+    borderColor: '#20222833',
+    color: '#202228'
+  },
+  datepickerDark: {
+    fontSize: 16,
+    padding: 11.25,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    backgroundColor: '#181818BF',
+    borderColor: '#FCFCFC33',
+    color: '#FCFCFC'
+  },
   acceptTerms: {
+    maxWidth: 290,
     display: 'flex',
     flexDirection: 'column',
     gap: 5,
-    marginBottom: 10
+    marginTop: 5,
+    marginBottom: 7
   },
   acceptTermsCheckbox: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10
+    gap: 7
   },
   acceptTermsCheckboxInput: {
-    width: 21,
-    height: 21
+    width: 19,
+    height: 19
+  },
+  acceptTermsCheckboxText: {
+    fontSize: 13.5
   },
   termsActionLink: {
     fontSize: 16,
@@ -224,7 +266,7 @@ const styles = StyleSheet.create({
     maxWidth: 250
   },
   inputContainer: {
-    marginTop: 20,
+    marginTop: 10,
     alignItems: 'center',
     width: '100%',
     gap: 15

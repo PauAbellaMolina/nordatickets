@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 20,
+    gap: 15,
     maxWidth: 500,
     width: '100%'
   },
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     maxWidth: 250
   },
   inputContainer: {
-    marginTop: 20,
+    marginTop: 10,
     alignItems: 'center',
     width: '100%',
     gap: 15

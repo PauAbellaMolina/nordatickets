@@ -33,6 +33,7 @@ export const ca: { [key: string]: string } = {
   logIn: 'Iniciar sessió',
   logOut: 'Tancar sessió',
   email: 'Correu electrònic',
+  birthdate: 'Data de naixement',
   oneTimeCode: 'Codi d\'un sol ús',
   emailCodeExplanation: 'T\'enviarem un codi de 6 dígits al correu electrònic',
   send: 'Enviar',

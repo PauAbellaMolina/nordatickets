@@ -172,21 +172,11 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
       }
     }
 
-    if (user && segments[0] !== "(auth)") {
-      supabase.from('users').select().eq('id', user?.id).single()
-      .then(({ data: user, error }) => {
-        if (error || !user) return;
-        if (!user.birthdate) {
-          router.replace("/age");
-        }
-      });
-    }
-
     //this should be commented out so that we can go to /something (/event/:id) and not be redirected to / (tab 1 index)
     // else if (session && segments !== "(app)") {
     //   router.replace("/");
     // }
-  }, [initialized, session, segments, user]);
+  }, [initialized, session, segments]);
 
   return (
     <SupabaseContext.Provider

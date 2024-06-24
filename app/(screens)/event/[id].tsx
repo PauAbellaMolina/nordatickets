@@ -36,18 +36,18 @@ export default function EventDetailScreen() {
 
   useEffect(() => {
     if (!user) return;
+    if (user.user_metadata?.birthdate) {
+      const userBirthdate = new Date(user.user_metadata.birthdate);
+      setUserIsMinor(new Date(Date.now() - userBirthdate.getTime()).getUTCFullYear() - 1970 < 18);
+    } else {
+      setUserIsMinor(true); //TODO PAU should we set the fallback to be true or false?
+    }
+
     let unmounted = false;
     supabase.from('events').select().eq('id', id as string).single()
     .then(({ data: event, error }) => {
       if (unmounted || error || !event) return;
       setEvent(event);
-    });
-
-    supabase.from('users').select().eq('id', user?.id).single()
-    .then(({ data: user, error }) => {
-      if (error || !user) return;
-      const userBirthdate = new Date(user.birthdate);
-      setUserIsMinor(new Date(Date.now() - userBirthdate.getTime()).getUTCFullYear() - 1970 < 18);
     });
 
     return () => {

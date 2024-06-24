@@ -33,6 +33,7 @@ export const en: { [key: string]: string } = {
   logIn: 'Log in',
   logOut: 'Log out',
   email: 'Email',
+  birthdate: 'Date of birth',
   oneTimeCode: 'One-time code',
   emailCodeExplanation: 'We will send a 6-digit code to your email',
   send: 'Send',

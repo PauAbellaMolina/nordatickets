@@ -33,6 +33,7 @@ export const es: { [key: string]: string } = {
   logIn: 'Iniciar sesión',
   logOut: 'Cerrar sesión',
   email: 'Correo electrónico',
+  birthdate: 'Fecha de nacimiento',
   oneTimeCode: 'Código de un solo uso',
   emailCodeExplanation: 'Te enviaremos un código de 6 dígitos al correo electrónico',
   send: 'Enviar',
