@@ -41,12 +41,12 @@ export type Database = {
           created_at: string
           event_id: number | null
           id: number
-          is_addon: boolean
           iva: number
           minor_restricted: boolean
           name: string | null
           price: number | null
           selling: boolean | null
+          type: Database["public"]["Enums"]["event_ticket_type"] | null
         }
         Insert: {
           color_code_dark?: string | null
@@ -54,12 +54,12 @@ export type Database = {
           created_at?: string
           event_id?: number | null
           id?: number
-          is_addon?: boolean
           iva?: number
           minor_restricted?: boolean
           name?: string | null
           price?: number | null
           selling?: boolean | null
+          type?: Database["public"]["Enums"]["event_ticket_type"] | null
         }
         Update: {
           color_code_dark?: string | null
@@ -67,12 +67,12 @@ export type Database = {
           created_at?: string
           event_id?: number | null
           id?: number
-          is_addon?: boolean
           iva?: number
           minor_restricted?: boolean
           name?: string | null
           price?: number | null
           selling?: boolean | null
+          type?: Database["public"]["Enums"]["event_ticket_type"] | null
         }
         Relationships: [
           {
@@ -205,7 +205,9 @@ export type Database = {
           event_id: number | null
           id: number
           order_id: string | null
-          order_status: string | null
+          order_status:
+            | Database["public"]["Enums"]["redsys_order_status"]
+            | null
           user_id: string | null
         }
         Insert: {
@@ -215,7 +217,9 @@ export type Database = {
           event_id?: number | null
           id?: number
           order_id?: string | null
-          order_status?: string | null
+          order_status?:
+            | Database["public"]["Enums"]["redsys_order_status"]
+            | null
           user_id?: string | null
         }
         Update: {
@@ -225,7 +229,9 @@ export type Database = {
           event_id?: number | null
           id?: number
           order_id?: string | null
-          order_status?: string | null
+          order_status?:
+            | Database["public"]["Enums"]["redsys_order_status"]
+            | null
           user_id?: string | null
         }
         Relationships: [
@@ -284,11 +290,12 @@ export type Database = {
           event_tickets_id: number | null
           event_tickets_name: string | null
           id: number
-          is_addon: boolean
           iva: number
           order_id: string | null
           price: number | null
+          type: Database["public"]["Enums"]["event_ticket_type"] | null
           used_at: string | null
+          used_with_addon_id: number | null
           user_id: string | null
         }
         Insert: {
@@ -297,11 +304,12 @@ export type Database = {
           event_tickets_id?: number | null
           event_tickets_name?: string | null
           id?: number
-          is_addon?: boolean
           iva?: number
           order_id?: string | null
           price?: number | null
+          type?: Database["public"]["Enums"]["event_ticket_type"] | null
           used_at?: string | null
+          used_with_addon_id?: number | null
           user_id?: string | null
         }
         Update: {
@@ -310,11 +318,12 @@ export type Database = {
           event_tickets_id?: number | null
           event_tickets_name?: string | null
           id?: number
-          is_addon?: boolean
           iva?: number
           order_id?: string | null
           price?: number | null
+          type?: Database["public"]["Enums"]["event_ticket_type"] | null
           used_at?: string | null
+          used_with_addon_id?: number | null
           user_id?: string | null
         }
         Relationships: [
@@ -386,7 +395,11 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      event_ticket_type: "ADDON" | "ADDON_REFUNDABLE"
+      redsys_order_status:
+        | "PAYMENT_PENDING"
+        | "PAYMENT_SUCCEEDED"
+        | "PAYMENT_FAILED"
     }
     CompositeTypes: {
       [_ in never]: never

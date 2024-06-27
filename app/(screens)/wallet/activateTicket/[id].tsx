@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet} from 'react-native';
+import { ActivityIndicator, Platform, Pressable, StyleSheet} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import Colors from '../../../../constants/Colors';
 import { Text, View } from '../../../../components/Themed';
@@ -71,52 +71,86 @@ export default function ActivateTicketScreen() {
     setTicketUsedTimeAgo(timeAgo.trim());
   };
 
-
   const fetchWalletTickets = (unmounted: boolean) => {
     supabase.from('wallet_tickets').select().eq('id', id).single()
     .then(({ data: wallet_ticket, error }) => {
       if (error || !wallet_ticket) return;
-      setTicketName(wallet_ticket.event_tickets_name);
-      setTicketUsedAt(wallet_ticket.used_at);
 
-      supabase.from('event_tickets').select().eq('id', wallet_ticket.event_tickets_id)
-      .then(({ data: event_tickets, error }) => {
-        if (unmounted || error || !event_tickets.length) return;
-        if ((theme === 'dark' && !event_tickets[0]?.color_code_dark) || (theme === 'light' && !event_tickets[0]?.color_code_light)) {
-          setEventBackgroundColor(getThemeRandomColor(theme));
-          setDarkEventBackgroundColor(getThemeRandomColor('dark'));
-          setLightEventBackgroundColor(getThemeRandomColor('light'));
+      supabase.from('redsys_orders').select().eq('order_id', wallet_ticket.order_id).single()
+      .then(({ data: redsys_order, error }) => {
+        if (error || !redsys_order) return;
+        if (redsys_order.order_status === 'PAYMENT_PENDING') {
+          router.navigate('/(tabs)/wallet');
           return;
-        };
-
-        setDarkEventBackgroundColor(event_tickets[0]?.color_code_dark ? event_tickets[0].color_code_dark : getThemeRandomColor('dark'));
-        setLightEventBackgroundColor(event_tickets[0]?.color_code_light ? event_tickets[0].color_code_light : getThemeRandomColor('light'));
-
-        if (theme === 'dark') {
-          setEventBackgroundColor(event_tickets[0].color_code_dark);
-        } else {
-          setEventBackgroundColor(event_tickets[0].color_code_light);
         }
-      });
-      
-      supabase.from('events').select().eq('id', wallet_ticket.event_id).single()
-      .then(({ data: event, error }) => {
-        if (unmounted || error || !event) return;
-        setEventName(event.name);
-      });
 
-      supabase.from('wallet_tickets').select().eq('event_id', wallet_ticket.event_id).eq('user_id', user.id).eq('is_addon', true).is('used_at', null).limit(1).single()
-      .then(({ data: addon_wallet_ticket, error }) => {
-        if (unmounted || error) {
-          setAddonTicket(null);
+        if (wallet_ticket.type === 'ADDON' || wallet_ticket.type === 'ADDON_REFUNDABLE') {
+          router.navigate('/(tabs)/wallet');
           return;
-        };
-        setAddonTicket(addon_wallet_ticket);
+        }
+  
+        setTicketName(wallet_ticket.event_tickets_name);
+        setTicketUsedAt(wallet_ticket.used_at);
+  
+        supabase.from('event_tickets').select().eq('id', wallet_ticket.event_tickets_id)
+        .then(({ data: event_tickets, error }) => {
+          if (unmounted || error || !event_tickets.length) return;
+          if ((theme === 'dark' && !event_tickets[0]?.color_code_dark) || (theme === 'light' && !event_tickets[0]?.color_code_light)) {
+            setEventBackgroundColor(getThemeRandomColor(theme));
+            setDarkEventBackgroundColor(getThemeRandomColor('dark'));
+            setLightEventBackgroundColor(getThemeRandomColor('light'));
+            return;
+          };
+  
+          setDarkEventBackgroundColor(event_tickets[0]?.color_code_dark ? event_tickets[0].color_code_dark : getThemeRandomColor('dark'));
+          setLightEventBackgroundColor(event_tickets[0]?.color_code_light ? event_tickets[0].color_code_light : getThemeRandomColor('light'));
+  
+          if (theme === 'dark') {
+            setEventBackgroundColor(event_tickets[0].color_code_dark);
+          } else {
+            setEventBackgroundColor(event_tickets[0].color_code_light);
+          }
+        });
+        
+        supabase.from('events').select().eq('id', wallet_ticket.event_id).single()
+        .then(({ data: event, error }) => {
+          if (unmounted || error || !event) return;
+          setEventName(event.name);
+        });
+  
+        if (wallet_ticket.used_at === null) {
+          supabase.from('wallet_tickets').select().eq('event_id', wallet_ticket.event_id).eq('user_id', user.id).in('type', ['ADDON', 'ADDON_REFUNDABLE']).is('used_at', null)
+          .then(async ({ data: addon_wallet_tickets, error }) => {
+            if (unmounted || error || !addon_wallet_tickets.length) {
+              setAddonTicket(null);
+              return;
+            };
+            for (let i = 0; i < addon_wallet_tickets.length; i++) {
+              const { data: addon_redsys_order, error } = await supabase.from('redsys_orders').select().eq('order_id', addon_wallet_tickets[i].order_id).single();
+              if (error || !addon_redsys_order) return false;
+              if (addon_redsys_order.order_status === 'PAYMENT_SUCCEEDED') {
+                setAddonTicket(addon_wallet_tickets[i]);
+                break;
+              }
+            }
+          });
+        } else if (wallet_ticket.used_with_addon_id) {
+          supabase.from('wallet_tickets').select().eq('id', wallet_ticket.used_with_addon_id).single()
+          .then(({ data: addon_wallet_ticket, error }) => {
+            if (unmounted || error) {
+              setAddonTicket(null);
+              return;
+            };
+            setAddonTicket(addon_wallet_ticket);
+          });
+        } else {
+          setAddonTicket(null);
+        }
       });
     });
   };
 
-  const deactivateTicket = async () => {
+  const onDeactivateTicket = async () => {
     if (loading) {
       return;
     }
@@ -125,33 +159,29 @@ export default function ActivateTicketScreen() {
       if (!window.confirm(i18n?.t('deactivateTicketConfirmationQuestion'))) {
         return;
       }
-    } else {
-      const AsyncAlert = async () => new Promise<boolean>((resolve) => {
-        Alert.prompt(
-          i18n?.t('deactivateTicket'),
-          i18n?.t('deactivateTicketConfirmationQuestion'),
-          [
-            {
-              text: "No",
-              onPress: () => {
-                resolve(true);
-              },
-              style: "cancel"
-            },
-            {
-              text: i18n?.t('yesDeactivate'),
-              onPress: () => {
-                resolve(false);
-              }
-            }
-          ],
-          "default"
-        );
-      });
-      if (await AsyncAlert()) {
-        return;
-      };
-    }
+    } 
+    // else { //Uncomment if on mobile and import Alert from react-native
+    //   const AsyncAlert = async () => new Promise<boolean>((resolve) => {
+    //     Alert.prompt(i18n?.t('deactivateTicket'), i18n?.t('deactivateTicketConfirmationQuestion'),
+    //       [{
+    //         text: "No",
+    //         onPress: () => {
+    //           resolve(true);
+    //         },
+    //         style: "cancel"
+    //       },
+    //       {
+    //         text: i18n?.t('yesDeactivate'),
+    //         onPress: () => {
+    //           resolve(false);
+    //         }
+    //       }],
+    //       "default");
+    //   });
+    //   if (await AsyncAlert()) {
+    //     return;
+    //   };
+    // }
 
     setLoading(true);
     if (addonTicket) {
@@ -169,7 +199,7 @@ export default function ActivateTicketScreen() {
   };
 
   const deactivateWalletTicket = () => {
-    supabase.from('wallet_tickets').update({ used_at: new Date().toISOString() }).eq('id', id).select().single()
+    supabase.from('wallet_tickets').update({ used_at: new Date().toISOString(), used_with_addon_id: addonTicket ? addonTicket.id : null }).eq('id', id).select().single()
     .then(({ data: wallet_ticket, error }) => {
       if (error || !wallet_ticket) return;
       setTicketUsedAt(wallet_ticket.used_at);
@@ -198,7 +228,7 @@ export default function ActivateTicketScreen() {
                   </View>
                   <View style={styles.addonTicketNameWrapper}>
                     <Text style={[styles.addonTicketName, {color: Colors['light'].text}]} numberOfLines={1}>{addonTicket.event_tickets_name}</Text>
-                    <Text style={[styles.addonTicketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ i18n?.t('activateTicketRefundableAddonExplanation') }</Text>
+                    <Text style={[styles.addonTicketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ addonTicket.type === 'ADDON_REFUNDABLE' ? i18n?.t('activateTicketRefundableAddonExplanation') : i18n?.t('activateTicketNonRefundableAddonExplanation') }</Text>
                   </View>
                 </View>
               </View>
@@ -232,11 +262,11 @@ export default function ActivateTicketScreen() {
         </View>
         <View style={styles.actionsContainer}>
           { Platform.OS === 'web' ? <>
-            <Pressable disabled={loading} onPress={() => router.back()} style={[styles.button, loading ? {opacity: .7} : {}, {height: '100%', flex: 1, justifyContent: 'center'}, {backgroundColor: eventBackgroundColor}]}>
+            <Pressable disabled={loading} onPress={() => router.navigate('/(tabs)/wallet')} style={[styles.button, loading ? {opacity: .7} : {}, {height: '100%', flex: 1, justifyContent: 'center'}, {backgroundColor: eventBackgroundColor}]}>
               <FeatherIcon name="arrow-left" size={38} color={Colors[theme].text} />
             </Pressable>
           </> : <></> }
-          <Pressable disabled={ticketUsedAt === undefined || ticketUsedAt != null} onPress={deactivateTicket} style={[styles.button, ticketUsedAt === undefined || ticketUsedAt != null ? {opacity: .7} : {}, {backgroundColor: eventBackgroundColor}]}>
+          <Pressable disabled={ticketUsedAt === undefined || ticketUsedAt != null} onPress={onDeactivateTicket} style={[styles.button, ticketUsedAt === undefined || ticketUsedAt != null ? {opacity: .7} : {}, {backgroundColor: eventBackgroundColor}]}>
             {loading ?
               <ActivityIndicator style={styles.buttonLoading} size="large" />
             :

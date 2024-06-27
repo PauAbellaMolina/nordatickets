@@ -49,7 +49,7 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
   );
 
   const renderItem = useCallback(({item}: {item: WalletTicket}) => {
-    if (item.is_addon) {
+    if (item.type === 'ADDON' || item.type === 'ADDON_REFUNDABLE') {
       return <WalletTicketAddonCardComponent walletTicket={item} />;
     }
     return <WalletTicketCardComponent walletTicket={item} />;

@@ -70,16 +70,16 @@ export default function EventDetailScreen() {
   }, [user, event, theme]);
 
   useEffect(() => {
-    if (!user || userIsMinor === undefined) return;
+    if (!user || userIsMinor === undefined || !event) return;
     let unmounted = false;
     if (userIsMinor) {
-      supabase.from('event_tickets').select().eq('event_id', id as string).is('minor_restricted', false).order('is_addon', { ascending: false }).order('name')
+      supabase.from('event_tickets').select().eq('event_id', id as string).is('minor_restricted', false).order('type', { ascending: true }).order('name')
       .then(({ data: event_tickets, error }) => {
         if (unmounted || error || !event_tickets.length) return;
         setEventTickets(event_tickets);
       });
     } else {
-      supabase.from('event_tickets').select().eq('event_id', id as string).order('is_addon', { ascending: false }).order('name')
+      supabase.from('event_tickets').select().eq('event_id', id as string).order('type', { ascending: true }).order('name')
       .then(({ data: event_tickets, error }) => {
         if (unmounted || error || !event_tickets.length) return;
         setEventTickets(event_tickets);
@@ -218,7 +218,7 @@ export default function EventDetailScreen() {
     used_at: WalletTicket['used_at'];
     user_id: WalletTicket['user_id'];
     iva: WalletTicket['iva'];
-    is_addon: WalletTicket['is_addon'];
+    type: WalletTicket['type'];
   };
 
   const addPendingTicketsToUser = (orderId: string) => {
@@ -228,7 +228,7 @@ export default function EventDetailScreen() {
 
     cart.forEach((cartItem) => {
       for (let i = 0; i < cartItem.quantity; i++) {
-        const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, event_tickets_name: cartItem.eventTicket.name, order_id: orderId, price: cartItem.eventTicket.price, used_at: null, user_id: user.id, iva: cartItem.eventTicket.iva, is_addon: cartItem.eventTicket.is_addon };
+        const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, event_tickets_name: cartItem.eventTicket.name, order_id: orderId, price: cartItem.eventTicket.price, used_at: null, user_id: user.id, iva: cartItem.eventTicket.iva, type: cartItem.eventTicket.type };
         supabase.from('wallet_tickets').insert(ticketToInsert)
         .select().then();
       }
@@ -277,14 +277,14 @@ export default function EventDetailScreen() {
   };
 
   const renderItemTickets = useCallback(({item}: {item: EventTicket}) => {
-    if (item.is_addon) {
+    if (item.type === "ADDON" || item.type === "ADDON_REFUNDABLE") {
       return <EventAddonTicketCardComponent ticket={item} eventSelling={event?.selling} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} />;
     }
     return <EventTicketCardComponent ticket={item} eventSelling={event?.selling} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} />;
   }, [cart, event]);
 
   const renderItemCartTicket = useCallback(({item}: {item: CartItem}) => (
-    <Text style={styles.cartItemsList}>{ item.eventTicket.is_addon ? null : item.quantity + '  -  ' }{item.eventTicket.name} · {item.eventTicket.price/100}€</Text>
+    <Text style={styles.cartItemsList}>{ (item.eventTicket.type === "ADDON" || item.eventTicket.type === "ADDON_REFUNDABLE") ? null : item.quantity + '  -  ' }{item.eventTicket.name} · {item.eventTicket.price/100}€</Text>
   ), []);
 
   return (

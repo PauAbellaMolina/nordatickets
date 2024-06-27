@@ -38,7 +38,7 @@ export default function Welcome() {
 
   return (
     <BlobsBackground style={styles.container}>
-      { theme === 'dark' ? <TiktDark width={175} height={175} /> : <TiktLight width={175} height={175} /> }
+      { theme === 'dark' ? <TiktDark width={165} height={165} /> : <TiktLight width={165} height={165} /> }
       <View style={styles.buttonsContainer}>
         <Pressable onPress={onGoToSignUp} style={[styles.button, {backgroundColor: Colors[theme].text}]}>
           <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('createAccount') }</Text>

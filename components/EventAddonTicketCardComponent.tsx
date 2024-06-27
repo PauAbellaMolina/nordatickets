@@ -38,7 +38,7 @@ export default function EventAddonTicketCardComponent({ticket, eventSelling, qua
             <ScrollView horizontal>
               <Text style={styles.ticketName}>{ticket.name} · {ticket.price/100}€</Text>
             </ScrollView>
-            <Text style={styles.ticketSubtitle}>{ i18n?.t('eventTicketRefundableAddonExplanation') }</Text>
+            <Text style={styles.ticketSubtitle}>{ ticket.type === 'ADDON_REFUNDABLE' ? i18n?.t('eventTicketRefundableAddonExplanation') : i18n?.t('eventTicketNonRefundableAddonExplanation') }</Text>
           </View>
         </View>
         <View style={styles.ticketActions}>

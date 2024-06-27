@@ -1,35 +1,27 @@
 import { FlatList, StyleSheet } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import WalletEventCardComponent from '../../components/WalletEventCardComponent';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { supabase } from "../../supabase";
 import { useSupabase } from '../../context/SupabaseProvider';
 import { WalletTicket } from '../../types/supabaseplain';
-import { RealtimeChannel } from '@supabase/realtime-js';
 import { useFocusEffect } from 'expo-router';
 
 export default function TabTwoScreen() {
   const { user, i18n } = useSupabase();
   const [eventGroupedWalletTickets, setEventGroupedWalletTickets] = useState<WalletTicket[][]>([]);
 
-  // let listenWalletTicketsChannel = useRef<RealtimeChannel>();
-
   let triggerNextFocus = useRef<boolean>(true);
 
-  useFocusEffect( //TODO PAU test this change deeply
+  useFocusEffect(
     useCallback(() => {
       if (triggerNextFocus.current) {
         if (!user) return;
         fetchWalletTickets();
-        // subscribeWalletTickets(); //TODO PAU make super sure we don't need to subscribe for any use case and then remove the subscription code (commented out for now). If needed, activate wallet_tickets table realtime on supabase back on again.
       }
 
       return () => {
         triggerNextFocus.current = false;
-        // if (listenWalletTicketsChannel.current) {
-        //   supabase.removeChannel(listenWalletTicketsChannel.current);
-        //   listenWalletTicketsChannel.current = null;
-        // }
         setTimeout(() => {
           triggerNextFocus.current = true;
         }, 3000); //This is to prevent fetching every time we focus, just fetching when focused and after every 8 seconds
@@ -38,7 +30,7 @@ export default function TabTwoScreen() {
   );
 
   const fetchWalletTickets = () => {
-    supabase.from('wallet_tickets').select().eq('user_id', user.id).is('used_at', null).order('is_addon', { ascending: false })
+    supabase.from('wallet_tickets').select().eq('user_id', user.id).is('used_at', null).order('type', { ascending: true })
     .then(({ data: wallet_tickets, error }) => {
       if (error) return;
       const eventGroupedWalletTickets: WalletTicket[][] = 
@@ -55,22 +47,6 @@ export default function TabTwoScreen() {
       setEventGroupedWalletTickets(eventGroupedWalletTickets);
     });
   };
-
-  // const subscribeWalletTickets = () => {
-  //   const walletTicketsChannel = supabase
-  //   .channel('wallet_tickets')
-  //   .on('postgres_changes',
-  //     {
-  //       event: '*',
-  //       schema: 'public',
-  //       table: 'wallet_tickets',
-  //       filter: `user_id=eq.${user.id}`
-  //     },
-  //     (payload) => fetchWalletTickets())
-  //   .subscribe();
-
-  //   listenWalletTicketsChannel.current = walletTicketsChannel
-  // };
 
   const renderItem = useCallback(({item}: {item: WalletTicket[]}) => (
     <WalletEventCardComponent eventWalletTickets={item} />

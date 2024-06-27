@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
-import { router, useFocusEffect } from 'expo-router';
+import { StyleSheet } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { EntypoIcon, FontAwesomeIcon } from './CustomIcons';
@@ -42,21 +42,21 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
 
   const fetchTicketOrderStatus = () => {
     supabase.from('redsys_orders').select().eq('order_id', walletTicket.order_id).single()
-    .then(({ data: redsysOrder, error }) => {
+    .then(({ data: redsys_order, error }) => {
       if (error) return;
       if (insertsRedsysOrdersChannel.current) {
         supabase.removeChannel(insertsRedsysOrdersChannel.current);
         insertsRedsysOrdersChannel.current = null;
       }
-      if (!redsysOrder) {
+      if (!redsys_order) {
         subscribeRedsysOrdersInserts();
         return;
       }
-      const status = redsysOrder.order_status;
+      const status = redsys_order.order_status;
       setEventTicketOrderStatus(status);
       const createdAt = new Date(walletTicket.created_at);
       const fiveSecondsAgo = new Date(new Date().getTime() - 5000);
-      if (status === 'PENDING_PAYMENT' && createdAt > fiveSecondsAgo) {
+      if (status === 'PAYMENT_PENDING' && createdAt > fiveSecondsAgo) {
         if (updatesRedsysOrdersChannel.current) {
           supabase.removeChannel(updatesRedsysOrdersChannel.current);
           updatesRedsysOrdersChannel.current = null;
@@ -64,7 +64,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
         setShouldDisplayPendingTicket(true);
         subscribeRedsysOrdersUpdates();
       }
-      if (updatesRedsysOrdersChannel.current && (redsysOrder.order_status === 'PAYMENT_SUCCEEDED' || redsysOrder.order_status === 'PAYMENT_FAILED')) {
+      if (updatesRedsysOrdersChannel.current && (redsys_order.order_status === 'PAYMENT_SUCCEEDED' || redsys_order.order_status === 'PAYMENT_FAILED')) {
         supabase.removeChannel(updatesRedsysOrdersChannel.current);
         updatesRedsysOrdersChannel.current = null;
       }
@@ -120,23 +120,16 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
     }, 5000);
   };
 
-  const onActivateTicket = () => {
-    if (eventTicketOrderStatus !== 'PAYMENT_SUCCEEDED') {
-      return;
-    }
-    router.navigate(`/wallet/activateTicket/${walletTicket.id}`);
-  };
-
   return (
-    <>{ walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEEDED' || (eventTicketOrderStatus === 'PENDING_PAYMENT')) ?
+    <>{ walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEEDED' || (eventTicketOrderStatus === 'PAYMENT_PENDING')) ?
       <View style={styles.wrapperContainer}>
-        <View style={[styles.singleTicketContainer, {opacity: eventTicketOrderStatus === 'PENDING_PAYMENT' ? .6 : 1 , backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
+        <View style={[styles.singleTicketContainer, {opacity: eventTicketOrderStatus === 'PAYMENT_PENDING' ? .6 : 1 , backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
           <View style={styles.ticketIconWrapper}>
             <EntypoIcon name="cup" size={30} color={Colors['light'].text} />
           </View>
           <View style={styles.ticketNameWrapper}>
             <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
-            <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ eventTicketOrderStatus === 'PENDING_PAYMENT' ? shouldDisplayPendingTicket ? i18n?.t('paymentProcessing')+'...' : i18n?.t('paymentFailed') : i18n?.t('walletTicketAddonExplanation') }</Text>
+            <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ eventTicketOrderStatus === 'PAYMENT_PENDING' ? shouldDisplayPendingTicket ? i18n?.t('paymentProcessing')+'...' : i18n?.t('paymentFailed') : i18n?.t('walletTicketAddonExplanation') }</Text>
           </View>
         </View>
         <View style={[styles.separator, {backgroundColor: Colors[theme].contrastSeparatorBackgroundColor}]} />

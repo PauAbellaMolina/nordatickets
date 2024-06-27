@@ -44,8 +44,8 @@ export default function TabThreeScreen() {
 
   const onDeleteUserCard = () => {
     supabase.rpc('delete_secret', { secret_name: user?.id })
-    .then(({ data: secretUuid, error }) => {
-      if (!error && secretUuid) {
+    .then(({ data: secret_uuid, error }) => {
+      if (!error && secret_uuid) {
         supabase.from('users')
         .update({
           card_number: null,
