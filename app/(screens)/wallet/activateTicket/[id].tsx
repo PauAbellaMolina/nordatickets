@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet} from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import Colors from '../../../../constants/Colors';
 import { Text, View } from '../../../../components/Themed';
-import { EntypoIcon, FeatherIcon } from '../../../../components/CustomIcons';
+import { EntypoIcon, FeatherIcon, FontAwesomeIcon } from '../../../../components/CustomIcons';
 import { supabase } from "../../../../supabase";
 import { useSupabase } from '../../../../context/SupabaseProvider';
 import { getThemeRandomColor } from '../../../../utils/chooseRandomColor';
@@ -74,7 +74,10 @@ export default function ActivateTicketScreen() {
   const fetchWalletTickets = (unmounted: boolean) => {
     supabase.from('wallet_tickets').select().eq('id', id).single()
     .then(({ data: wallet_ticket, error }) => {
-      if (error || !wallet_ticket) return;
+      if (error || !wallet_ticket) {
+        router.navigate('/(tabs)/wallet');
+        return;
+      };
 
       supabase.from('redsys_orders').select().eq('order_id', wallet_ticket.order_id).single()
       .then(({ data: redsys_order, error }) => {
@@ -125,13 +128,19 @@ export default function ActivateTicketScreen() {
               setAddonTicket(null);
               return;
             };
+
+            let didFindSucceededPayment = false;
             for (let i = 0; i < addon_wallet_tickets.length; i++) {
               const { data: addon_redsys_order, error } = await supabase.from('redsys_orders').select().eq('order_id', addon_wallet_tickets[i].order_id).single();
               if (error || !addon_redsys_order) return false;
               if (addon_redsys_order.order_status === 'PAYMENT_SUCCEEDED') {
+                didFindSucceededPayment = true;
                 setAddonTicket(addon_wallet_tickets[i]);
                 break;
               }
+            }
+            if (!didFindSucceededPayment) {
+              setAddonTicket(null);
             }
           });
         } else if (wallet_ticket.used_with_addon_id) {
@@ -206,6 +215,18 @@ export default function ActivateTicketScreen() {
       setLoading(false);
     });
   }
+
+  const scale = useRef(new Animated.Value(1));
+  const opacity = useRef(new Animated.Value(1));
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity.current, { toValue: .1, duration: 800, useNativeDriver: true }),
+        Animated.timing(opacity.current, { toValue: 1, duration: 750, useNativeDriver: true })
+      ])
+    ).start();
+  }, []);
   
   return (
     <View style={styles.container}>
@@ -215,6 +236,9 @@ export default function ActivateTicketScreen() {
       </> : <>
         <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
           <View style={styles.ticketInfoContainer}>
+            <Animated.View style={{ position: 'absolute', top: 0, transform: [{ scale: scale.current }], opacity: opacity.current }}>
+              <View style={[styles.pulseView, {backgroundColor: ticketUsedAt === undefined ? 'transparent' : ticketUsedAt != null ? '#ff3737' : '#3fde7a'}]} />
+            </Animated.View>
             <View style={[styles.ticketInfoTextsContainer, addonTicket ? {justifyContent: 'flex-end'} : {justifyContent: 'center'}]}>
               <Text style={styles.ticketName} numberOfLines={4}>{ ticketName }</Text>
               <Text style={styles.eventName}>{ eventName }</Text>
@@ -253,7 +277,7 @@ export default function ActivateTicketScreen() {
                     <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketAlreadyUsedExplanation') }</Text>
                   : <>
                     <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUsedTimeAgoExplanation') }</Text>
-                    <Text style={[styles.statusInfoText, {color: Colors['light'].text, fontWeight: 'bold'}]}>{ ticketUsedTimeAgo }</Text>
+                    <Text style={[styles.statusInfoTextTime, {color: Colors['light'].text}]}>{ ticketUsedTimeAgo }</Text>
                   </>}
                 </View>
               </>}</>
@@ -443,12 +467,28 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginHorizontal: 20
   },
+  pulseView: {
+    marginTop: 3,
+    marginLeft: 44,
+    position: 'absolute',
+    left: -200,
+    borderRadius: 45,
+    width: 25,
+    height: 25
+  },
   statusText: {
     fontSize: 30,
     fontWeight: 'bold'
   },
   statusInfoText: {
     fontSize: 15,
+    textAlign: 'center',
+    marginHorizontal: 7
+  },
+  statusInfoTextTime: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    lineHeight: 17.5,
     textAlign: 'center',
     marginHorizontal: 7
   },

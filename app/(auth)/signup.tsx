@@ -207,9 +207,10 @@ const styles = StyleSheet.create({
   datepickerTitle: {
     fontSize: 16,
     opacity: 0.7,
-    marginHorizontal: 10
+    marginHorizontal: 8
   },
   datepickerLight: {
+    minWidth: '90%',
     fontSize: 16,
     padding: 10,
     borderRadius: 15,
@@ -220,6 +221,7 @@ const styles = StyleSheet.create({
     color: '#202228'
   },
   datepickerDark: {
+    minWidth: '90%',
     fontSize: 16,
     padding: 11.25,
     borderRadius: 15,
