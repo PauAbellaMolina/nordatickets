@@ -21,12 +21,14 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
 
   useFocusEffect(
     useCallback(() => {
+      let unmounted = false;
       if (triggerNextFocus.current) {
         if (!walletTicket || walletTicket?.used_at != null) return;
-        fetchTicketOrderStatus();
+        fetchTicketOrderStatus(unmounted);
       }
 
       return () => {
+        unmounted = true;
         triggerNextFocus.current = false;
         if (insertsRedsysOrdersChannel.current) {
           supabase.removeChannel(insertsRedsysOrdersChannel.current);
@@ -40,10 +42,10 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
     }, [])
   );
 
-  const fetchTicketOrderStatus = () => {
+  const fetchTicketOrderStatus = (unmounted: boolean) => {
     supabase.from('redsys_orders').select().eq('order_id', walletTicket.order_id).single()
     .then(({ data: redsys_order, error }) => {
-      if (error) return;
+      if (unmounted || error) return;
       if (insertsRedsysOrdersChannel.current) {
         supabase.removeChannel(insertsRedsysOrdersChannel.current);
         insertsRedsysOrdersChannel.current = null;
@@ -81,7 +83,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
         table: 'redsys_orders',
         filter: `order_id=eq.${walletTicket.order_id}`
       },
-      (payload) => fetchTicketOrderStatus())
+      (payload) => fetchTicketOrderStatus(false))
     .subscribe();
 
     insertsRedsysOrdersChannel.current = redsysOrdersChannel;
@@ -105,7 +107,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
         table: 'redsys_orders',
         filter: `order_id=eq.${walletTicket.order_id}`
       },
-      (payload) => fetchTicketOrderStatus())
+      (payload) => fetchTicketOrderStatus(false))
     .subscribe();
 
     updatesRedsysOrdersChannel.current = redsysOrdersChannel;

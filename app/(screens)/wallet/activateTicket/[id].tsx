@@ -12,6 +12,7 @@ import { WalletTicket } from '../../../../types/supabaseplain';
 export default function ActivateTicketScreen() {
   const { i18n, user, theme } = useSupabase();
   const [loading, setLoading] = useState<boolean>(false);
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [lightEventBackgroundColor, setLightEventBackgroundColor] = useState<string>();
   const [darkEventBackgroundColor, setDarkEventBackgroundColor] = useState<string>();
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>();
@@ -163,35 +164,44 @@ export default function ActivateTicketScreen() {
     if (loading) {
       return;
     }
+    setShowConfirm(true);
 
-    if (Platform.OS === 'web') {
-      if (!window.confirm(i18n?.t('deactivateTicketConfirmationQuestion'))) {
-        return;
-      }
-    } 
-    // else { //Uncomment if on mobile and import Alert from react-native
-    //   const AsyncAlert = async () => new Promise<boolean>((resolve) => {
-    //     Alert.prompt(i18n?.t('deactivateTicket'), i18n?.t('deactivateTicketConfirmationQuestion'),
-    //       [{
-    //         text: "No",
-    //         onPress: () => {
-    //           resolve(true);
-    //         },
-    //         style: "cancel"
-    //       },
-    //       {
-    //         text: i18n?.t('yesDeactivate'),
-    //         onPress: () => {
-    //           resolve(false);
-    //         }
-    //       }],
-    //       "default");
-    //   });
-    //   if (await AsyncAlert()) {
+    // Native/Browser confirm dialog code (might not work just uncommenting it)
+    // if (Platform.OS === 'web') {
+    //   if (!window.confirm(i18n?.t('deactivateTicketConfirmationQuestion'))) {
     //     return;
-    //   };
-    // }
+    //   }
+    // } 
+    // // else { //Uncomment if on mobile and import Alert from react-native
+    // //   const AsyncAlert = async () => new Promise<boolean>((resolve) => {
+    // //     Alert.prompt(i18n?.t('deactivateTicket'), i18n?.t('deactivateTicketConfirmationQuestion'),
+    // //       [{
+    // //         text: "No",
+    // //         onPress: () => {
+    // //           resolve(true);
+    // //         },
+    // //         style: "cancel"
+    // //       },
+    // //       {
+    // //         text: i18n?.t('yesDeactivate'),
+    // //         onPress: () => {
+    // //           resolve(false);
+    // //         }
+    // //       }],
+    // //       "default");
+    // //   });
+    // //   if (await AsyncAlert()) {
+    // //     return;
+    // //   };
+    // // }
+  };
 
+  const onConfirmDeactivateTicket = async () => {
+    if (loading) {
+      return;
+    }
+
+    setShowConfirm(false);
     setLoading(true);
     if (addonTicket) {
       supabase.from('wallet_tickets').update({ used_at: new Date().toISOString() }).eq('id', addonTicket.id).select().single()
@@ -236,8 +246,8 @@ export default function ActivateTicketScreen() {
       </> : <>
         <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
           <View style={styles.ticketInfoContainer}>
-            <Animated.View style={{ position: 'absolute', top: 0, transform: [{ scale: scale.current }], opacity: opacity.current }}>
-              <View style={[styles.pulseView, {backgroundColor: ticketUsedAt === undefined ? 'transparent' : ticketUsedAt != null ? '#ff3737' : '#3fde7a'}]} />
+            <Animated.View style={[styles.pulseContainer, {transform: [{ scale: scale.current }], opacity: opacity.current }]}>
+              <View style={[styles.pulseDot, {backgroundColor: ticketUsedAt === undefined ? 'transparent' : ticketUsedAt != null ? '#ff3737' : '#3fde7a'}]} />
             </Animated.View>
             <View style={[styles.ticketInfoTextsContainer, addonTicket ? {justifyContent: 'flex-end'} : {justifyContent: 'center'}]}>
               <Text style={styles.ticketName} numberOfLines={4}>{ ticketName }</Text>
@@ -284,20 +294,32 @@ export default function ActivateTicketScreen() {
             }
           </View>
         </View>
-        <View style={styles.actionsContainer}>
-          { Platform.OS === 'web' ? <>
+        { !showConfirm ? <>
+          <View style={styles.actionsButtonsContainer}>
             <Pressable disabled={loading} onPress={() => router.navigate('/(tabs)/wallet')} style={[styles.button, loading ? {opacity: .7} : {}, {height: '100%', flex: 1, justifyContent: 'center'}, {backgroundColor: eventBackgroundColor}]}>
               <FeatherIcon name="arrow-left" size={38} color={Colors[theme].text} />
             </Pressable>
-          </> : <></> }
-          <Pressable disabled={ticketUsedAt === undefined || ticketUsedAt != null} onPress={onDeactivateTicket} style={[styles.button, ticketUsedAt === undefined || ticketUsedAt != null ? {opacity: .7} : {}, {backgroundColor: eventBackgroundColor}]}>
-            {loading ?
-              <ActivityIndicator style={styles.buttonLoading} size="large" />
-            :
-              <Text style={styles.buttonText}>{ i18n?.t('deactivateTicket') }</Text>
-            }
-          </Pressable>
-        </View>
+            <Pressable disabled={ticketUsedAt === undefined || ticketUsedAt != null} onPress={onDeactivateTicket} style={[styles.button, ticketUsedAt === undefined || ticketUsedAt != null || loading ? {opacity: .7} : {}, {backgroundColor: eventBackgroundColor}]}>
+              {loading ?
+                <ActivityIndicator style={styles.buttonLoading} size="large" />
+              :
+                <Text style={styles.buttonText}>{ i18n?.t('deactivateTicket') }</Text>
+              }
+            </Pressable>
+          </View>
+        </> : <>
+          <View style={styles.actionsConfirmContainer}>
+            <Text style={styles.confirmPrompt}>{ i18n?.t('deactivateTicketConfirmationQuestion') }</Text>
+            <View style={styles.actionsConfirmButtonsContainer}>
+              <Pressable onPress={() => setShowConfirm(false)} style={[styles.button, styles.buttonConfirm, {borderColor: '#E84F44', backgroundColor: eventBackgroundColor}]}>
+                <Text style={styles.buttonText}>No</Text>
+              </Pressable>
+              <Pressable onPress={onConfirmDeactivateTicket} style={[styles.button, styles.buttonConfirm, {borderColor: '#79D475', backgroundColor: eventBackgroundColor}]}>
+                <Text style={styles.buttonText}>{ i18n?.t('yesDeactivate') }</Text>
+              </Pressable>
+            </View>
+          </View>
+        </>}
       </> }
 
       {/* Use a light status bar on iOS to account for the black space above the modal */}
@@ -350,7 +372,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     width: '100%',
     borderRadius: 50,
-    marginBottom: 15,
     ...Platform.select({
       web: {
         boxShadow: '0px 1px 5px rgba(0, 0, 0, 0.12)'
@@ -467,11 +488,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginHorizontal: 20
   },
-  pulseView: {
-    marginTop: 3,
-    marginLeft: 44,
+  pulseContainer: {
     position: 'absolute',
-    left: -200,
+    left: 0,
+    top: 0
+  },
+  pulseDot: {
+    marginTop: 4,
+    marginLeft: 30,
     borderRadius: 45,
     width: 25,
     height: 25
@@ -495,18 +519,37 @@ const styles = StyleSheet.create({
   infoContainer: {
     alignItems: 'center'
   },
-  actionsContainer: {
+  actionsConfirmContainer: {
+    marginTop: 8,
+    width: '100%',
+    flexDirection: 'column',
+    gap: 7
+  },
+  actionsConfirmButtonsContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10
+  },
+  confirmPrompt: {
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  actionsButtonsContainer: {
+    marginTop: 15,
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10
   },
   button: {
+    height: 82.5,
     verticalAlign: 'bottom',
     borderRadius: 28,
     borderWidth: 5,
     borderColor: '#0000001A',
     alignItems: 'center',
+    justifyContent: 'center',
     flex: 3,
     ...Platform.select({
       web: {
@@ -516,12 +559,16 @@ const styles = StyleSheet.create({
       android: {...buttonMobileShadow, elevation: 5}
     })
   },
+  buttonConfirm: {
+    height: 61,
+    borderRadius: 23,
+    borderWidth: 2
+  },
   buttonLoading: {
     paddingVertical: 19
   },
   buttonText: {
     fontSize: 20,
-    fontWeight: 'bold',
-    paddingVertical: 24.5
+    fontWeight: 'bold'
   }
 });

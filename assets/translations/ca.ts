@@ -73,7 +73,7 @@ export const ca: { [key: string]: string } = {
   description: 'Descripció',
   amount: 'Import',
   quantity: 'Quantitat',
-  deactivateTicketConfirmationQuestion: 'Segur que vols desactivar aquest ticket?',
+  deactivateTicketConfirmationQuestion: 'Confirma per desactivar aquest ticket:',
   deactivateTicket: 'Desactivar ticket',
   yesDeactivate: 'Sí, desactivar',
   ticketActive: 'Ticket actiu',

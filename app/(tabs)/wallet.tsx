@@ -15,24 +15,26 @@ export default function TabTwoScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      let unmounted = false;
       if (triggerNextFocus.current) {
         if (!user) return;
-        fetchWalletTickets();
+        fetchWalletTickets(unmounted);
       }
 
       return () => {
+        unmounted = true;
         triggerNextFocus.current = false;
         setTimeout(() => {
           triggerNextFocus.current = true;
-        }, 3000); //This is to prevent fetching every time we focus, just fetching when focused and after every 8 seconds
+        }, 3000); //This is to prevent fetching every time we focus, just fetching when focused and after every 3 seconds
       };
     }, [user])
   );
 
-  const fetchWalletTickets = () => {
+  const fetchWalletTickets = (unmounted: boolean) => {
     supabase.from('wallet_tickets').select().eq('user_id', user.id).is('used_at', null).order('type', { ascending: true })
     .then(({ data: wallet_tickets, error }) => {
-      if (error) return;
+      if (unmounted || error) return;
       const eventGroupedWalletTickets: WalletTicket[][] = 
       Object.values(
         wallet_tickets.reduce((groups, ticket) => {

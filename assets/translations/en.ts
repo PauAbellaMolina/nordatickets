@@ -73,7 +73,7 @@ export const en: { [key: string]: string } = {
   description: 'Description',
   amount: 'Amount',
   quantity: 'Quantity',
-  deactivateTicketConfirmationQuestion: 'Are you sure you want to deactivate this ticket?',
+  deactivateTicketConfirmationQuestion: 'Confirm to deactivate this ticket:',
   deactivateTicket: 'Deactivate ticket',
   yesDeactivate: 'Yes, deactivate',
   ticketActive: 'Ticket active',

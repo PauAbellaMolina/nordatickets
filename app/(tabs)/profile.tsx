@@ -1,11 +1,11 @@
 import { Pressable, StyleSheet } from 'react-native';
 import { Text, View } from '../../components/Themed';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FeatherIcon } from '../../components/CustomIcons';
 import Colors from '../../constants/Colors';
 import { supabase } from "../../supabase";
 import { useSupabase } from '../../context/SupabaseProvider';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { AvailableLocales } from '../../assets/translations/translation';
 import { Picker } from '@react-native-picker/picker';
 
@@ -15,15 +15,25 @@ export default function TabThreeScreen() {
   const [expiryDate, setExpiryDate] = useState<string>();
   const [selectedLanguage, setSelectedLanguage] = useState<AvailableLocales>();
 
-  useEffect(() => {
-    if (!user) return;
-    let unmounted = false;
-    fetchUser(unmounted);
+  let triggerNextFocus = useRef<boolean>(true);
 
-    return () => {
-      unmounted = true;
-    };
-  }, [user]);
+  useFocusEffect(
+    useCallback(() => {
+      let unmounted = false;
+      if (triggerNextFocus.current) {
+        if (!user) return;
+        fetchUser(unmounted);
+      }
+
+      return () => {
+        unmounted = true;
+        triggerNextFocus.current = false;
+        setTimeout(() => {
+          triggerNextFocus.current = true;
+        }, 10000); //This is to prevent fetching every time we focus, just fetching when focused and after every 10 seconds
+      };
+    }, [user])
+  );
 
   useEffect(() => {
     if (!user) return;
