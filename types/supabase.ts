@@ -93,7 +93,6 @@ export type Database = {
           id: number
           more_info_content: string | null
           name: string | null
-          organizer_id: number | null
           selling: boolean | null
           ticket_fee: number | null
         }
@@ -105,7 +104,6 @@ export type Database = {
           id?: number
           more_info_content?: string | null
           name?: string | null
-          organizer_id?: number | null
           selling?: boolean | null
           ticket_fee?: number | null
         }
@@ -117,19 +115,10 @@ export type Database = {
           id?: number
           more_info_content?: string | null
           name?: string | null
-          organizer_id?: number | null
           selling?: boolean | null
           ticket_fee?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "events_organizer_id_fkey"
-            columns: ["organizer_id"]
-            isOneToOne: false
-            referencedRelation: "organizers"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       faqs: {
         Row: {

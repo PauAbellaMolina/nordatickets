@@ -1,6 +1,6 @@
 import { FlatList, StyleSheet, Dimensions, ActivityIndicator, Platform } from 'react-native';
 import { View, Text } from '../../../../components/Themed';
-import { Organizer, WalletTicket } from "../../../../types/supabaseplain";
+import { WalletTicket } from "../../../../types/supabaseplain";
 import { useLocalSearchParams } from 'expo-router';
 import TiktLight from '../../../../assets/svgs/tiktlight.svg';
 import { useCallback, useEffect, useState } from 'react';
@@ -16,10 +16,10 @@ export default function ReceiptDetailScreen() {
   const [loaded, setLoaded] = useState<boolean>(false);
   const [paginatedGroupedWalletTickets, setPaginatedGroupedWalletTickets] = useState<WalletTicket[][][]>([]);
   const [receiptDate, setReceiptDate] = useState<Date>(null);
+  const [orderDbId, setOrderDbId] = useState<number>(null);
   const [orderStatus, setOrderStatus] = useState<string>(null);
   const [eventName, setEventName] = useState<string>(null);
   const [eventTicketFee, setEventTicketFee] = useState<number>(null);
-  const [organizer, setOrganizer] = useState<Organizer>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -35,19 +35,20 @@ export default function ReceiptDetailScreen() {
   useEffect(() => {
     if (!user) return;
     let unmounted = false;
-    if (!unmounted && paginatedGroupedWalletTickets.length && eventName && receiptDate && orderStatus && organizer && !loaded) {
+    if (!unmounted && paginatedGroupedWalletTickets.length && eventName && receiptDate && orderStatus && !loaded) {
       setLoaded(true);
     }
 
     return () => {
       unmounted = true;
     };
-  }, [user, paginatedGroupedWalletTickets, eventName, eventTicketFee, receiptDate, orderStatus, organizer]);
+  }, [user, paginatedGroupedWalletTickets, eventName, eventTicketFee, receiptDate, orderStatus]);
 
   const fetchRedsysOrder = (unmounted: boolean) => {
     supabase.from('redsys_orders').select().eq('order_id', id).single()
     .then(({ data: redsys_order, error }) => {
       if (unmounted || error || !redsys_order) return;
+      setOrderDbId(redsys_order.id);
       const formattedStatus = redsys_order.order_status.replace(/_/g, ' ').toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
       setOrderStatus(formattedStatus);
     });
@@ -64,11 +65,12 @@ export default function ReceiptDetailScreen() {
         setEventTicketFee(event.ticket_fee);
         setEventName(event.name);
         
-        supabase.from('organizers').select().eq('id', event.organizer_id).single()
-        .then(({ data: organizer, error }) => {
-          if (unmounted || error || !organizer) return;
-          setOrganizer(organizer);
-        });
+        //Uncomment if we ever go back to emitting invoices in the name of the organizer instead of ourselves
+        // supabase.from('organizers').select().eq('id', event.organizer_id).single()
+        // .then(({ data: organizer, error }) => {
+        //   if (unmounted || error || !organizer) return;
+        //   setOrganizer(organizer);
+        // });
       });
 
       if (unmounted) return
@@ -101,45 +103,38 @@ export default function ReceiptDetailScreen() {
         <View style={styles.generalInfoRow}>
           <View style={[styles.generalInfoContainer, {gap: vwpDimension/120}]}>
             <View style={styles.generalInfoEntry}>
-              <Text style={[styles.receiptText, styles.bodyTextTitle,, {fontSize: vwpDimension/54}]}>{ i18n?.t('organizerLegalName') }</Text>
-              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ organizer?.legal_name }</Text>
+              <Text style={[styles.receiptText, styles.bodyTextTitle,, {fontSize: vwpDimension/54}]}>{ i18n?.t('issuer') }</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>Marc Abella Molina</Text>
             </View>
             <View style={styles.generalInfoEntry}>
               <Text style={[styles.receiptText, styles.bodyTextTitle,, {fontSize: vwpDimension/54}]}>{ i18n?.t('address') }</Text>
-              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ organizer?.address }</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>Carrer Sant Julià, 9</Text>
             </View>
             <View style={styles.generalInfoEntry}>
               <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('cityAndCountry') }</Text>
-              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ organizer?.zipcode_city_country }</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>08310, Argentona, España</Text>
             </View>
-            { organizer?.nif ? 
-              <View style={styles.generalInfoEntry}>
-                <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>NIF</Text>
-                <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ organizer?.nif }</Text>
-              </View>
-            : organizer?.cif ?
-              <View style={styles.generalInfoEntry}>
-                <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>CIF</Text>
-                <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ organizer?.cif }</Text>
-              </View>
-            : null }
             <View style={styles.generalInfoEntry}>
-              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('contact') }</Text>
-              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ organizer?.email + (organizer?.phone ? ' · ' + organizer?.phone : '') }</Text>
+              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>NIF</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>39470762W</Text>
             </View>
           </View>
           <View style={[styles.generalInfoContainer, {gap: vwpDimension/120}]}>
+            <View style={[styles.generalInfoEntry, styles.alignedRight]}>
+              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('invoiceNumber') }</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ orderDbId }</Text>
+            </View>
+            <View style={[styles.generalInfoEntry, styles.alignedRight]}>
+              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('transactionDate') }</Text>
+              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ receiptDate?.toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) }h</Text>
+            </View>
             <View style={[styles.generalInfoEntry, styles.alignedRight]}>
               <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('event') }</Text>
               <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ eventName }</Text>
             </View>
             <View style={[styles.generalInfoEntry, styles.alignedRight]}>
-              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('invoiceNumber') }</Text>
+              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('orderIdentifier') }</Text>
               <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ id }</Text>
-            </View>
-            <View style={[styles.generalInfoEntry, styles.alignedRight]}>
-              <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('transactionDate') }</Text>
-              <Text style={[styles.receiptText, {fontSize: vwpDimension/54}]}>{ receiptDate?.toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) }h</Text>
             </View>
             <View style={[styles.generalInfoEntry, styles.alignedRight]}>
               <Text style={[styles.receiptText, styles.bodyTextTitle, {fontSize: vwpDimension/54}]}>{ i18n?.t('receiptOrderStatus') }</Text>
@@ -174,7 +169,7 @@ export default function ReceiptDetailScreen() {
             return (<>
               <View style={styles.tableRow}>
                 <View style={[styles.tableCell, styles.firstCol]}>
-                  <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{tickets[0].event_tickets_name}</Text>
+                  <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{ i18n?.t('ticketReedemableFor') } "{tickets[0].event_tickets_name}"</Text>
                 </View>
                 <View style={styles.tableCell}>
                   <Text style={[styles.receiptText, {fontSize: vwpDimension/50}]}>{tickets.length}</Text>
@@ -235,7 +230,7 @@ export default function ReceiptDetailScreen() {
         />
       </View>
     </View>
-  ), [user, paginatedGroupedWalletTickets, eventName, eventTicketFee, receiptDate, organizer]);
+  ), [user, paginatedGroupedWalletTickets, eventName, eventTicketFee, receiptDate]);
   
   return !loaded ? 
   (
@@ -345,7 +340,7 @@ const styles = StyleSheet.create({
     textAlign: 'right'
   },
   firstCol: {
-    flex: 2,
+    flex: 3.5,
     alignItems: 'flex-start',
     marginLeft: '1%'
   },

@@ -13,6 +13,7 @@ import { Picker } from '@react-native-picker/picker';
 import { getThemeRandomColor } from '../../../utils/chooseRandomColor';
 import { CollapsableMoreInfoComponent } from '../../../components/CollapsableMoreInfoComponent';
 import EventAddonTicketCardComponent from '../../../components/EventAddonTicketCardComponent';
+import Checkbox from 'expo-checkbox';
 
 type CartItem = { eventTicket: EventTicket, quantity: number };
 type Cart = CartItem[] | null;
@@ -33,6 +34,7 @@ export default function EventDetailScreen() {
   const [loading, setLoading] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string>('misc');
+  const [storeCreditCardChecked, setStoreCreditCardChecked] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -187,7 +189,8 @@ export default function EventDetailScreen() {
       body: JSON.stringify({
         amount: finalAmount,
         userId: user.id,
-        eventId: event.id
+        eventId: event.id,
+        requestToken: storeCreditCardChecked
       })
     })
     .then((response) => response.json())
@@ -370,7 +373,17 @@ export default function EventDetailScreen() {
                           <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
                           <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCardWithExpiryDate') } {expiryDate}</Text>
                         </View>
-                      : null }
+                      :
+                        <View style={styles.storeCreditCardContainer}>
+                          <Checkbox
+                            style={styles.storeCreditCardCheckboxInput}
+                            color={Colors[theme].cartContainerButtonBackground}
+                            value={storeCreditCardChecked}
+                            onValueChange={setStoreCreditCardChecked}
+                          />
+                          <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>Guardar tarjeta per futures compres</Text>
+                        </View>
+                      }
                     <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground, marginTop: !cardNumber ? 5 : 3}]} onPress={onBuyCart}>
                     { loading ?
                       <ActivityIndicator style={{marginVertical: 1.75}} size="small" />
@@ -583,6 +596,16 @@ const styles = StyleSheet.create({
   },
   cartItemsList: {
     fontSize: 18
+  },
+  storeCreditCardContainer: {
+    marginHorizontal: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8
+  },
+  storeCreditCardCheckboxInput: {
+    width: 18,
+    height: 18
   },
   usingCreditCardContainer: {
     marginHorizontal: 8,

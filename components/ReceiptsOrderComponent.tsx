@@ -30,8 +30,8 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
     <View style={[styles.container, {backgroundColor: Colors[theme].backgroundContrast}]}>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <View>
-          <Text style={styles.orderTitle}>{ i18n?.t('identifier') }:</Text>
-          <Text style={styles.orderTitle}>{ order[0].order_id }</Text>
+          <Text style={styles.orderTitle}>{ i18n?.t('invoiceNumber') }:</Text>
+          <Text style={styles.orderTitle}>{ order[0].id }</Text>
         </View>
         <View>
           <Text style={styles.orderInfo}>{ new Date(order[0].created_at).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) }h</Text>
