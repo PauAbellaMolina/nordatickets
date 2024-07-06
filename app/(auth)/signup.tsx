@@ -100,9 +100,9 @@ export default function Signup() {
             { Platform.OS === 'web' ?
               <View style={styles.datepickerWrapper}>
                 <Text style={styles.datepickerTitle}>{ i18n?.t('birthdate') }:</Text>
-                <input style={theme === 'light' ? styles.datepickerLight : styles.datepickerDark} type="date" id="birthday" name="birthday" value={birthdate || ''} onChange={(e) => setBirthdate(e.target.value)} />
+                <input style={theme === 'light' ? styles.datepickerLight : styles.datepickerDark} type="date" id="birthdate" name="birthdate" value={birthdate || ''} onChange={(e) => setBirthdate(e.target.value)} />
               </View>
-            : null } {/* native date picker not implemented */}
+            : null }
             <View style={styles.acceptTerms}>
               <View style={styles.acceptTermsCheckbox}>
                 <Checkbox

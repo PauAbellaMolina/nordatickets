@@ -132,6 +132,9 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
         setRealSession(null)
         setUser(null);
       }
+      if (event === 'USER_UPDATED' && session) {
+        setUser(session.user);
+      }
       setInitialized(true);
     });
     return () => {
@@ -170,6 +173,8 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
       } else {
         router.replace("/");
       }
+    } else if (session && segments[0] !== "(auth)" && !session.user.user_metadata?.birthdate) {
+      router.navigate('/profile/birthdate');
     }
 
     //this should be commented out so that we can go to /something (/event/:id) and not be redirected to / (tab 1 index)

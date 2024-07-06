@@ -93,6 +93,7 @@ export type Database = {
           id: number
           more_info_content: string | null
           name: string | null
+          organizer_email: string | null
           selling: boolean | null
           ticket_fee: number | null
         }
@@ -104,6 +105,7 @@ export type Database = {
           id?: number
           more_info_content?: string | null
           name?: string | null
+          organizer_email?: string | null
           selling?: boolean | null
           ticket_fee?: number | null
         }
@@ -115,6 +117,7 @@ export type Database = {
           id?: number
           more_info_content?: string | null
           name?: string | null
+          organizer_email?: string | null
           selling?: boolean | null
           ticket_fee?: number | null
         }

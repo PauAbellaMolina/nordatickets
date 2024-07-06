@@ -86,5 +86,10 @@ export const en: { [key: string]: string } = {
   yourOneTimeCodeGreeting: 'Hello! This is your one-time code:',
   yourOneTimeCodeExplanation: 'Use this code to log into ElTeuTikt',
   moreInfo: 'More info',
-  noEventsInList: 'No events in your list'
+  birthdateConfig: 'Birthdate settings',
+  noEventsInList: 'No events in your list',
+  needYourBirthdateTitle: 'We need your birthdate!',
+  save: 'Save',
+  alreadyHaveSetBirthdateTitle: 'We already have your birthdate',
+  ifIncorrectGetInContactWithHelp: 'If this is incorrect, get in contact with help@elteutikt.com to rectify it.'
 };

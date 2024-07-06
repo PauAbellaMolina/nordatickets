@@ -86,5 +86,10 @@ export const ca: { [key: string]: string } = {
   yourOneTimeCodeGreeting: "Hola! Aquest és el teu codi d'un sol ús:",
   yourOneTimeCodeExplanation: "Utilitza'l per iniciar sessió a ElTeuTikt",
   moreInfo: 'Més informació',
-  noEventsInList: 'No hi ha esdeveniments a la teva llista'
+  birthdateConfig: 'Configuració de la data de naixement',
+  noEventsInList: 'No hi ha esdeveniments a la teva llista',
+  needYourBirthdateTitle: 'Necessitem la teva data de naixement!',
+  save: 'Guardar',
+  alreadyHaveSetBirthdateTitle: 'Ja tenim la teva data de naixement',
+  ifIncorrectGetInContactWithHelp: 'Si és incorrecta posa\'t en contacte amb help@elteutikt.com per rectificar-la.'
 };

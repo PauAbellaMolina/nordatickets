@@ -13,6 +13,7 @@ type Faq = {
 
 export default function HelpAndTermsScreen() {
   const { i18n, theme, user } = useSupabase();
+  
   const [faqs, setFaqs] = useState<Faq[] | null>(null);
 
   useEffect(() => {
