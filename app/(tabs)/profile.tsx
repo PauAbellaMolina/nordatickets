@@ -71,7 +71,7 @@ export default function TabThreeScreen() {
     });
   };
 
-  const onSelectedLanguage = (language: AvailableLocales) => {
+  const onSelectedLanguage = (language: AvailableLocales) => { //TODO PAU ideally we should update user's metadata email translations so we can send emails in the selected language, but we can assume the user will understand the email in the language they signed up
     if (!i18n) return;
     setSelectedLanguage(language);
     setLanguage(language);

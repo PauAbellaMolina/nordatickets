@@ -67,6 +67,7 @@ export default function Signup() {
   };
 
   const onChangeEmail = () => {
+    setEmail('');
     setEmailSent(false);
     setEmailErrorMessage(undefined);
     setLoading(false);

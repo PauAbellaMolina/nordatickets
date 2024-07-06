@@ -1,11 +1,13 @@
+import { ActivityIndicator, Platform, Pressable, StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { router } from 'expo-router';
 import { Text, View } from '../../../../components/Themed';
 import GoBackArrow from '../../../../components/GoBackArrow';
-import { ActivityIndicator, Platform, Pressable, StyleSheet } from 'react-native';
 import { useSupabase } from '../../../../context/SupabaseProvider';
 import Colors from '../../../../constants/Colors';
-import { useEffect, useState } from 'react';
 import { supabase } from '../../../../supabase';
-import { router } from 'expo-router';
+import { AvailableLocales } from "../../../../assets/translations/translation";
+import { authEmailsTranslations } from "../../../../assets/translations/email";
 
 export default function BirthdateScreen() {
   const { i18n, theme, user } = useSupabase();
@@ -20,8 +22,10 @@ export default function BirthdateScreen() {
 
   const onSaveBirthdate = () => {
     if (!birthdate || !user || user.user_metadata?.birthdate) return;
+    const langMetaData = authEmailsTranslations[i18n.locale as AvailableLocales];
     supabase.auth.updateUser({
       data: {
+        emailData: langMetaData,
         birthdate: birthdate
       }
     })

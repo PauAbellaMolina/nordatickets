@@ -52,6 +52,7 @@ export default function Login() {
   };
 
   const onChangeEmail = () => {
+    setEmail('');
     setEmailSent(false);
     setEmailErrorMessage(undefined);
     setLoading(false);
