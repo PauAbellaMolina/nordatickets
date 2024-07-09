@@ -11,8 +11,9 @@ import { Event, WalletTicket, EventTicket } from '../../../types/supabaseplain';
 import { useSupabase } from '../../../context/SupabaseProvider';
 import { Picker } from '@react-native-picker/picker';
 import { getThemeRandomColor } from '../../../utils/chooseRandomColor';
-import { CollapsableMoreInfoComponent } from '../../../components/CollapsableMoreInfoComponent';
+import { CollapsableComponent } from '../../../components/CollapsableComponent';
 import EventAddonTicketCardComponent from '../../../components/EventAddonTicketCardComponent';
+import EventAccessTicketCardComponent from '../../../components/EventAccessTicketCardComponent';
 import Checkbox from 'expo-checkbox';
 
 type CartItem = { eventTicket: EventTicket, quantity: number };
@@ -27,6 +28,8 @@ export default function EventDetailScreen() {
   const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
   const [event, setEvent] = useState<Event>();
   const [eventTickets, setEventTickets] = useState<EventTicket[]>();
+  const [accessEventTickets, setAccessEventTickets] = useState<EventTicket[]>();
+  const [accessEventTicketsExpanded, setAccessEventTicketsExpanded] = useState<boolean>(false);
   const [moreInfoExpanded, setMoreInfoExpanded] = useState<boolean>(false);
   const [cart, setCart] = useState<Cart>();
   const [cartTotalPrice, setCartTotalPrice] = useState<number>(0);
@@ -42,7 +45,7 @@ export default function EventDetailScreen() {
       const userBirthdate = new Date(user.user_metadata.birthdate);
       setUserIsMinor(new Date(Date.now() - userBirthdate.getTime()).getUTCFullYear() - 1970 < 18);
     } else {
-      setUserIsMinor(true); //TODO PAU should we set the fallback to be true or false?
+      setUserIsMinor(true); //fallback set to true if no birthdate
     }
 
     let unmounted = false;
@@ -74,17 +77,38 @@ export default function EventDetailScreen() {
   useEffect(() => {
     if (!user || userIsMinor === undefined || !event) return;
     let unmounted = false;
+
+    supabase.from('event_tickets').select().eq('event_id', id as string).eq('type', 'ACCESS').order('price')
+    .then(({ data: event_tickets, error }) => {
+      if (unmounted || error || !event_tickets.length) return;
+      setAccessEventTickets(event_tickets);
+    });
+
     if (userIsMinor) {
-      supabase.from('event_tickets').select().eq('event_id', id as string).is('minor_restricted', false).order('type', { ascending: true }).order('name')
+      supabase.from('event_tickets').select().eq('event_id', id as string).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).is('minor_restricted', false).order('type', { ascending: true }).order('name')
       .then(({ data: event_tickets, error }) => {
         if (unmounted || error || !event_tickets.length) return;
-        setEventTickets(event_tickets);
+        const typeOrder = ['ADDON_REFUNDABLE', 'ADDON'];
+        const typeOrderMap = new Map(typeOrder.map((type, index) => [type, index]));
+        const orderedEventTickets = event_tickets.sort((a, b) => {
+          const aIndex = typeOrderMap.has(a.type) ? typeOrderMap.get(a.type) : typeOrder.length;
+          const bIndex = typeOrderMap.has(b.type) ? typeOrderMap.get(b.type) : typeOrder.length;
+          return aIndex - bIndex;
+        });
+        setEventTickets(orderedEventTickets);
       });
     } else {
-      supabase.from('event_tickets').select().eq('event_id', id as string).order('type', { ascending: true }).order('name')
+      supabase.from('event_tickets').select().eq('event_id', id as string).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).order('type', { ascending: true }).order('name')
       .then(({ data: event_tickets, error }) => {
         if (unmounted || error || !event_tickets.length) return;
-        setEventTickets(event_tickets);
+        const typeOrder = ['ADDON_REFUNDABLE', 'ADDON'];
+        const typeOrderMap = new Map(typeOrder.map((type, index) => [type, index]));
+        const orderedEventTickets = event_tickets.sort((a, b) => {
+          const aIndex = typeOrderMap.has(a.type) ? typeOrderMap.get(a.type) : typeOrder.length;
+          const bIndex = typeOrderMap.has(b.type) ? typeOrderMap.get(b.type) : typeOrder.length;
+          return aIndex - bIndex;
+        });
+        setEventTickets(orderedEventTickets);
       });
     }
 
@@ -234,6 +258,21 @@ export default function EventDetailScreen() {
         const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, event_tickets_name: cartItem.eventTicket.name, order_id: orderId, price: cartItem.eventTicket.price, used_at: null, user_id: user.id, iva: cartItem.eventTicket.iva, type: cartItem.eventTicket.type };
         supabase.from('wallet_tickets').insert(ticketToInsert)
         .select().then();
+
+        const buyIncludesIds = cartItem.eventTicket.buy_includes_event_tickets_ids;
+        if (buyIncludesIds?.length) {
+          buyIncludesIds.forEach((id) => {
+            let eventTicketToInclude = eventTickets.find((eventTicket) => eventTicket.id === id);
+            if (!eventTicketToInclude) {
+              eventTicketToInclude = accessEventTickets.find((eventTicket) => eventTicket.id === id);
+            }
+            if (eventTicketToInclude) {
+              const ticketToInsert: NewWalletTicket = { event_id: eventTicketToInclude.event_id, event_tickets_id: eventTicketToInclude.id, event_tickets_name: eventTicketToInclude.name, order_id: orderId, price: eventTicketToInclude.price, used_at: null, user_id: user.id, iva: eventTicketToInclude.iva, type: eventTicketToInclude.type };
+              supabase.from('wallet_tickets').insert(ticketToInsert)
+              .select().then();
+            }
+          });
+        }
       }
     });
 
@@ -275,9 +314,17 @@ export default function EventDetailScreen() {
     setMoreInfoExpanded(!moreInfoExpanded);
   };
 
+  const onAccessTicketsExpand = () => {
+    setAccessEventTicketsExpanded(!accessEventTicketsExpanded);
+  };
+
   const onDismissAddedToWallet = () => {
     setOrderConfirmed(false);
   };
+
+  const renderItemAccessTickets = useCallback(({item}: {item: EventTicket}) => {
+    return <EventAccessTicketCardComponent ticket={item} eventSelling={event?.selling_access} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} />;
+  }, [cart, event]);
 
   const renderItemTickets = useCallback(({item}: {item: EventTicket}) => {
     if (item.type === "ADDON" || item.type === "ADDON_REFUNDABLE") {
@@ -318,15 +365,36 @@ export default function EventDetailScreen() {
               <FeatherIcon name={moreInfoExpanded ? 'chevron-up' : 'chevron-down'} size={21} color={Colors['light'].text} />
               <Text style={[styles.moreEventInfoActionable, {color: Colors['light'].text}]}>{ i18n?.t('moreInfo') }</Text>
             </Pressable>
-            <CollapsableMoreInfoComponent expanded={moreInfoExpanded}>
+            <CollapsableComponent expanded={moreInfoExpanded}>
               <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
               <Text style={[styles.moreEventInfoText, {color: Colors['light'].text}]}>{event.more_info_content}</Text>
-            </CollapsableMoreInfoComponent>
+            </CollapsableComponent>
           </> }
         </View>
-        { eventTickets ?
-          <>
-            <View style={[styles.ticketsContainer, {marginTop: event.more_info_content ? 170 : 180}]}>
+        { eventTickets ? <>
+          <View style={[styles.ticketsContainer, {marginTop: event.more_info_content ? 167 : 177}]}>
+            { accessEventTickets ? <>
+              <View style={styles.accessTickets}>
+                { accessEventTicketsExpanded ?
+                  <View style={styles.sellingStatusContainer}>
+                    <View style={[styles.sellingStatusDot, {backgroundColor: event.selling_access ? 'green' : 'red'}]}></View>
+                    <Text style={[styles.sellingStatus, {color: event.selling_access ? 'green' : 'red'}]}>{ i18n?.t(event.selling_access ? 'selling': 'notSelling') }</Text>
+                  </View>
+                : null }
+                <Pressable style={styles.accessTicketsExpand} onPress={onAccessTicketsExpand}>
+                  <Text style={styles.subtitle}>{ i18n?.t('accessControlTickets') }</Text>
+                  <FeatherIcon name={accessEventTicketsExpanded ? 'chevron-down' : 'chevron-right'} size={24} color={Colors[theme].text} />
+                </Pressable>
+                <CollapsableComponent expanded={accessEventTicketsExpanded} maxHeight={255}>
+                  <FlatList
+                    style={styles.ticketsList}
+                    data={accessEventTickets}
+                    renderItem={renderItemAccessTickets}
+                  />
+                </CollapsableComponent>
+              </View>
+            </> : null }
+            <View>
               <View style={styles.sellingStatusContainer}>
                 <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
                 <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{ i18n?.t(event.selling ? 'selling': 'notSelling') }</Text>
@@ -338,69 +406,65 @@ export default function EventDetailScreen() {
                 renderItem={renderItemTickets}
               />
             </View>
-            { orderConfirmed ?
-              <Pressable style={[styles.orderConfirmedContainer, {backgroundColor: Colors[theme].cartContainerBackground}]} onPress={onGoToWallet}>
-                <Pressable onPress={onDismissAddedToWallet} style={styles.dismissAddedToWallet}>
-                  <FeatherIcon name="x" size={25} color={Colors[theme].text} />
-                </Pressable>
-                <FeatherIcon name="check-circle" size={40} color={Colors[theme].text} />
-                <View style={styles.orderConfirmedTextContainer}><Text style={styles.orderConfirmedSubtitle}>{ i18n?.t('ticketsAddedToWallet') }</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
+          </View>
+          { orderConfirmed ?
+            <Pressable style={[styles.orderConfirmedContainer, {backgroundColor: Colors[theme].cartContainerBackground}]} onPress={onGoToWallet}>
+              <Pressable onPress={onDismissAddedToWallet} style={styles.dismissAddedToWallet}>
+                <FeatherIcon name="x" size={25} color={Colors[theme].text} />
               </Pressable>
-            :
-              <View style={[styles.cartContainer, {backgroundColor: Colors[theme].cartContainerBackground}]}>
-                <View style={styles.cartTitleRowContainer}><Text style={styles.subtitle}>{ i18n?.t('cart') }</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
-                { cart?.length ?
-                  <>
-                    <FlatList
-                      style={styles.cartList}
-                      data={cart}
-                      renderItem={renderItemCartTicket}
-                      ItemSeparatorComponent={() => <View style={{height: 3}} />}
-                    />
-                    { event.ticket_fee ?
-                      <View style={{marginHorizontal: 8, flexDirection: 'row', alignItems: 'flex-end'}}>
-                        <Text style={[styles.transactionFeePrice, {color: Colors[theme].cartContainerBackgroundContrast}]}>+ {event.ticket_fee * cartTotalQuantity / 100}€ </Text>
-                        <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('serviceFee') }</Text>
+              <FeatherIcon name="check-circle" size={40} color={Colors[theme].text} />
+              <View style={styles.orderConfirmedTextContainer}><Text style={styles.orderConfirmedSubtitle}>{ i18n?.t('ticketsAddedToWallet') }</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
+            </Pressable>
+          :
+            <View style={[styles.cartContainer, {backgroundColor: Colors[theme].cartContainerBackground}]}>
+              <View style={styles.cartTitleRowContainer}><Text style={styles.subtitle}>{ i18n?.t('cart') }</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
+              { cart?.length ? <>
+                  <FlatList
+                    style={styles.cartList}
+                    data={cart}
+                    renderItem={renderItemCartTicket}
+                    ItemSeparatorComponent={() => <View style={{height: 3}} />}
+                  />
+                  { event.ticket_fee ?
+                    <View style={{marginHorizontal: 8, flexDirection: 'row', alignItems: 'flex-end'}}>
+                      <Text style={[styles.transactionFeePrice, {color: Colors[theme].cartContainerBackgroundContrast}]}>+ {event.ticket_fee * cartTotalQuantity / 100}€ </Text>
+                      <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('serviceFee') }</Text>
+                    </View>
+                  : null }
+                    { cardNumber ?
+                      <View style={styles.usingCreditCardContainer}>
+                        <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
+                        <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCreditCard') } {cardNumber.slice(-7)}</Text>
                       </View>
-                    : null }
-                      { cardNumber ?
-                        <View style={styles.usingCreditCardContainer}>
-                          <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
-                          <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCreditCard') } {cardNumber.slice(-7)}</Text>
-                        </View>
-                      : expiryDate ?
-                        <View style={styles.usingCreditCardContainer}>
-                          <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
-                          <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCardWithExpiryDate') } {expiryDate}</Text>
-                        </View>
-                      :
-                        <View style={styles.storeCreditCardContainer}>
-                          <Checkbox
-                            style={styles.storeCreditCardCheckboxInput}
-                            color={Colors[theme].cartContainerButtonBackground}
-                            value={storeCreditCardChecked}
-                            onValueChange={setStoreCreditCardChecked}
-                          />
-                          <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>Guardar tarjeta per futures compres</Text>
-                        </View>
-                      }
-                    <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground, marginTop: !cardNumber ? 5 : 3}]} onPress={onBuyCart}>
-                    { loading ?
-                      <ActivityIndicator style={{marginVertical: 1.75}} size="small" />
+                    : expiryDate ?
+                      <View style={styles.usingCreditCardContainer}>
+                        <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
+                        <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCardWithExpiryDate') } {expiryDate}</Text>
+                      </View>
                     :
-                      <Text style={styles.buyButtonText}>{(cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)) / 100 + '€  ·  '}{ i18n?.t('buy') }</Text>
+                      <View style={styles.storeCreditCardContainer}>
+                        <Checkbox
+                          style={styles.storeCreditCardCheckboxInput}
+                          color={Colors[theme].cartContainerButtonBackground}
+                          value={storeCreditCardChecked}
+                          onValueChange={setStoreCreditCardChecked}
+                        />
+                        <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>Guardar tarjeta per futures compres</Text>
+                      </View>
                     }
-                    </Pressable>
-                  </>
-                :
-                  <Text style={[styles.emptyCard, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('noTicketsInCart') }</Text>
-                }
-              </View>
-            }
-          </>
-        :
-          <></>
-        }
+                  <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground, marginTop: !cardNumber ? 5 : 3}]} onPress={onBuyCart}>
+                  { loading ?
+                    <ActivityIndicator style={{marginVertical: 1.75}} size="small" />
+                  :
+                    <Text style={styles.buyButtonText}>{(cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)) / 100 + '€  ·  '}{ i18n?.t('buy') }</Text>
+                  }
+                  </Pressable>
+              </> :
+                <Text style={[styles.emptyCard, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('noTicketsInCart') }</Text>
+              }
+            </View>
+          }
+        </> : null }
       </>}
 
     </View> 
@@ -441,6 +505,7 @@ const styles = StyleSheet.create({
   container: {
     display: 'flex',
     height: '100%',
+    gap: 5,
     overflow: 'hidden'
   },
   eventInfoContainer: {
@@ -506,11 +571,20 @@ const styles = StyleSheet.create({
   },
   ticketsContainer: {
     flex: 1,
-    marginHorizontal: 30,
-    borderRadius: 35
+    marginHorizontal: 20,
+    overflow: 'scroll',
+    borderRadius: 5
+  },
+  accessTickets: {
+    marginBottom: 7
+  },
+  accessTicketsExpand: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 5
   },
   ticketsList: {
-    marginTop: 10
+    marginTop: 5
   },
   sellingStatusContainer: {
     position: 'absolute',
@@ -534,13 +608,12 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
   orderConfirmedContainer: {
-    position: 'absolute',
     flexDirection: 'column',
     alignItems: 'center',
     alignSelf: 'center',
     gap: 20,
     width: '95%',
-    bottom: 25,
+    marginBottom: 15,
     paddingTop: 20,
     paddingBottom: 30,
     paddingHorizontal: 20,
@@ -570,7 +643,6 @@ const styles = StyleSheet.create({
   },
   cartContainer: {
     gap: 7,
-    position: 'relative',
     marginBottom: 15,
     alignSelf: 'center',
     width: '95%',

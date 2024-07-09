@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { LayoutChangeEvent, View, Dimensions } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
-export const CollapsableMoreInfoComponent = ({ children, expanded }: { children: React.ReactNode; expanded: boolean }) => {
+export const CollapsableComponent = ({ children, expanded, maxHeight }: { children: React.ReactNode; expanded: boolean; maxHeight?: number }) => {
   const [height, setHeight] = useState(0);
   const animatedHeight = useSharedValue(0);
   const { height: windowHeight } = Dimensions.get('window');
@@ -12,7 +12,7 @@ export const CollapsableMoreInfoComponent = ({ children, expanded }: { children:
   };
 
   const onLayout = (event: LayoutChangeEvent) => {
-    const percentOfScreenHeight = windowHeight - 215;
+    const percentOfScreenHeight = maxHeight ? maxHeight : windowHeight - 215;
     const elementHeight = event.nativeEvent.layout.height;
     const onLayoutHeight = elementHeight > percentOfScreenHeight ? percentOfScreenHeight : elementHeight;
 
@@ -31,7 +31,7 @@ export const CollapsableMoreInfoComponent = ({ children, expanded }: { children:
 
   return (
     <Animated.View style={[collapsableStyle, { overflow: "scroll" }]}>
-      <View style={{ position: "absolute" }} onLayout={onLayout}>
+      <View onLayout={onLayout}>
         {children}
       </View>
     </Animated.View>

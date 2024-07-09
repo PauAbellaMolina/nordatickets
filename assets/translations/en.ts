@@ -91,5 +91,9 @@ export const en: { [key: string]: string } = {
   needYourBirthdateTitle: 'We need your birthdate!',
   save: 'Save',
   alreadyHaveSetBirthdateTitle: 'We already have your birthdate',
-  ifIncorrectGetInContactWithHelp: 'If this is incorrect, get in contact with help@elteutikt.com to rectify it.'
+  ifIncorrectGetInContactWithHelp: 'If this is incorrect, get in contact with help@elteutikt.com to rectify it.',
+  accessControlTickets: 'Access tickets',
+  requiredToGetIntoTheEvent: 'Required to get into the event',
+  walletTicketAccessExplanation: 'Use it to access the event',
+  deactivateTicketOnAccessExplanation: 'Deactivate ticket when asked to access the event'
 };

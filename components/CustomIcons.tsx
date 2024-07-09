@@ -1,4 +1,4 @@
-import { FontAwesome, Feather, Entypo } from '@expo/vector-icons'; 
+import { FontAwesome, Feather, Entypo, FontAwesome6 } from '@expo/vector-icons'; 
 
 //PAU info available icons here -> https://icons.expo.fyi/
 export default function TabBarIcon(props: {
@@ -24,6 +24,15 @@ export function FontAwesomeIcon(props: {
   opacity?: number;
 }) {
   return <FontAwesome {...props} style={{ opacity: props.opacity ?? 1, alignContent: 'center' }} />;
+}
+
+export function FontAwesome6Icon(props: {
+  name: React.ComponentProps<typeof FontAwesome6>['name'];
+  color: string;
+  size: number;
+  opacity?: number;
+}) {
+  return <FontAwesome6 {...props} style={{ opacity: props.opacity ?? 1, alignContent: 'center' }} />;
 }
 
 export function FeatherIcon(props: {

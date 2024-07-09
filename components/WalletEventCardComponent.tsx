@@ -8,6 +8,7 @@ import WalletTicketCardComponent from './WalletTicketCardComponent';
 import { getThemeRandomColor } from '../utils/chooseRandomColor';
 import { useSupabase } from '../context/SupabaseProvider';
 import WalletTicketAddonCardComponent from './WalletTicketAddonCardComponent';
+import WalletTicketAccessCardComponent from './WalletTicketAccessCardComponent';
 
 export default function WalletEventCardComponent({ eventWalletTickets }: { eventWalletTickets: WalletTicket[] }) {
   const { theme } = useSupabase();
@@ -51,6 +52,8 @@ export default function WalletEventCardComponent({ eventWalletTickets }: { event
   const renderItem = useCallback(({item}: {item: WalletTicket}) => {
     if (item.type === 'ADDON' || item.type === 'ADDON_REFUNDABLE') {
       return <WalletTicketAddonCardComponent walletTicket={item} />;
+    } else if (item.type === 'ACCESS') {
+      return <WalletTicketAccessCardComponent walletTicket={item} />;
     }
     return <WalletTicketCardComponent walletTicket={item} />;
   }, []);

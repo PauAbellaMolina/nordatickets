@@ -36,8 +36,8 @@ export default function EventCardComponent(event: Event) {
           <Text ellipsizeMode='tail' numberOfLines={6} style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
         </View>
         <View style={styles.sellingStatusContainer}>
-          <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
-          <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{ i18n?.t(event.selling ? 'selling': 'notSelling') }</Text>
+          <View style={[styles.sellingStatusDot, {backgroundColor: event.selling || event.selling_access ? 'green' : 'red'}]}></View>
+          <Text style={[styles.sellingStatus, {color: event.selling || event.selling_access ? 'green' : 'red'}]}>{ i18n?.t(event.selling || event.selling_access ? 'selling': 'notSelling') }</Text>
         </View>
         <View style={styles.goToDetailContainer}>
           <FeatherIcon name="arrow-up-right" size={40} color={Colors['light'].text} />

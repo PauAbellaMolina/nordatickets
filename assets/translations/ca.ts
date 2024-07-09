@@ -91,5 +91,9 @@ export const ca: { [key: string]: string } = {
   needYourBirthdateTitle: 'Necessitem la teva data de naixement!',
   save: 'Guardar',
   alreadyHaveSetBirthdateTitle: 'Ja tenim la teva data de naixement',
-  ifIncorrectGetInContactWithHelp: 'Si és incorrecta posa\'t en contacte amb help@elteutikt.com per rectificar-la.'
+  ifIncorrectGetInContactWithHelp: 'Si és incorrecta posa\'t en contacte amb help@elteutikt.com per rectificar-la.',
+  accessControlTickets: 'Entrades',
+  requiredToGetIntoTheEvent: 'Necessari per entrar a l\'esdeveniment',
+  walletTicketAccessExplanation: "Utilitza'l per accedir a l'esdeveniment",
+  deactivateTicketOnAccessExplanation: "Desactivar ticket quan t'ho demanin per accedir a l'esdeveniment"
 };

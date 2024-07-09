@@ -20,6 +20,7 @@ export default function ActivateTicketScreen() {
   const [ticketName, setTicketName] = useState<string>('');
   const [ticketUsedAt, setTicketUsedAt] = useState<string>(undefined);
   const [ticketUsedTimeAgo, setTicketUsedTimeAgo] = useState<string>();
+  const [ticketType, setTicketType] = useState<string>();
   const [addonTicket, setAddonTicket] = useState<WalletTicket>(undefined);
 
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -95,6 +96,7 @@ export default function ActivateTicketScreen() {
   
         setTicketName(wallet_ticket.event_tickets_name);
         setTicketUsedAt(wallet_ticket.used_at);
+        setTicketType(wallet_ticket.type);
   
         supabase.from('event_tickets').select().eq('id', wallet_ticket.event_tickets_id)
         .then(({ data: event_tickets, error }) => {
@@ -122,37 +124,41 @@ export default function ActivateTicketScreen() {
           setEventName(event.name);
         });
   
-        if (wallet_ticket.used_at === null) {
-          supabase.from('wallet_tickets').select().eq('event_id', wallet_ticket.event_id).eq('user_id', user.id).in('type', ['ADDON', 'ADDON_REFUNDABLE']).is('used_at', null)
-          .then(async ({ data: addon_wallet_tickets, error }) => {
-            if (unmounted || error || !addon_wallet_tickets.length) {
-              setAddonTicket(null);
-              return;
-            };
+        if (wallet_ticket.type === 'CONSUMABLE') {
+          if (wallet_ticket.used_at === null) {
+            supabase.from('wallet_tickets').select().eq('event_id', wallet_ticket.event_id).eq('user_id', user.id).in('type', ['ADDON', 'ADDON_REFUNDABLE']).is('used_at', null)
+            .then(async ({ data: addon_wallet_tickets, error }) => {
+              if (unmounted || error || !addon_wallet_tickets.length) {
+                setAddonTicket(null);
+                return;
+              };
 
-            let didFindSucceededPayment = false;
-            for (let i = 0; i < addon_wallet_tickets.length; i++) {
-              const { data: addon_redsys_order, error } = await supabase.from('redsys_orders').select().eq('order_id', addon_wallet_tickets[i].order_id).single();
-              if (error || !addon_redsys_order) return false;
-              if (addon_redsys_order.order_status === 'PAYMENT_SUCCEEDED') {
-                didFindSucceededPayment = true;
-                setAddonTicket(addon_wallet_tickets[i]);
-                break;
+              let didFindSucceededPayment = false;
+              for (let i = 0; i < addon_wallet_tickets.length; i++) {
+                const { data: addon_redsys_order, error } = await supabase.from('redsys_orders').select().eq('order_id', addon_wallet_tickets[i].order_id).single();
+                if (error || !addon_redsys_order) return false;
+                if (addon_redsys_order.order_status === 'PAYMENT_SUCCEEDED') {
+                  didFindSucceededPayment = true;
+                  setAddonTicket(addon_wallet_tickets[i]);
+                  break;
+                }
               }
-            }
-            if (!didFindSucceededPayment) {
-              setAddonTicket(null);
-            }
-          });
-        } else if (wallet_ticket.used_with_addon_id) {
-          supabase.from('wallet_tickets').select().eq('id', wallet_ticket.used_with_addon_id).single()
-          .then(({ data: addon_wallet_ticket, error }) => {
-            if (unmounted || error) {
-              setAddonTicket(null);
-              return;
-            };
-            setAddonTicket(addon_wallet_ticket);
-          });
+              if (!didFindSucceededPayment) {
+                setAddonTicket(null);
+              }
+            });
+          } else if (wallet_ticket.used_with_addon_id) {
+            supabase.from('wallet_tickets').select().eq('id', wallet_ticket.used_with_addon_id).single()
+            .then(({ data: addon_wallet_ticket, error }) => {
+              if (unmounted || error) {
+                setAddonTicket(null);
+                return;
+              };
+              setAddonTicket(addon_wallet_ticket);
+            });
+          } else {
+            setAddonTicket(null);
+          }
         } else {
           setAddonTicket(null);
         }
@@ -279,7 +285,7 @@ export default function ActivateTicketScreen() {
               <Text style={styles.statusInfoText}> </Text>
             </> : <>{ ticketUsedAt === null ? <>
                 <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketActive') }</Text>
-                <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('deactivateTicketOnDrinkExplanation') }</Text>
+                <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ ticketType === 'CONSUMABLE' ? i18n?.t('deactivateTicketOnDrinkExplanation') : i18n?.t('deactivateTicketOnAccessExplanation') }</Text>
               </> : <>
                 <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUnactive') }</Text>
                 <View style={{ alignItems: 'center' }}>

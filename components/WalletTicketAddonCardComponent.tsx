@@ -3,13 +3,13 @@ import { StyleSheet } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
-import { EntypoIcon, FontAwesomeIcon } from './CustomIcons';
+import { EntypoIcon } from './CustomIcons';
 import { supabase } from "../supabase";
 import { WalletTicket } from '../types/supabaseplain';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { useSupabase } from '../context/SupabaseProvider';
 
-export default function WalletTicketCardComponent({ walletTicket }: { walletTicket: WalletTicket }) {
+export default function WalletTicketAddonCardComponent({ walletTicket }: { walletTicket: WalletTicket }) {
   const { i18n, theme } = useSupabase();
   const [eventTicketOrderStatus, setEventTicketOrderStatus] = useState<string>();
   const [shouldDisplayPendingTicket, setShouldDisplayPendingTicket] = useState<boolean>(false);
@@ -122,8 +122,8 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
     }, 5000);
   };
 
-  return (
-    <>{ walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEEDED' || (eventTicketOrderStatus === 'PAYMENT_PENDING')) ?
+  return (<>
+    { walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEEDED' || (eventTicketOrderStatus === 'PAYMENT_PENDING')) ?
       <View style={styles.wrapperContainer}>
         <View style={[styles.singleTicketContainer, {opacity: eventTicketOrderStatus === 'PAYMENT_PENDING' ? .6 : 1 , backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
           <View style={styles.ticketIconWrapper}>
@@ -136,8 +136,8 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
         </View>
         <View style={[styles.separator, {backgroundColor: Colors[theme].contrastSeparatorBackgroundColor}]} />
       </View>
-    : null }</>
-  );
+    : null }
+  </>);
 };
 
 const styles = StyleSheet.create({
@@ -155,6 +155,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 12,
     borderWidth: 2,
+    borderColor: '#00000059',
     flexDirection: 'row',
     alignItems: 'center'
   },
@@ -163,6 +164,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 23,
     borderWidth: 2,
     borderRadius: 12,
+    borderColor: '#00000040',
     margin: -2
   },
   ticketNameWrapper: {

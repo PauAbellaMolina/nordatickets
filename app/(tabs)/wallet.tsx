@@ -35,9 +35,17 @@ export default function TabTwoScreen() {
     supabase.from('wallet_tickets').select().eq('user_id', user.id).is('used_at', null).order('type', { ascending: true })
     .then(({ data: wallet_tickets, error }) => {
       if (unmounted || error) return;
+      const typeOrder = ['ADDON_REFUNDABLE', 'ADDON', 'ACCESS'];
+      const typeOrderMap = new Map(typeOrder.map((type, index) => [type, index]));
+      const orderedWalletTickets = wallet_tickets.sort((a, b) => {
+        const aIndex = typeOrderMap.has(a.type) ? typeOrderMap.get(a.type) : typeOrder.length;
+        const bIndex = typeOrderMap.has(b.type) ? typeOrderMap.get(b.type) : typeOrder.length;
+        return aIndex - bIndex;
+      });
+
       const eventGroupedWalletTickets: WalletTicket[][] = 
       Object.values(
-        wallet_tickets.reduce((groups, ticket) => {
+        orderedWalletTickets.reduce((groups, ticket) => {
           const { event_id } = ticket;
           if (!groups[event_id]) {
             groups[event_id] = [];
