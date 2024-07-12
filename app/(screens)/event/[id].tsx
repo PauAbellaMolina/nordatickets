@@ -78,14 +78,14 @@ export default function EventDetailScreen() {
     if (!user || userIsMinor === undefined || !event) return;
     let unmounted = false;
 
-    supabase.from('event_tickets').select().eq('event_id', id as string).eq('type', 'ACCESS').order('price')
+    supabase.from('event_tickets').select().eq('event_id', id).eq('type', 'ACCESS').order('price')
     .then(({ data: event_tickets, error }) => {
       if (unmounted || error || !event_tickets.length) return;
       setAccessEventTickets(event_tickets);
     });
 
     if (userIsMinor) {
-      supabase.from('event_tickets').select().eq('event_id', id as string).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).is('minor_restricted', false).order('type', { ascending: true }).order('name')
+      supabase.from('event_tickets').select().eq('event_id', id).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).is('minor_restricted', false).order('type', { ascending: true }).order('name')
       .then(({ data: event_tickets, error }) => {
         if (unmounted || error || !event_tickets.length) return;
         const typeOrder = ['ADDON_REFUNDABLE', 'ADDON'];
@@ -98,7 +98,7 @@ export default function EventDetailScreen() {
         setEventTickets(orderedEventTickets);
       });
     } else {
-      supabase.from('event_tickets').select().eq('event_id', id as string).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).order('type', { ascending: true }).order('name')
+      supabase.from('event_tickets').select().eq('event_id', id).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).order('type', { ascending: true }).order('name')
       .then(({ data: event_tickets, error }) => {
         if (unmounted || error || !event_tickets.length) return;
         const typeOrder = ['ADDON_REFUNDABLE', 'ADDON'];
@@ -267,7 +267,7 @@ export default function EventDetailScreen() {
               eventTicketToInclude = accessEventTickets.find((eventTicket) => eventTicket.id === id);
             }
             if (eventTicketToInclude) {
-              const ticketToInsert: NewWalletTicket = { event_id: eventTicketToInclude.event_id, event_tickets_id: eventTicketToInclude.id, event_tickets_name: eventTicketToInclude.name, order_id: orderId, price: eventTicketToInclude.price, used_at: null, user_id: user.id, iva: eventTicketToInclude.iva, type: eventTicketToInclude.type };
+              const ticketToInsert: NewWalletTicket = { event_id: eventTicketToInclude.event_id, event_tickets_id: eventTicketToInclude.id, event_tickets_name: eventTicketToInclude.name, order_id: orderId, price: 0, used_at: null, user_id: user.id, iva: eventTicketToInclude.iva, type: eventTicketToInclude.type };
               supabase.from('wallet_tickets').insert(ticketToInsert)
               .select().then();
             }
