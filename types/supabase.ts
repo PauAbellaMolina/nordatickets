@@ -80,13 +80,14 @@ export type Database = {
           color_code_light: string | null
           created_at: string
           event_id: number | null
+          hide_from_event_page: boolean
           id: number
           iva: number
           minor_restricted: boolean
           name: string | null
           price: number | null
           selling: boolean
-          type: Database["public"]["Enums"]["event_ticket_type"] | null
+          type: Database["public"]["Enums"]["event_ticket_type"]
         }
         Insert: {
           buy_includes_event_tickets_ids?: number[] | null
@@ -94,13 +95,14 @@ export type Database = {
           color_code_light?: string | null
           created_at?: string
           event_id?: number | null
+          hide_from_event_page?: boolean
           id?: number
           iva?: number
           minor_restricted?: boolean
           name?: string | null
           price?: number | null
           selling?: boolean
-          type?: Database["public"]["Enums"]["event_ticket_type"] | null
+          type?: Database["public"]["Enums"]["event_ticket_type"]
         }
         Update: {
           buy_includes_event_tickets_ids?: number[] | null
@@ -108,13 +110,14 @@ export type Database = {
           color_code_light?: string | null
           created_at?: string
           event_id?: number | null
+          hide_from_event_page?: boolean
           id?: number
           iva?: number
           minor_restricted?: boolean
           name?: string | null
           price?: number | null
           selling?: boolean
-          type?: Database["public"]["Enums"]["event_ticket_type"] | null
+          type?: Database["public"]["Enums"]["event_ticket_type"]
         }
         Relationships: [
           {
@@ -305,7 +308,7 @@ export type Database = {
           iva?: number
           order_id?: string | null
           price?: number | null
-          type: Database["public"]["Enums"]["event_ticket_type"]
+          type?: Database["public"]["Enums"]["event_ticket_type"]
           used_at?: string | null
           used_with_addon_id?: number | null
           user_id?: string | null
@@ -325,13 +328,6 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "public_wallet_tickets_event_tickets_name_fkey"
-            columns: ["event_tickets_name"]
-            isOneToOne: false
-            referencedRelation: "event_tickets"
-            referencedColumns: ["name"]
-          },
           {
             foreignKeyName: "wallet_tickets_event_id_fkey"
             columns: ["event_id"]
@@ -679,6 +675,10 @@ export type Database = {
           metadata: Json
           updated_at: string
         }[]
+      }
+      operation: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       search: {
         Args: {

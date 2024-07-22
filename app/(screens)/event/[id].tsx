@@ -323,10 +323,12 @@ export default function EventDetailScreen() {
   };
 
   const renderItemAccessTickets = useCallback(({item}: {item: EventTicket}) => {
+    if (item.hide_from_event_page) return;
     return <EventAccessTicketCardComponent ticket={item} eventSelling={event?.selling_access} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} />;
   }, [cart, event]);
 
   const renderItemTickets = useCallback(({item}: {item: EventTicket}) => {
+    if (item.hide_from_event_page) return;
     if (item.type === "ADDON" || item.type === "ADDON_REFUNDABLE") {
       return <EventAddonTicketCardComponent ticket={item} eventSelling={event?.selling} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} />;
     }
