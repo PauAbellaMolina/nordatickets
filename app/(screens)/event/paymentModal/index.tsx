@@ -34,7 +34,7 @@ export default function PaymentModalScreen() {
               <body onload='document.forms[0].submit();'>
                 <h1>${ i18n?.t('loading') }...</h1>
                 <p>${ i18n?.t('clickIfNoRedirectExplanation') }</p>
-                <form action='${parsedFormUrl}' method='post' target='_top'>
+                <form action='${parsedFormUrl}' method='post'>
                   <input type='hidden' name='Ds_MerchantParameters' value='${parsedDs_MerchantParameters}' />
                   <input type='hidden' name='Ds_Signature' value='${parsedDs_Signature}' />
                   <input type='hidden' name='Ds_SignatureVersion' value='${parsedDs_SignatureVersion}' />
