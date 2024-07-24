@@ -26,45 +26,47 @@ export default function PaymentModalScreen() {
         <Pressable onPress={() => router.back()} style={styles.closeBttnWeb}>
           <FeatherIcon name="x" size={30} color={Colors[theme].text} />
         </Pressable>
-        <iframe 
-            style={styles.iframe}
-            srcDoc={`
-              <html>
-                <body onload='document.forms[0].submit();'>
-                  <h1>${ i18n?.t('loading') }...</h1>
-                  <p>${ i18n?.t('clickIfNoRedirectExplanation') }</p>
-                  <form action='${parsedFormUrl}' method='post'>
-                    <input type='hidden' name='Ds_MerchantParameters' value='${parsedDs_MerchantParameters}' />
-                    <input type='hidden' name='Ds_Signature' value='${parsedDs_Signature}' />
-                    <input type='hidden' name='Ds_SignatureVersion' value='${parsedDs_SignatureVersion}' />
-                    <input class='submitBtn' type='submit' value='Anar-hi' />
-                  </form>
-                </body>
-                <style>
-                  body {
-                    font-family: Arial, sans-serif;
-                    margin: 5dvh 0;
-                    display: flex;
-                    flex-flow: column;
-                    align-items: center;
-                    background-color: #fff;
-                  }
-                  p {
-                    margin: 1dvh 15dvw 0;
-                    text-align: center;
-                  }
-                  .submitBtn {
-                    margin-top: 2.5dvh;
-                    font-size: .85rem;
-                  }
-                </style>
-              </html>
-            `}
-          >
+        <iframe
+          allow="payment"
+          style={styles.iframe}
+          srcDoc={`
+            <html>
+              <body onload='document.forms[0].submit();'>
+                <h1>${ i18n?.t('loading') }...</h1>
+                <p>${ i18n?.t('clickIfNoRedirectExplanation') }</p>
+                <form action='${parsedFormUrl}' method='post'>
+                  <input type='hidden' name='Ds_MerchantParameters' value='${parsedDs_MerchantParameters}' />
+                  <input type='hidden' name='Ds_Signature' value='${parsedDs_Signature}' />
+                  <input type='hidden' name='Ds_SignatureVersion' value='${parsedDs_SignatureVersion}' />
+                  <input class='submitBtn' type='submit' value='Anar-hi' />
+                </form>
+              </body>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  margin: 5dvh 0;
+                  display: flex;
+                  flex-flow: column;
+                  align-items: center;
+                  background-color: #fff;
+                }
+                p {
+                  margin: 1dvh 15dvw 0;
+                  text-align: center;
+                }
+                .submitBtn {
+                  margin-top: 2.5dvh;
+                  font-size: .85rem;
+                }
+              </style>
+            </html>
+          `}
+        >
         </iframe>
       </>:<>
         {/* Uncomment when adding support to ios and android */}
         {/* <WebView
+          enableApplePay={true}
           containerStyle={styles.containerStyle}
           source={{ html: `
             <body onload="document.forms[0].submit();">
