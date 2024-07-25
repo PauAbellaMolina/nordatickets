@@ -229,7 +229,7 @@ export default function EventDetailScreen() {
 
       addPendingTicketsToUser(data.orderId);
 
-      router.navigate({ pathname: '/event/paymentModal', params: { bg: eventBackgroundColor, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } });
+      router.navigate({ pathname: '/event/paymentModal', params: { bg: eventBackgroundColor, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion, savedCard: cardNumber || expiryDate ? 'true' : 'false' } });
     })
     .catch(() => {
       setLoading(false);

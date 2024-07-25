@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Pressable, StyleSheet, Platform } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 // import { WebView } from 'react-native-webview'; // Install package when adding support to ios and android
@@ -9,11 +10,22 @@ import { useSupabase } from '../../../../context/SupabaseProvider';
 
 export default function PaymentModalScreen() {
   const { i18n, theme } = useSupabase();
-  const { bg, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion } = useLocalSearchParams<{ bg: string, formUrl: string, Ds_MerchantParameters: string, Ds_Signature: string, Ds_SignatureVersion: string }>();
+  const { bg, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion, savedCard } = useLocalSearchParams<{ bg: string, formUrl: string, Ds_MerchantParameters: string, Ds_Signature: string, Ds_SignatureVersion: string, savedCard: 'true' | 'false' }>();
   const parsedFormUrl = formUrl.replace(/%2F/g, '/');
   const parsedDs_MerchantParameters = Ds_MerchantParameters.replace(/%2F/g, '/');
   const parsedDs_Signature = Ds_Signature.replace(/%2F/g, '/');
   const parsedDs_SignatureVersion = Ds_SignatureVersion.replace(/%2F/g, '/');
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data === 'close') {
+        router.back();
+      }
+    };
+  
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
   
   return (
     <View style={[styles.container, Platform.OS !== 'web' ? {marginTop: 50} : {paddingHorizontal: 10, paddingVertical: 11}]}>
@@ -27,20 +39,27 @@ export default function PaymentModalScreen() {
           <FeatherIcon name="x" size={30} color={Colors[theme].text} />
         </Pressable>
         <iframe
-          allow="payment *"
+          allow="payment https://sis-t.redsys.es"
           style={styles.iframe}
           srcDoc={`
             <html>
-              <body onload='document.forms[0].submit();'>
+              <body onload='${ savedCard === 'true' ? 'document.forms[0].submit();' : null }'>
                 <h1>${ i18n?.t('loading') }...</h1>
                 <p>${ i18n?.t('clickIfNoRedirectExplanation') }</p>
-                <form action='${parsedFormUrl}' method='post' target='_blank'>
+                <form action='${parsedFormUrl}' method='post' target='${ savedCard === 'true' ? '_self' : '_blank' }'>
                   <input type='hidden' name='Ds_MerchantParameters' value='${parsedDs_MerchantParameters}' />
                   <input type='hidden' name='Ds_Signature' value='${parsedDs_Signature}' />
                   <input type='hidden' name='Ds_SignatureVersion' value='${parsedDs_SignatureVersion}' />
                   <input class='submitBtn' type='submit' value='Anar-hi' />
                 </form>
               </body>
+              <script>
+                document.forms[0].addEventListener('submit', () => {
+                  setTimeout(() => {
+                    window.parent.postMessage('close', 'https://elteutikt.com');
+                  }, 1000);
+                });
+              </script>
               <style>
                 body {
                   font-family: Arial, sans-serif;
