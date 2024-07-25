@@ -62,6 +62,8 @@ export const es: { [key: string]: string } = {
   eventTicketNonRefundableAddonExplanation: 'No se puede devolver',
   loading: 'Cargando',
   clickIfNoRedirectExplanation: 'Si no eres redirigido a la pantalla de pago automáticamente, haz clic en el siguiente botón.',
+  clickToGoToPaymentExplanation: 'Haz clic en el siguiente botón para ir a la pantalla de pago.',
+  goToPaymentScreenBtn: 'Ir al pago',
   simplifiedInvoice: 'Factura simplificada',
   issuer: 'Emisor',
   address: 'Dirección',

@@ -44,13 +44,13 @@ export default function PaymentModalScreen() {
           srcDoc={`
             <html>
               <body onload='${ savedCard === 'true' ? 'document.forms[0].submit();' : null }'>
-                <h1>${ i18n?.t('loading') }...</h1>
-                <p>${ i18n?.t('clickIfNoRedirectExplanation') }</p>
+                <h1>${ savedCard === 'true' ? (i18n?.t('loading') + '...') : i18n?.t('payment') }</h1>
+                <p>${ savedCard === 'true' ? i18n?.t('clickIfNoRedirectExplanation') : i18n?.t('clickToGoToPaymentExplanation') }</p>
                 <form action='${parsedFormUrl}' method='post' target='${ savedCard === 'true' ? '_self' : '_blank' }'>
                   <input type='hidden' name='Ds_MerchantParameters' value='${parsedDs_MerchantParameters}' />
                   <input type='hidden' name='Ds_Signature' value='${parsedDs_Signature}' />
                   <input type='hidden' name='Ds_SignatureVersion' value='${parsedDs_SignatureVersion}' />
-                  <input class='submitBtn' type='submit' value='Anar-hi' />
+                  <input class='submitBtn' type='submit' value='${ i18n?.t('goToPaymentScreenBtn') }' />
                 </form>
               </body>
               <script>
@@ -75,7 +75,10 @@ export default function PaymentModalScreen() {
                 }
                 .submitBtn {
                   margin-top: 2.5dvh;
-                  font-size: .85rem;
+                  font-size: .9rem;
+                  border-radius: 10px;
+                  min-width: 100px;
+                  min-height: 35px;
                 }
               </style>
             </html>

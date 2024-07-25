@@ -62,6 +62,8 @@ export const ca: { [key: string]: string } = {
   eventTicketNonRefundableAddonExplanation: 'No retornable',
   loading: 'Carregant',
   clickIfNoRedirectExplanation: 'Si no ets redireccionat a la pantalla de pagament automàticament, clica el següent botó.',
+  clickToGoToPaymentExplanation: 'Clica el següent botó per anar a la pantalla de pagament.',
+  goToPaymentScreenBtn: 'Anar al pagament',
   simplifiedInvoice: 'Factura simplificada',
   issuer: 'Emissor',
   address: 'Adreça',

@@ -62,6 +62,8 @@ export const en: { [key: string]: string } = {
   eventTicketNonRefundableAddonExplanation: 'Not returnable',
   loading: 'Loading',
   clickIfNoRedirectExplanation: 'If you are not redirected to the payment screen automatically, click the following button.',
+  clickToGoToPaymentExplanation: 'Click the following button to go to the payment screen.',
+  goToPaymentScreenBtn: 'Go to payment',
   simplifiedInvoice: 'Simplified invoice',
   issuer: 'Issuer',
   address: 'Address',
