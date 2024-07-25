@@ -27,7 +27,7 @@ export default function PaymentModalScreen() {
           <FeatherIcon name="x" size={30} color={Colors[theme].text} />
         </Pressable>
         <iframe
-          allow="payment 'self'"
+          allow="payment *"
           style={styles.iframe}
           srcDoc={`
             <html>
