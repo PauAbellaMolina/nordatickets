@@ -27,7 +27,7 @@ export default function PaymentModalScreen() {
           <FeatherIcon name="x" size={30} color={Colors[theme].text} />
         </Pressable>
         <iframe
-          allow="payment https://elteutikt.com/"
+          allow="payment https://sis.redsys.es"
           style={styles.iframe}
           srcDoc={`
             <html>
