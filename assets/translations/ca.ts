@@ -97,5 +97,6 @@ export const ca: { [key: string]: string } = {
   accessControlTickets: 'Entrades',
   requiredToGetIntoTheEvent: 'Necessari per entrar a l\'esdeveniment',
   walletTicketAccessExplanation: "Utilitza'l per accedir a l'esdeveniment",
-  deactivateTicketOnAccessExplanation: "Desactivar ticket quan t'ho demanin per accedir a l'esdeveniment"
+  deactivateTicketOnAccessExplanation: "Desactivar ticket quan t'ho demanin per accedir a l'esdeveniment",
+  download: 'Descarregar'
 };

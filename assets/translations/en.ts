@@ -97,5 +97,6 @@ export const en: { [key: string]: string } = {
   accessControlTickets: 'Access tickets',
   requiredToGetIntoTheEvent: 'Required to get into the event',
   walletTicketAccessExplanation: 'Use it to access the event',
-  deactivateTicketOnAccessExplanation: 'Deactivate ticket when asked to access the event'
+  deactivateTicketOnAccessExplanation: 'Deactivate ticket when asked to access the event',
+  download: 'Download'
 };

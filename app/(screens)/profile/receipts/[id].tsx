@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Dimensions, ActivityIndicator, Platform } from 'react-native';
+import { FlatList, StyleSheet, Dimensions, ActivityIndicator, Platform, Pressable } from 'react-native';
 import { View, Text } from '../../../../components/Themed';
 import { WalletTicket } from "../../../../types/supabaseplain";
 import { useLocalSearchParams } from 'expo-router';
@@ -6,13 +6,15 @@ import TiktLight from '../../../../assets/svgs/tiktlight.svg';
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../supabase';
 import { useSupabase } from '../../../../context/SupabaseProvider';
+import Colors from '../../../../constants/Colors';
 
 export default function ReceiptDetailScreen() {
-  const { user, i18n } = useSupabase();
+  const { user, i18n, theme } = useSupabase();
   const { id } = useLocalSearchParams<{ id: string }>(); //TODO PAU make sure that the user will only be able to retrieve their own receipts. With the correct fetch and also RLS config!!!!
   const { width, height } = Dimensions.get('window');
-  const vwpDimension = width < height/1.414 ? width : height/1.414;
 
+  const [vwpDimension, setVwpDimension] = useState<number>(width < height/1.414 ? width : height/1.414);
+  const [printMode, setPrintMode] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<boolean>(false);
   const [paginatedGroupedWalletTickets, setPaginatedGroupedWalletTickets] = useState<WalletTicket[][][]>([]);
   const [receiptDate, setReceiptDate] = useState<Date>(null);
@@ -91,6 +93,16 @@ export default function ReceiptDetailScreen() {
 
       setPaginatedGroupedWalletTickets(paginatedGroupedWalletTickets);
     });
+  };
+
+  const onDownload = () => {
+    setPrintMode(true);
+    setVwpDimension(600);
+    window.print();
+    setTimeout(() => {
+      setPrintMode(false);
+      setVwpDimension(width < height/1.414 ? width : height/1.414);
+    }, 5000);
   };
 
   const renderItemFolio = useCallback(({item: page, index: pageIndex}: {item: WalletTicket[][], index: number}) => (
@@ -230,7 +242,7 @@ export default function ReceiptDetailScreen() {
         />
       </View>
     </View>
-  ), [user, paginatedGroupedWalletTickets, eventName, eventTicketFee, receiptDate]);
+  ), [user, paginatedGroupedWalletTickets, eventName, eventTicketFee, receiptDate, vwpDimension]);
   
   return !loaded ? 
   (
@@ -238,13 +250,19 @@ export default function ReceiptDetailScreen() {
       <ActivityIndicator size="large" />
     </View>
   ) : (
-    <View style={styles.container}>
+    <View style={[styles.container, printMode ? { backgroundColor: 'white' } : null]}>
       <FlatList
         contentContainerStyle={{alignItems: 'center'}}
-        data={paginatedGroupedWalletTickets}
+        data={[...paginatedGroupedWalletTickets, ...paginatedGroupedWalletTickets, ...paginatedGroupedWalletTickets]}
         ItemSeparatorComponent={() => <View style={{height: 20}} /> }
         renderItem={renderItemFolio}
       />
+      { !printMode ? 
+        <Pressable
+          onPress={onDownload}
+          style={[styles.downloadButton, {borderWidth: 1, borderColor: Colors[theme].text}]}
+        ><Text>{ i18n?.t('download') }</Text></Pressable>
+      : null }
     </View>
   );
 
@@ -347,5 +365,14 @@ const styles = StyleSheet.create({
   borderTop: {
     borderTopColor: 'black',
     paddingTop: 8
+  },
+  downloadButton: {
+    alignSelf: 'center',
+    alignItems: 'center',
+    borderRadius: 15,
+    paddingVertical: 11,
+    paddingHorizontal: 30,
+    marginHorizontal: 25,
+    marginVertical: 13
   }
 });

@@ -97,5 +97,6 @@ export const es: { [key: string]: string } = {
   accessControlTickets: 'Entradas',
   requiredToGetIntoTheEvent: 'Necesario para entrar al evento',
   walletTicketAccessExplanation: 'Úsalo para acceder al evento',
-  deactivateTicketOnAccessExplanation: 'Desactivar ticket cuando te lo pidan para acceder al evento'
+  deactivateTicketOnAccessExplanation: 'Desactivar ticket cuando te lo pidan para acceder al evento',
+  download: 'Descargar'
 };
