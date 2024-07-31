@@ -253,7 +253,7 @@ export default function ReceiptDetailScreen() {
     <View style={[styles.container, printMode ? { backgroundColor: 'white' } : null]}>
       <FlatList
         contentContainerStyle={{alignItems: 'center'}}
-        data={[...paginatedGroupedWalletTickets, ...paginatedGroupedWalletTickets, ...paginatedGroupedWalletTickets]}
+        data={paginatedGroupedWalletTickets}
         ItemSeparatorComponent={() => <View style={{height: 20}} /> }
         renderItem={renderItemFolio}
       />
