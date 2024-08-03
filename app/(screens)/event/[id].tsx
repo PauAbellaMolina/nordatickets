@@ -357,7 +357,9 @@ export default function EventDetailScreen() {
               <Picker.Item label={ i18n?.t('stopFollowingEventConfirmation') } value="unfollow" />
             </Picker>
           </View>
-          <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
+          <ScrollView horizontal>
+            <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
+          </ScrollView>
           { !event.more_info_content ?
             <ScrollView horizontal>
               <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>

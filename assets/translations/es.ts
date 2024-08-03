@@ -18,7 +18,7 @@ export const es: { [key: string]: string } = {
   purchaseReceipts: 'Recibos de compra',
   purchaseReceiptsDetails: 'Detalles del recibo de compra',
   helpAndFaqs: 'Ayuda y preguntas frecuentes',
-  termsAndPrivacy: 'Condiciones de uso y privacidad',
+  termsAndPrivacy: 'Términos y condiciones',
   haveReadAndAcceptTermsAndPrivacy: 'He leído y acepto los términos y condiciones',
   getInContactExplanation: 'Si has tenido algún problema utilizando ElTeuTikt, puedes ponerte en contacto con nosotros desde la misma dirección de correo electrónico con la que estás registrado.',
   sendAnEmailTo: 'Envia un correo a',
@@ -98,5 +98,9 @@ export const es: { [key: string]: string } = {
   requiredToGetIntoTheEvent: 'Necesario para entrar al evento',
   walletTicketAccessExplanation: 'Úsalo para acceder al evento',
   deactivateTicketOnAccessExplanation: 'Desactivar ticket cuando te lo pidan para acceder al evento',
-  download: 'Descargar'
+  download: 'Descargar',
+  legalNotice: 'Aviso Legal',
+  privacyPolicy: 'Política de Privacidad',
+  cookiePolicy: 'Política de Cookies',
+  generalConditions: 'Condiciones Generales de Contratación'
 };
