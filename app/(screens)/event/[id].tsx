@@ -306,6 +306,7 @@ export default function EventDetailScreen() {
       .then(({ data: users, error }) => {
         if (error || !users.length) return;
         swapFollowingEventsChanged();
+        router.navigate('/');
       });
     });
   };
@@ -580,7 +581,7 @@ const styles = StyleSheet.create({
     borderRadius: 5
   },
   accessTickets: {
-    marginBottom: 7
+    marginBottom: 10
   },
   accessTicketsExpand: {
     flexDirection: 'row',
