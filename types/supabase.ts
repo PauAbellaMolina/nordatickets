@@ -142,6 +142,7 @@ export type Database = {
           selling: boolean
           selling_access: boolean
           ticket_fee: number | null
+          tickets_deactivable: boolean
         }
         Insert: {
           color_code_dark?: string | null
@@ -155,6 +156,7 @@ export type Database = {
           selling?: boolean
           selling_access?: boolean
           ticket_fee?: number | null
+          tickets_deactivable?: boolean
         }
         Update: {
           color_code_dark?: string | null
@@ -168,6 +170,7 @@ export type Database = {
           selling?: boolean
           selling_access?: boolean
           ticket_fee?: number | null
+          tickets_deactivable?: boolean
         }
         Relationships: []
       }
@@ -384,6 +387,12 @@ export type Database = {
       read_secret: {
         Args: {
           secret_name: string
+        }
+        Returns: string
+      }
+      user_email_by_id: {
+        Args: {
+          user_id: string
         }
         Returns: string
       }
