@@ -390,7 +390,7 @@ export default function EventDetailScreen() {
                   <Text style={styles.subtitle}>{ i18n?.t('accessControlTickets') }</Text>
                   <FeatherIcon name={accessEventTicketsExpanded ? 'chevron-down' : 'chevron-right'} size={24} color={Colors[theme].text} />
                 </Pressable>
-                <CollapsableComponent expanded={accessEventTicketsExpanded} maxHeight={255}>
+                <CollapsableComponent expanded={accessEventTicketsExpanded} maxHeight={300}>
                   <FlatList
                     style={styles.ticketsList}
                     data={accessEventTickets}

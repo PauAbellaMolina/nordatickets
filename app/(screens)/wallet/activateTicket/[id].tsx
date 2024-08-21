@@ -307,7 +307,7 @@ export default function ActivateTicketScreen() {
             <Pressable disabled={loading} onPress={() => router.navigate('/(tabs)/wallet')} style={[styles.button, loading ? {opacity: .7} : {}, {height: '100%', flex: 1, justifyContent: 'center'}, {backgroundColor: eventBackgroundColor}]}>
               <FeatherIcon name="arrow-left" size={38} color={Colors[theme].text} />
             </Pressable>
-            <Pressable disabled={ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null} onPress={onDeactivateTicket} style={[styles.button, ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null || loading ? {opacity: .7} : {}, {backgroundColor: eventBackgroundColor}]}>
+            <Pressable disabled={!ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null} onPress={onDeactivateTicket} style={[styles.button, !ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null || loading ? {opacity: .7} : {}, {backgroundColor: eventBackgroundColor}]}>
               {loading ?
                 <ActivityIndicator style={styles.buttonLoading} size="large" />
               :
