@@ -6,16 +6,30 @@ import { router } from 'expo-router';
 import { FeatherIcon } from './CustomIcons';
 import { useSupabase } from '../context/SupabaseProvider';
 import { useCallback, useEffect, useState } from 'react';
+import { supabase } from '../supabase';
 
 export default function ReceiptsOrderComponent({ order, eventName, eventTicketFee }: { order: WalletTicket[], eventName: string, eventTicketFee: number}) {
   const { i18n, theme } = useSupabase();
   const [total, setTotal] = useState<number>(null);
+  const [orderDbId, setOrderDbId] = useState<number>(null);
 
   useEffect(() => {
+    let unmounted = false;
+
     if (!order.length) return;
     const totalTickets = order.reduce((acc, ticket) => acc + ticket.price, 0);
     const totalFees = eventTicketFee ? eventTicketFee * order.length : 0;
     setTotal((totalTickets + totalFees) / 100);
+
+    supabase.from('redsys_orders').select('id').eq('order_id', order[0].order_id).single()
+    .then(({ data: redsys_order, error }) => {
+      if (unmounted || error || !redsys_order) return;
+      setOrderDbId(redsys_order.id);
+    });
+
+    return () => {
+      unmounted = true;
+    };
   }, [order]);
 
   const onGoToReceiptDetail = () => {
@@ -31,7 +45,7 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <View>
           <Text style={styles.orderTitle}>{ i18n?.t('invoiceNumber') }:</Text>
-          <Text style={styles.orderTitle}>{ order[0].id }</Text>
+          <Text style={styles.orderTitle}>{ orderDbId }</Text>
         </View>
         <View>
           <Text style={styles.orderInfo}>{ new Date(order[0].created_at).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) }h</Text>
