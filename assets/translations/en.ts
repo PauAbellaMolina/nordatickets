@@ -102,5 +102,7 @@ export const en: { [key: string]: string } = {
   legalNotice: 'Legal notice',
   privacyPolicy: 'Privacy policy',
   cookiePolicy: 'Cookie policy',
-  generalConditions: 'General conditions'
+  generalConditions: 'General conditions',
+  enterYourAnswer: 'Enter your answer',
+  addToCart: 'Add to cart'
 };

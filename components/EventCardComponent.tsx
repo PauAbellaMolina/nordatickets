@@ -14,7 +14,7 @@ export default function EventCardComponent(event: Event) {
 
   const goToEventDetail = () => {
     router.navigate(`/event/${event.id}`);
-  }
+  };
 
   useEffect(() => {
     if (!event || (theme === 'dark' && !event?.color_code_dark) || (theme === 'light' && !event?.color_code_light)) {

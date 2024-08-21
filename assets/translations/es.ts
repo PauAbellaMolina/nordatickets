@@ -102,5 +102,7 @@ export const es: { [key: string]: string } = {
   legalNotice: 'Aviso Legal',
   privacyPolicy: 'Política de Privacidad',
   cookiePolicy: 'Política de Cookies',
-  generalConditions: 'Condiciones Generales de Contratación'
+  generalConditions: 'Condiciones Generales de Contratación',
+  enterYourAnswer: 'Introduce tu respuesta',
+  addToCart: 'Añadir al carrito'
 };

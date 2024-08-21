@@ -102,5 +102,7 @@ export const ca: { [key: string]: string } = {
   legalNotice: 'Avís legal',
   privacyPolicy: 'Política de privacitat',
   cookiePolicy: 'Política de cookies',
-  generalConditions: 'Condicions generals de contractació'
+  generalConditions: 'Condicions generals de contractació',
+  enterYourAnswer: 'Introdueix la teva resposta',
+  addToCart: 'Afegir al carretó'
 };
