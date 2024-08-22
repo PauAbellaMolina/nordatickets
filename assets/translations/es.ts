@@ -104,5 +104,6 @@ export const es: { [key: string]: string } = {
   cookiePolicy: 'Política de Cookies',
   generalConditions: 'Condiciones Generales de Contratación',
   enterYourAnswer: 'Introduce tu respuesta',
-  addToCart: 'Añadir al carrito'
+  addToCart: 'Añadir al carrito',
+  showFormSubmit: 'Información agregada'
 };

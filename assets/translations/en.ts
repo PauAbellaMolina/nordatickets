@@ -104,5 +104,6 @@ export const en: { [key: string]: string } = {
   cookiePolicy: 'Cookie policy',
   generalConditions: 'General conditions',
   enterYourAnswer: 'Enter your answer',
-  addToCart: 'Add to cart'
+  addToCart: 'Add to cart',
+  showFormSubmit: 'Information added'
 };

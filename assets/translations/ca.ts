@@ -104,5 +104,6 @@ export const ca: { [key: string]: string } = {
   cookiePolicy: 'Política de cookies',
   generalConditions: 'Condicions generals de contractació',
   enterYourAnswer: 'Introdueix la teva resposta',
-  addToCart: 'Afegir al carretó'
+  addToCart: 'Afegir al carretó',
+  showFormSubmit: 'Informació afegida'
 };
