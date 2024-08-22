@@ -7,7 +7,7 @@ import Colors from '../../../constants/Colors';
 import { FeatherIcon } from '../../../components/CustomIcons';
 import GoBackArrow from '../../../components/GoBackArrow';
 import { supabase } from "../../../supabase";
-import { Event, WalletTicket, EventTicket } from '../../../types/supabaseplain';
+import { Event, WalletTicket, EventTicket, TicketFormSubmit } from '../../../types/supabaseplain';
 import { useSupabase } from '../../../context/SupabaseProvider';
 import { Picker } from '@react-native-picker/picker';
 import { getThemeRandomColor } from '../../../utils/chooseRandomColor';
@@ -16,7 +16,7 @@ import EventAddonTicketCardComponent from '../../../components/EventAddonTicketC
 import EventAccessTicketCardComponent from '../../../components/EventAccessTicketCardComponent';
 import Checkbox from 'expo-checkbox';
 
-type CartItem = { eventTicket: EventTicket, quantity: number };
+type CartItem = { eventTicket: EventTicket, quantity: number, associatedTicketFormSubmit?: Partial<TicketFormSubmit> };
 type Cart = CartItem[] | null;
 
 export default function EventDetailScreen() {
@@ -164,9 +164,9 @@ export default function EventDetailScreen() {
     setCartTotalQuantity(totalQuantity);
   }, [user, cart]);
 
-  const onAddTicketHandler = (ticket: EventTicket) => {
+  const onAddTicketHandler = (ticket: EventTicket, associatedTicketFormSubmit?: Partial<TicketFormSubmit>) => {
     if (!cart) {
-      setCart([{eventTicket: ticket, quantity: 1}]);
+      setCart([{eventTicket: ticket, quantity: 1, associatedTicketFormSubmit}]);
       return;
     }
     const existingCartItem = cart.find((cartItem) => cartItem.eventTicket.id === ticket.id);
@@ -174,7 +174,7 @@ export default function EventDetailScreen() {
       existingCartItem.quantity++;
       setCart([...cart]);
     } else {
-      setCart([...cart, {eventTicket: ticket, quantity: 1}]);
+      setCart([...cart, {eventTicket: ticket, quantity: 1, associatedTicketFormSubmit}]);
     }
   };
   const onRemoveTicketHandler = (ticket: EventTicket) => {
@@ -256,8 +256,18 @@ export default function EventDetailScreen() {
     cart.forEach((cartItem) => {
       for (let i = 0; i < cartItem.quantity; i++) {
         const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, event_tickets_name: cartItem.eventTicket.name, order_id: orderId, price: cartItem.eventTicket.price, used_at: null, user_id: user.id, iva: cartItem.eventTicket.iva, type: cartItem.eventTicket.type };
-        supabase.from('wallet_tickets').insert(ticketToInsert)
-        .select().then();
+        supabase.from('wallet_tickets').insert(ticketToInsert).select().single()
+        .then(({ data: wallet_ticket, error }) => {
+          if (error || !wallet_ticket || !cartItem.associatedTicketFormSubmit) return;
+          const ticketFormSubmit: Partial<TicketFormSubmit> & { wallet_tickets_id: number, user_id: string, event_id: number, tickets_form_templates_id: number } = {
+            entries: cartItem.associatedTicketFormSubmit.entries,
+            event_id: cartItem.eventTicket.event_id,
+            tickets_form_templates_id: cartItem.associatedTicketFormSubmit.tickets_form_templates_id,
+            wallet_tickets_id: wallet_ticket.id,
+            user_id: user.id
+          };
+          supabase.from('ticket_form_submits').insert(ticketFormSubmit).then();
+        });
 
         const buyIncludesIds = cartItem.eventTicket.buy_includes_event_tickets_ids;
         if (buyIncludesIds?.length) {

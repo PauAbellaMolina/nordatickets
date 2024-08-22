@@ -12,7 +12,7 @@ export interface TicketCardComponentProps {
   eventSelling: boolean,
   quantityInCart: number,
   onRemoveTicket: (ticket: EventTicket) => void,
-  onAddTicket: (ticket: EventTicket) => void,
+  onAddTicket: (ticket: EventTicket, associatedTicketFormSubmit?: Partial<TicketFormSubmit>) => void,
   ticket: EventTicket
 }
 
@@ -20,6 +20,7 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
   const { i18n, theme } = useSupabase();
 
   const [formExpanded, setFormExpanded] = useState<boolean>(false);
+  const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
 
   const onExpandForm = () => {
     setFormExpanded(!formExpanded);
@@ -30,6 +31,8 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
       return;
     }
     onRemoveTicket(ticket);
+    setFormSubmitted(false);
+    setFormExpanded(false);
   };
   const onAdd = () => {
     if (quantityInCart === 5) {
@@ -39,7 +42,11 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
   };
 
   const onFormSubmit = (ticketFormSubmit: Partial<TicketFormSubmit>) => {
-    console.log('ticketFormSubmit out', ticketFormSubmit);
+    if (quantityInCart === 5) {
+      return;
+    }
+    setFormSubmitted(true);
+    onAddTicket(ticket, ticketFormSubmit);
   };
   
   return (
@@ -58,23 +65,23 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
           { eventSelling ? <>
             { ticket.selling ? <>
               { ticket.ticket_form_templates_id ?
-                <Pressable onPress={onExpandForm}>
-                  <FeatherIcon name={formExpanded ? 'chevron-up' : 'chevron-down'} size={28} color={Colors[theme].text} />
+                <Pressable onPress={formSubmitted ? onRemove : onExpandForm}>
+                  <FeatherIcon name={formSubmitted ? 'x-circle' : formExpanded ? 'chevron-up' : 'chevron-down'} size={28} color={Colors[theme].text} />
                 </Pressable>
               :
                 <Pressable onPress={quantityInCart === 1 ? onRemove : onAdd}>
                   <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={28} color={quantityInCart === 5 ? Colors[theme].text+'60' : Colors[theme].text} />
                 </Pressable>
-}
+              }
             </> :
               <Text style={styles.notAvailable}>{ i18n?.t('notAvailable') }</Text>
             }
-          </> : <></> }
+          </> : null }
         </View>
       </View>
       { ticket.ticket_form_templates_id ?
         <CollapsableComponent expanded={formExpanded} maxHeight={200}>
-          <EventTicketCardFormComponent event_id={ticket.event_id} ticket_form_templates_id={ticket.ticket_form_templates_id} onSubmit={onFormSubmit} />
+          <EventTicketCardFormComponent event_id={ticket.event_id} ticket_form_templates_id={ticket.ticket_form_templates_id} onSubmit={onFormSubmit} formSubmitted={formSubmitted} />
         </CollapsableComponent>
       : null }
     </View>

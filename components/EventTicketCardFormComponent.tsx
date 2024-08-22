@@ -6,11 +6,12 @@ import { TextInput, StyleSheet, Pressable } from 'react-native';
 import { useSupabase } from '../context/SupabaseProvider';
 import Colors from '../constants/Colors';
 
-export default function EventAccessTicketCardFormComponent({ event_id, ticket_form_templates_id, onSubmit }: { event_id: number, ticket_form_templates_id: number, onSubmit: (ticketFormSubmit: Partial<TicketFormSubmit>) => void }) {
+export default function EventAccessTicketCardFormComponent({ event_id, ticket_form_templates_id, onSubmit, formSubmitted }: { event_id: number, ticket_form_templates_id: number, onSubmit: (ticketFormSubmit: Partial<TicketFormSubmit>) => void, formSubmitted: boolean }) {
   const { i18n, theme } = useSupabase();
   
   const [ticketFormTemplate, setTicketFormTemplate] = useState<TicketFormTemplate>(null);
   const [formData, setFormData] = useState<Record<string, string>>({});
+  const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
 
   useEffect(() => {
     let unmounted = false;
@@ -26,7 +27,19 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
     };
   }, [ticket_form_templates_id]);
 
+  useEffect(() => {
+    if (!formSubmitted) {
+      setFormData({});
+      setAttemptedSubmit(false);
+    }
+  }, [formSubmitted]);
+
   const onPressSubmit = () => {
+    if (formSubmitted) {
+      return;
+    }
+    setAttemptedSubmit(true);
+
     const requiredFields = Object.entries(ticketFormTemplate)
     .filter(([key, value]) => key.startsWith('q') && !key.includes('_') && ticketFormTemplate[`${key}_required`])
     .map(([key]) => key);
@@ -44,7 +57,7 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
     onSubmit(ticketFormSubmit);
   };
 
-  const renderInput = (key: string, question: string, type: string, required: boolean, options: string[] | null) => {
+  const renderInput = (key: string, question: string, type: string, required: boolean, options: string[] | null, formSubmitted: boolean) => {
     const isRequired = required ? ' *' : '';
 
     const getKeyboardType = () => {
@@ -65,8 +78,10 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
         <Text style={styles.questionText}>{question}{isRequired}</Text>
         <TextInput
           style={[styles.input, { color: Colors[theme].text, borderColor: Colors[theme].inputBorderColor },
-            required && !formData[key] ? styles.requiredInput : null
+            attemptedSubmit && required && !formData[key] ? styles.requiredInput : null,
+            formSubmitted ? styles.submittedInput : null
           ]}
+          editable={!formSubmitted}
           placeholder={i18n?.t('enterYourAnswer')}
           placeholderTextColor={Colors[theme].text+'99'}
           keyboardType={getKeyboardType()}
@@ -85,10 +100,10 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
           const type = ticketFormTemplate[`${key}_type`];
           const required = ticketFormTemplate[`${key}_required`];
           const options = ticketFormTemplate[`${key}_options`];
-          return renderInput(key, String(question), type, required, options);
+          return renderInput(key, String(question), type, required, options, formSubmitted);
         })
       }
-      <Pressable onPress={onPressSubmit} style={[styles.submitButton, { backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity }]}>
+      <Pressable onPress={onPressSubmit} style={[styles.submitButton, { backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity, opacity: formSubmitted ? 0.5 : 1 }]}>
         <Text style={[styles.submitButtonText, { color: Colors[theme].text }]}>{i18n?.t('addToCart')}</Text>
       </Pressable>
     </View>
@@ -118,6 +133,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     fontSize: 14
+  },
+  submittedInput: {
+    borderColor: 'transparent',
+    fontWeight: 'bold'
   },
   requiredInput: {
     borderColor: 'red',

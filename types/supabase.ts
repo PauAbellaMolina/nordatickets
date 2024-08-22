@@ -262,28 +262,38 @@ export type Database = {
         Row: {
           created_at: string
           entries: string[] | null
-          event_id: number | null
+          event_id: number
           id: number
-          tickets_form_templates_id: number | null
-          wallet_tickets_id: number | null
+          tickets_form_templates_id: number
+          user_id: string
+          wallet_tickets_id: number
         }
         Insert: {
           created_at?: string
           entries?: string[] | null
-          event_id?: number | null
+          event_id: number
           id?: number
-          tickets_form_templates_id?: number | null
-          wallet_tickets_id?: number | null
+          tickets_form_templates_id: number
+          user_id: string
+          wallet_tickets_id: number
         }
         Update: {
           created_at?: string
           entries?: string[] | null
-          event_id?: number | null
+          event_id?: number
           id?: number
-          tickets_form_templates_id?: number | null
-          wallet_tickets_id?: number | null
+          tickets_form_templates_id?: number
+          user_id?: string
+          wallet_tickets_id?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "ticket_form_submits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "ticket_form_submits_wallet_tickets_id_fkey"
             columns: ["wallet_tickets_id"]
