@@ -85,12 +85,13 @@ export default function ActivateTicketScreen() {
         return;
       };
 
-      supabase.from('ticket_form_submits').select().eq('wallet_tickets_id', wallet_ticket.id).single() //TODO PAU this will fail and show a message on console with all tickets that dont have form associated. figure out how to not show this error message on console.
-      .then(({ data: ticket_form_submit, error }) => {
-        if (error || !ticket_form_submit) return;
-        setTicketFormSubmit(ticket_form_submit);
-        console.log('ticket_form_submit', ticket_form_submit); //TODO PAU continue here showing the form submit entries in the UI
-      });
+      if (wallet_ticket.ticket_form_submits_id) {
+        supabase.from('ticket_form_submits').select().eq('id', wallet_ticket.ticket_form_submits_id).single()
+        .then(({ data: ticket_form_submit, error }) => {
+          if (error || !ticket_form_submit) return;
+          setTicketFormSubmit(ticket_form_submit);
+        });
+      }
 
       supabase.from('redsys_orders').select().eq('order_id', wallet_ticket.order_id).single()
       .then(({ data: redsys_order, error }) => {

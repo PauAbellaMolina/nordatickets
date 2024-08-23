@@ -5,6 +5,7 @@ import { supabase } from '../supabase';
 import { TextInput, StyleSheet, Pressable } from 'react-native';
 import { useSupabase } from '../context/SupabaseProvider';
 import Colors from '../constants/Colors';
+import { formatDateInput, isValidDate, isValidEmail } from '../utils/formValidationUtils';
 
 export default function EventAccessTicketCardFormComponent({ event_id, ticket_form_templates_id, onSubmit, formSubmitted }: { event_id: number, ticket_form_templates_id: number, onSubmit: (ticketFormSubmit: Partial<TicketFormSubmit>) => void, formSubmitted: boolean }) {
   const { i18n, theme } = useSupabase();
@@ -43,9 +44,19 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
     const requiredFields = Object.entries(ticketFormTemplate)
     .filter(([key, value]) => key.startsWith('q') && !key.includes('_') && ticketFormTemplate[`${key}_required`])
     .map(([key]) => key);
-
     const missingFields = requiredFields.filter(field => !formData[field]);
-    if (missingFields.length > 0) {
+
+    const invalidDateFields = Object.entries(ticketFormTemplate)
+    .filter(([key, value]) => key.startsWith('q') && !key.includes('_') && ticketFormTemplate[`${key}_type`] === 'DATE')
+    .map(([key]) => key)
+    .filter(key => formData[key] && !isValidDate(formData[key]));
+
+    const invalidEmailFields = Object.entries(ticketFormTemplate)
+    .filter(([key, value]) => key.startsWith('q') && !key.includes('_') && ticketFormTemplate[`${key}_type`] === 'EMAIL')
+    .map(([key]) => key)
+    .filter(key => formData[key] && !isValidEmail(formData[key]));
+
+    if (missingFields.length > 0 || invalidDateFields.length > 0 || invalidEmailFields.length > 0) {
       return;
     }
 
@@ -59,6 +70,7 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
 
   const renderInput = (key: string, question: string, type: string, required: boolean, options: string[] | null, formSubmitted: boolean) => {
     const isRequired = required ? ' *' : '';
+    const maxLength = ticketFormTemplate[`${key}_max_length`] as number | undefined;
 
     const getKeyboardType = () => {
       switch (type) {
@@ -68,25 +80,41 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
           return 'numeric';
         case 'EMAIL':
           return 'email-address';
+        case 'DATE':
+          return 'numeric';
         default:
           return 'default';
       }
+    };
+
+    const handleInputChange = (text: string) => {
+      let formattedText = text.replace(/[<>&]/g, '');
+      if (type === 'DATE') {
+        formattedText = formatDateInput(formattedText);
+      }
+      setFormData(prev => ({ ...prev, [key]: formattedText }));
     };
     
     return (
       <View key={key} style={styles.questionContainer}>
         <Text style={styles.questionText}>{question}{isRequired}</Text>
         <TextInput
-          style={[styles.input, { color: Colors[theme].text, borderColor: Colors[theme].inputBorderColor },
-            attemptedSubmit && required && !formData[key] ? styles.requiredInput : null,
-            formSubmitted ? styles.submittedInput : null
-          ]}
+          style={[
+          styles.input,
+          { color: Colors[theme].text, borderColor: Colors[theme].inputBorderColor },
+          (attemptedSubmit && required && !formData[key]) ||
+          (type === 'DATE' && formData[key] && !isValidDate(formData[key])) ||
+          (type === 'EMAIL' && formData[key] && !isValidEmail(formData[key])) 
+            ? styles.inputError : null,
+          formSubmitted ? styles.submittedInput : null
+        ]}
           editable={!formSubmitted}
-          placeholder={i18n?.t('enterYourAnswer')}
+          placeholder={type === 'DATE' ? new Date().toLocaleDateString('es-ES') : i18n?.t('enterYourAnswer')}
           placeholderTextColor={Colors[theme].text+'99'}
           keyboardType={getKeyboardType()}
           value={formData[key] || ''}
-          onChangeText={(text) => setFormData(prev => ({ ...prev, [key]: text }))}
+          onChangeText={handleInputChange}
+          maxLength={type === 'DATE' ? 10 : maxLength}
         />
       </View>
     );
@@ -138,7 +166,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
     fontWeight: 'bold'
   },
-  requiredInput: {
+  inputError: {
     borderColor: 'red',
     borderWidth: 1
   },

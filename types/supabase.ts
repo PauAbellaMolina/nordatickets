@@ -266,7 +266,6 @@ export type Database = {
           id: number
           tickets_form_templates_id: number
           user_id: string
-          wallet_tickets_id: number
         }
         Insert: {
           created_at?: string
@@ -275,7 +274,6 @@ export type Database = {
           id?: number
           tickets_form_templates_id: number
           user_id: string
-          wallet_tickets_id: number
         }
         Update: {
           created_at?: string
@@ -284,7 +282,6 @@ export type Database = {
           id?: number
           tickets_form_templates_id?: number
           user_id?: string
-          wallet_tickets_id?: number
         }
         Relationships: [
           {
@@ -294,13 +291,6 @@ export type Database = {
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "ticket_form_submits_wallet_tickets_id_fkey"
-            columns: ["wallet_tickets_id"]
-            isOneToOne: false
-            referencedRelation: "wallet_tickets"
-            referencedColumns: ["id"]
-          },
         ]
       }
       ticket_form_templates: {
@@ -308,14 +298,17 @@ export type Database = {
           created_at: string
           id: number
           q1: string | null
+          q1_max_length: number | null
           q1_options: string[] | null
           q1_required: boolean
           q1_type: Database["public"]["Enums"]["ticket_form_templates_q_type"]
           q2: string | null
+          q2_max_length: number | null
           q2_options: string[] | null
           q2_required: boolean
           q2_type: Database["public"]["Enums"]["ticket_form_templates_q_type"]
           q3: string | null
+          q3_max_length: number | null
           q3_options: string[] | null
           q3_required: boolean
           q3_type: Database["public"]["Enums"]["ticket_form_templates_q_type"]
@@ -324,14 +317,17 @@ export type Database = {
           created_at?: string
           id?: number
           q1?: string | null
+          q1_max_length?: number | null
           q1_options?: string[] | null
           q1_required?: boolean
           q1_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
           q2?: string | null
+          q2_max_length?: number | null
           q2_options?: string[] | null
           q2_required?: boolean
           q2_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
           q3?: string | null
+          q3_max_length?: number | null
           q3_options?: string[] | null
           q3_required?: boolean
           q3_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
@@ -340,14 +336,17 @@ export type Database = {
           created_at?: string
           id?: number
           q1?: string | null
+          q1_max_length?: number | null
           q1_options?: string[] | null
           q1_required?: boolean
           q1_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
           q2?: string | null
+          q2_max_length?: number | null
           q2_options?: string[] | null
           q2_required?: boolean
           q2_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
           q3?: string | null
+          q3_max_length?: number | null
           q3_options?: string[] | null
           q3_required?: boolean
           q3_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
@@ -448,6 +447,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "wallet_tickets_ticket_form_submits_id_fkey"
+            columns: ["ticket_form_submits_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_form_submits"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "wallet_tickets_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -505,7 +511,12 @@ export type Database = {
         | "PAYMENT_PENDING"
         | "PAYMENT_SUCCEEDED"
         | "PAYMENT_FAILED"
-      ticket_form_templates_q_type: "TEXT" | "EMAIL" | "NUMBER" | "DATE"
+      ticket_form_templates_q_type:
+        | "TEXT"
+        | "EMAIL"
+        | "NUMBER"
+        | "DATE"
+        | "OPTIONS"
     }
     CompositeTypes: {
       [_ in never]: never

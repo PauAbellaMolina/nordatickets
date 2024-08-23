@@ -246,6 +246,7 @@ export default function EventDetailScreen() {
     user_id: WalletTicket['user_id'];
     iva: WalletTicket['iva'];
     type: WalletTicket['type'];
+    ticket_form_submits_id?: WalletTicket['ticket_form_submits_id'];
   };
 
   const addPendingTicketsToUser = (orderId: string) => {
@@ -255,19 +256,23 @@ export default function EventDetailScreen() {
 
     cart.forEach((cartItem) => {
       for (let i = 0; i < cartItem.quantity; i++) {
-        const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, event_tickets_name: cartItem.eventTicket.name, order_id: orderId, price: cartItem.eventTicket.price, used_at: null, user_id: user.id, iva: cartItem.eventTicket.iva, type: cartItem.eventTicket.type };
-        supabase.from('wallet_tickets').insert(ticketToInsert).select().single()
-        .then(({ data: wallet_ticket, error }) => {
-          if (error || !wallet_ticket || !cartItem.associatedTicketFormSubmit) return;
-          const ticketFormSubmit: Partial<TicketFormSubmit> & { wallet_tickets_id: number, user_id: string, event_id: number, tickets_form_templates_id: number } = {
+        if (cartItem.associatedTicketFormSubmit) {
+          const ticketFormSubmit: Partial<TicketFormSubmit> & { user_id: string, event_id: number, tickets_form_templates_id: number } = {
             entries: cartItem.associatedTicketFormSubmit.entries,
             event_id: cartItem.eventTicket.event_id,
             tickets_form_templates_id: cartItem.associatedTicketFormSubmit.tickets_form_templates_id,
-            wallet_tickets_id: wallet_ticket.id,
             user_id: user.id
           };
-          supabase.from('ticket_form_submits').insert(ticketFormSubmit).then();
-        });
+          supabase.from('ticket_form_submits').insert(ticketFormSubmit).select().single()
+          .then(({ data: ticket_form_submit, error }) => {
+            if (error || !ticket_form_submit) return;
+            const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, event_tickets_name: cartItem.eventTicket.name, order_id: orderId, price: cartItem.eventTicket.price, used_at: null, user_id: user.id, iva: cartItem.eventTicket.iva, type: cartItem.eventTicket.type, ticket_form_submits_id: ticket_form_submit.id };
+            supabase.from('wallet_tickets').insert(ticketToInsert).then();
+          });
+        } else {
+          const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, event_tickets_name: cartItem.eventTicket.name, order_id: orderId, price: cartItem.eventTicket.price, used_at: null, user_id: user.id, iva: cartItem.eventTicket.iva, type: cartItem.eventTicket.type };
+          supabase.from('wallet_tickets').insert(ticketToInsert).then();
+        }
 
         const buyIncludesIds = cartItem.eventTicket.buy_includes_event_tickets_ids;
         if (buyIncludesIds?.length) {
