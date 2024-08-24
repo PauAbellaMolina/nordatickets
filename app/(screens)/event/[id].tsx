@@ -204,6 +204,12 @@ export default function EventDetailScreen() {
 
   const getPaymentFormInfo = () => {
     const finalAmount = cartTotalPrice + ((event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0));
+
+    if (finalAmount === 0) {
+      addPendingTicketsToUser('free');
+      return;
+    }
+
     fetch(process.env.EXPO_PUBLIC_FIREBASE_FUNC_GET_FORM_INFO_URL, {
       method: 'POST',
       headers: {

@@ -393,7 +393,7 @@ export type Database = {
           event_tickets_name: string | null
           id: number
           iva: number
-          order_id: string | null
+          order_id: string
           price: number | null
           ticket_form_submits_id: number | null
           type: Database["public"]["Enums"]["event_ticket_type"]
@@ -408,7 +408,7 @@ export type Database = {
           event_tickets_name?: string | null
           id?: number
           iva?: number
-          order_id?: string | null
+          order_id: string
           price?: number | null
           ticket_form_submits_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
@@ -423,7 +423,7 @@ export type Database = {
           event_tickets_name?: string | null
           id?: number
           iva?: number
-          order_id?: string | null
+          order_id?: string
           price?: number | null
           ticket_form_submits_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]

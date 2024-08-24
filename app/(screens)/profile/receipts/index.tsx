@@ -33,6 +33,9 @@ export default function ReceiptsScreen() {
       Object.values(
         wallet_tickets.reduce((groups, ticket) => {
           const { order_id } = ticket;
+          if (order_id === 'free') {
+            return groups;
+          }
           if (!groups[order_id]) {
             groups[order_id] = [];
           }

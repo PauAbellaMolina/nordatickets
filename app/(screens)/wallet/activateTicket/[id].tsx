@@ -93,6 +93,11 @@ export default function ActivateTicketScreen() {
         });
       }
 
+      if (wallet_ticket.order_id === 'free') {
+        proceedWalletTickets(wallet_ticket, unmounted);
+        return;
+      }
+
       supabase.from('redsys_orders').select().eq('order_id', wallet_ticket.order_id).single()
       .then(({ data: redsys_order, error }) => {
         if (error || !redsys_order) return;
@@ -101,82 +106,91 @@ export default function ActivateTicketScreen() {
           return;
         }
 
-        if (wallet_ticket.type === 'ADDON' || wallet_ticket.type === 'ADDON_REFUNDABLE') {
-          router.navigate('/(tabs)/wallet');
-          return;
-        }
-  
-        setTicketName(wallet_ticket.event_tickets_name);
-        setTicketUsedAt(wallet_ticket.used_at);
-        setTicketType(wallet_ticket.type);
-  
-        supabase.from('event_tickets').select().eq('id', wallet_ticket.event_tickets_id)
-        .then(({ data: event_tickets, error }) => {
-          if (unmounted || error || !event_tickets.length) return;
-          if ((theme === 'dark' && !event_tickets[0]?.color_code_dark) || (theme === 'light' && !event_tickets[0]?.color_code_light)) {
-            setEventBackgroundColor(getThemeRandomColor(theme));
-            setDarkEventBackgroundColor(getThemeRandomColor('dark'));
-            setLightEventBackgroundColor(getThemeRandomColor('light'));
-            return;
-          };
-  
-          setDarkEventBackgroundColor(event_tickets[0]?.color_code_dark ? event_tickets[0].color_code_dark : getThemeRandomColor('dark'));
-          setLightEventBackgroundColor(event_tickets[0]?.color_code_light ? event_tickets[0].color_code_light : getThemeRandomColor('light'));
-  
-          if (theme === 'dark') {
-            setEventBackgroundColor(event_tickets[0].color_code_dark);
-          } else {
-            setEventBackgroundColor(event_tickets[0].color_code_light);
-          }
-        });
-        
-        supabase.from('events').select().eq('id', wallet_ticket.event_id).single()
-        .then(({ data: event, error }) => {
-          if (unmounted || error || !event) return;
-          setEventName(event.name);
-          setTicketDeactivable(event.tickets_deactivable);
-        });
-  
-        if (wallet_ticket.type === 'CONSUMABLE') {
-          if (wallet_ticket.used_at === null) {
-            supabase.from('wallet_tickets').select().eq('event_id', wallet_ticket.event_id).eq('user_id', user.id).in('type', ['ADDON', 'ADDON_REFUNDABLE']).is('used_at', null)
-            .then(async ({ data: addon_wallet_tickets, error }) => {
-              if (unmounted || error || !addon_wallet_tickets.length) {
-                setAddonTicket(null);
-                return;
-              };
-
-              let didFindSucceededPayment = false;
-              for (let i = 0; i < addon_wallet_tickets.length; i++) {
-                const { data: addon_redsys_order, error } = await supabase.from('redsys_orders').select().eq('order_id', addon_wallet_tickets[i].order_id).single();
-                if (error || !addon_redsys_order) return false;
-                if (addon_redsys_order.order_status === 'PAYMENT_SUCCEEDED') {
-                  didFindSucceededPayment = true;
-                  setAddonTicket(addon_wallet_tickets[i]);
-                  break;
-                }
-              }
-              if (!didFindSucceededPayment) {
-                setAddonTicket(null);
-              }
-            });
-          } else if (wallet_ticket.used_with_addon_id) {
-            supabase.from('wallet_tickets').select().eq('id', wallet_ticket.used_with_addon_id).single()
-            .then(({ data: addon_wallet_ticket, error }) => {
-              if (unmounted || error) {
-                setAddonTicket(null);
-                return;
-              };
-              setAddonTicket(addon_wallet_ticket);
-            });
-          } else {
-            setAddonTicket(null);
-          }
-        } else {
-          setAddonTicket(null);
-        }
+        proceedWalletTickets(wallet_ticket, unmounted);
       });
     });
+  };
+  
+  const proceedWalletTickets = (wallet_ticket: WalletTicket, unmounted: boolean) => {
+    if (wallet_ticket.type === 'ADDON' || wallet_ticket.type === 'ADDON_REFUNDABLE') {
+      router.navigate('/(tabs)/wallet');
+      return;
+    }
+
+    setTicketName(wallet_ticket.event_tickets_name);
+    setTicketUsedAt(wallet_ticket.used_at);
+    setTicketType(wallet_ticket.type);
+
+    supabase.from('event_tickets').select().eq('id', wallet_ticket.event_tickets_id)
+    .then(({ data: event_tickets, error }) => {
+      if (unmounted || error || !event_tickets.length) return;
+      if ((theme === 'dark' && !event_tickets[0]?.color_code_dark) || (theme === 'light' && !event_tickets[0]?.color_code_light)) {
+        setEventBackgroundColor(getThemeRandomColor(theme));
+        setDarkEventBackgroundColor(getThemeRandomColor('dark'));
+        setLightEventBackgroundColor(getThemeRandomColor('light'));
+        return;
+      };
+
+      setDarkEventBackgroundColor(event_tickets[0]?.color_code_dark ? event_tickets[0].color_code_dark : getThemeRandomColor('dark'));
+      setLightEventBackgroundColor(event_tickets[0]?.color_code_light ? event_tickets[0].color_code_light : getThemeRandomColor('light'));
+
+      if (theme === 'dark') {
+        setEventBackgroundColor(event_tickets[0].color_code_dark);
+      } else {
+        setEventBackgroundColor(event_tickets[0].color_code_light);
+      }
+    });
+    
+    supabase.from('events').select().eq('id', wallet_ticket.event_id).single()
+    .then(({ data: event, error }) => {
+      if (unmounted || error || !event) return;
+      setEventName(event.name);
+      setTicketDeactivable(event.tickets_deactivable);
+    });
+
+    if (wallet_ticket.type === 'CONSUMABLE') {
+      if (wallet_ticket.used_at === null) {
+        supabase.from('wallet_tickets').select().eq('event_id', wallet_ticket.event_id).eq('user_id', user.id).in('type', ['ADDON', 'ADDON_REFUNDABLE']).is('used_at', null)
+        .then(async ({ data: addon_wallet_tickets, error }) => {
+          if (unmounted || error || !addon_wallet_tickets.length) {
+            setAddonTicket(null);
+            return;
+          };
+
+          let didFindSucceededPayment = false;
+          for (let i = 0; i < addon_wallet_tickets.length; i++) {
+            if (addon_wallet_tickets[i].order_id === 'free') {
+              didFindSucceededPayment = true;
+              setAddonTicket(addon_wallet_tickets[i]);
+              break;
+            }
+            const { data: addon_redsys_order, error } = await supabase.from('redsys_orders').select().eq('order_id', addon_wallet_tickets[i].order_id).single();
+            if (error || !addon_redsys_order) return false;
+            if (addon_redsys_order.order_status === 'PAYMENT_SUCCEEDED') {
+              didFindSucceededPayment = true;
+              setAddonTicket(addon_wallet_tickets[i]);
+              break;
+            }
+          }
+          if (!didFindSucceededPayment) {
+            setAddonTicket(null);
+          }
+        });
+      } else if (wallet_ticket.used_with_addon_id) {
+        supabase.from('wallet_tickets').select().eq('id', wallet_ticket.used_with_addon_id).single()
+        .then(({ data: addon_wallet_ticket, error }) => {
+          if (unmounted || error) {
+            setAddonTicket(null);
+            return;
+          };
+          setAddonTicket(addon_wallet_ticket);
+        });
+      } else {
+        setAddonTicket(null);
+      }
+    } else {
+      setAddonTicket(null);
+    }
   };
 
   const onDeactivateTicket = async () => {

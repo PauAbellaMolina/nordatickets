@@ -43,6 +43,11 @@ export default function WalletTicketAccessCardComponent({ walletTicket }: { wall
   );
 
   const fetchTicketOrderStatus = (unmounted: boolean) => {
+    if (walletTicket.order_id === 'free') {
+      setEventTicketOrderStatus('PAYMENT_SUCCEEDED');
+      return;
+    }
+
     supabase.from('redsys_orders').select().eq('order_id', walletTicket.order_id).single()
     .then(({ data: redsys_order, error }) => {
       if (unmounted || error) return;
