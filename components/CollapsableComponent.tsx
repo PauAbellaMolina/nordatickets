@@ -1,39 +1,55 @@
-import React, { useState } from "react";
-import { LayoutChangeEvent, View, Dimensions } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import React, { useEffect, useState } from "react";
+import { LayoutChangeEvent, View, Dimensions, ScrollView } from "react-native";
+import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 export const CollapsableComponent = ({ children, expanded, maxHeight }: { children: React.ReactNode; expanded: boolean; maxHeight?: number }) => {
-  const [height, setHeight] = useState(0);
   const animatedHeight = useSharedValue(0);
+  const contentHeight = useSharedValue(0);
   const { height: windowHeight } = Dimensions.get('window');
+  
   const config = {
     duration: 500,
     easing: Easing.bezier(0.35, 1, 0.25, 1)
   };
 
-  const onLayout = (event: LayoutChangeEvent) => {
-    const percentOfScreenHeight = maxHeight ? maxHeight : windowHeight - 215;
-    const elementHeight = event.nativeEvent.layout.height;
-    const onLayoutHeight = elementHeight > percentOfScreenHeight ? percentOfScreenHeight : elementHeight;
+  const getMaxHeight = () => maxHeight ? maxHeight : windowHeight - 215;
 
-    if (onLayoutHeight > 0 && height !== onLayoutHeight) {
-      setHeight(onLayoutHeight);
+  const updateHeight = (newHeight: number) => {
+    const maxAllowedHeight = getMaxHeight();
+    contentHeight.value = newHeight;
+    if (expanded) {
+      animatedHeight.value = withTiming(Math.min(newHeight, maxAllowedHeight), config);
     }
   };
 
-  const collapsableStyle = useAnimatedStyle(() => {
-    animatedHeight.value = expanded ? withTiming(height, config) : withTiming(0, config);
+  const onLayout = (event: LayoutChangeEvent) => {
+    const newHeight = event.nativeEvent.layout.height;
+    runOnJS(updateHeight)(newHeight);
+  };
 
-    return {
-      height: animatedHeight.value
-    };
+  useEffect(() => {
+    if (expanded) {
+      animatedHeight.value = withTiming(Math.min(contentHeight.value, getMaxHeight()), config);
+    } else {
+      animatedHeight.value = withTiming(0, config);
+    }
   }, [expanded]);
 
+  const collapsableStyle = useAnimatedStyle(() => ({
+    height: animatedHeight.value,
+    overflow: "hidden"
+  }));
+
   return (
-    <Animated.View style={[collapsableStyle, { overflow: "scroll" }]}>
-      <View onLayout={onLayout}>
-        {children}
-      </View>
+    <Animated.View style={collapsableStyle}>
+      <ScrollView 
+        scrollEnabled={expanded}
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
+        <View onLayout={onLayout}>
+          {children}
+        </View>
+      </ScrollView>
     </Animated.View>
   );
 };
