@@ -94,7 +94,7 @@ export const es: { [key: string]: string } = {
   save: 'Guardar',
   alreadyHaveSetBirthdateTitle: 'Ya tenemos tu fecha de nacimiento',
   ifIncorrectGetInContactWithHelp: 'Si es incorrecta ponte en contacto con help@elteutikt.com para rectificarla.',
-  accessControlTickets: 'Entradas',
+  accessControlTickets: 'Inscripciones',
   requiredToGetIntoTheEvent: 'Necesario para entrar al evento',
   walletTicketAccessExplanation: 'Úsalo para acceder al evento',
   deactivateTicketOnAccessExplanation: 'Desactivar ticket cuando te lo pidan para acceder al evento',
