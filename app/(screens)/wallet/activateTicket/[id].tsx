@@ -7,7 +7,8 @@ import { EntypoIcon, FeatherIcon, FontAwesomeIcon } from '../../../../components
 import { supabase } from "../../../../supabase";
 import { useSupabase } from '../../../../context/SupabaseProvider';
 import { getThemeRandomColor } from '../../../../utils/chooseRandomColor';
-import { WalletTicket } from '../../../../types/supabaseplain';
+import { TicketFormSubmit, WalletTicket } from '../../../../types/supabaseplain';
+import { CollapsableComponent } from '../../../../components/CollapsableComponent';
 
 export default function ActivateTicketScreen() {
   const { i18n, user, theme } = useSupabase();
@@ -23,6 +24,8 @@ export default function ActivateTicketScreen() {
   const [ticketUsedTimeAgo, setTicketUsedTimeAgo] = useState<string>();
   const [ticketType, setTicketType] = useState<string>();
   const [addonTicket, setAddonTicket] = useState<WalletTicket>(undefined);
+  const [ticketFormSubmit, setTicketFormSubmit] = useState<TicketFormSubmit>();
+  const [formSubmitExpanded, setFormSubmitExpanded] = useState<boolean>(false);
 
   const { id } = useLocalSearchParams<{ id: string }>();
 
@@ -81,6 +84,14 @@ export default function ActivateTicketScreen() {
         router.navigate('/(tabs)/wallet');
         return;
       };
+
+      if (wallet_ticket.ticket_form_submits_id) {
+        supabase.from('ticket_form_submits').select().eq('id', wallet_ticket.ticket_form_submits_id).single()
+        .then(({ data: ticket_form_submit, error }) => {
+          if (error || !ticket_form_submit) return;
+          setTicketFormSubmit(ticket_form_submit);
+        });
+      }
 
       supabase.from('redsys_orders').select().eq('order_id', wallet_ticket.order_id).single()
       .then(({ data: redsys_order, error }) => {
@@ -253,11 +264,11 @@ export default function ActivateTicketScreen() {
         <ActivityIndicator size="large" />
       </> : <>
         <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
-          <View style={styles.ticketInfoContainer}>
+          <View style={[styles.ticketInfoContainer, { gap: ticketFormSubmit ? 20 : 8 }]}>
             <Animated.View style={[styles.pulseContainer, {transform: [{ scale: scale.current }], opacity: opacity.current }]}>
               <View style={[styles.pulseDot, {backgroundColor: ticketUsedAt === undefined ? 'transparent' : ticketUsedAt != null ? '#ff3737' : '#3fde7a'}]} />
             </Animated.View>
-            <View style={[styles.ticketInfoTextsContainer, addonTicket ? {justifyContent: 'flex-end'} : {justifyContent: 'center'}]}>
+            <View style={[styles.ticketInfoTextsContainer, addonTicket || ticketFormSubmit ? {justifyContent: 'flex-end'} : {justifyContent: 'center'}]}>
               <Text style={styles.ticketName} numberOfLines={4}>{ ticketName }</Text>
               <Text style={styles.eventName}>{ eventName }</Text>
             </View>
@@ -273,6 +284,23 @@ export default function ActivateTicketScreen() {
                     <Text style={[styles.addonTicketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ addonTicket.type === 'ADDON_REFUNDABLE' ? i18n?.t('activateTicketRefundableAddonExplanation') : i18n?.t('activateTicketNonRefundableAddonExplanation') }</Text>
                   </View>
                 </View>
+              </View>
+            : null }
+            { ticketFormSubmit ? 
+              <View style={styles.formSubmitContainer}>
+                <Pressable onPress={() => setFormSubmitExpanded(!formSubmitExpanded)}>
+                  <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 3, opacity: .8}}>
+                    <FeatherIcon name={formSubmitExpanded ? 'chevron-up' : 'chevron-down'} size={20} color={Colors[theme].text} />
+                    <Text>{ i18n?.t('showFormSubmit') }</Text>
+                  </View>
+                </Pressable>
+                <CollapsableComponent expanded={formSubmitExpanded} maxHeight={125}>
+                  <View style={{maxWidth: 280}}>
+                    { ticketFormSubmit.entries.map((entry, index) => {
+                      return <Text key={index} style={index % 2 === 0 ? styles.formSubmitQuestion : styles.formSubmitAnswer}>{ entry }</Text>
+                    })}
+                  </View>
+                </CollapsableComponent>
               </View>
             : null }
           </View>
@@ -390,7 +418,6 @@ const styles = StyleSheet.create({
   },
   ticketInfoContainer: {
     flex: 1,
-    gap: 8,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
@@ -399,7 +426,8 @@ const styles = StyleSheet.create({
   },
   ticketInfoTextsContainer: {
     flex: 1.2,
-    alignItems: 'center'
+    alignItems: 'center',
+    gap: 5
   },
   plusAddonTicketContainer: {
     flex: 1,
@@ -434,6 +462,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     marginHorizontal: 14
+  },
+  formSubmitContainer: {
+    flex: 1,
+    gap: 10
+  },
+  formSubmitAnswer: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8
+  },
+  formSubmitQuestion: {
+    fontSize: 14
   },
   ticketDecorContainer: {
     flexDirection: 'row',
@@ -476,6 +516,7 @@ const styles = StyleSheet.create({
   ticketName: {
     fontSize: 45,
     fontWeight: '900',
+    lineHeight: 48,
     textAlign: 'center',
     marginHorizontal: 15
   },

@@ -87,6 +87,7 @@ export type Database = {
           name: string | null
           price: number | null
           selling: boolean
+          ticket_form_templates_id: number | null
           type: Database["public"]["Enums"]["event_ticket_type"]
         }
         Insert: {
@@ -102,6 +103,7 @@ export type Database = {
           name?: string | null
           price?: number | null
           selling?: boolean
+          ticket_form_templates_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
         }
         Update: {
@@ -117,6 +119,7 @@ export type Database = {
           name?: string | null
           price?: number | null
           selling?: boolean
+          ticket_form_templates_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
         }
         Relationships: [
@@ -255,6 +258,101 @@ export type Database = {
           },
         ]
       }
+      ticket_form_submits: {
+        Row: {
+          created_at: string
+          entries: string[] | null
+          event_id: number
+          id: number
+          tickets_form_templates_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entries?: string[] | null
+          event_id: number
+          id?: number
+          tickets_form_templates_id: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entries?: string[] | null
+          event_id?: number
+          id?: number
+          tickets_form_templates_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_form_submits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_form_templates: {
+        Row: {
+          created_at: string
+          id: number
+          q1: string | null
+          q1_max_length: number | null
+          q1_options: string[] | null
+          q1_required: boolean
+          q1_type: Database["public"]["Enums"]["ticket_form_templates_q_type"]
+          q2: string | null
+          q2_max_length: number | null
+          q2_options: string[] | null
+          q2_required: boolean
+          q2_type: Database["public"]["Enums"]["ticket_form_templates_q_type"]
+          q3: string | null
+          q3_max_length: number | null
+          q3_options: string[] | null
+          q3_required: boolean
+          q3_type: Database["public"]["Enums"]["ticket_form_templates_q_type"]
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          q1?: string | null
+          q1_max_length?: number | null
+          q1_options?: string[] | null
+          q1_required?: boolean
+          q1_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
+          q2?: string | null
+          q2_max_length?: number | null
+          q2_options?: string[] | null
+          q2_required?: boolean
+          q2_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
+          q3?: string | null
+          q3_max_length?: number | null
+          q3_options?: string[] | null
+          q3_required?: boolean
+          q3_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          q1?: string | null
+          q1_max_length?: number | null
+          q1_options?: string[] | null
+          q1_required?: boolean
+          q1_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
+          q2?: string | null
+          q2_max_length?: number | null
+          q2_options?: string[] | null
+          q2_required?: boolean
+          q2_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
+          q3?: string | null
+          q3_max_length?: number | null
+          q3_options?: string[] | null
+          q3_required?: boolean
+          q3_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
+        }
+        Relationships: []
+      }
       users: {
         Row: {
           card_number: string | null
@@ -297,6 +395,7 @@ export type Database = {
           iva: number
           order_id: string | null
           price: number | null
+          ticket_form_submits_id: number | null
           type: Database["public"]["Enums"]["event_ticket_type"]
           used_at: string | null
           used_with_addon_id: number | null
@@ -311,6 +410,7 @@ export type Database = {
           iva?: number
           order_id?: string | null
           price?: number | null
+          ticket_form_submits_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
           used_at?: string | null
           used_with_addon_id?: number | null
@@ -325,6 +425,7 @@ export type Database = {
           iva?: number
           order_id?: string | null
           price?: number | null
+          ticket_form_submits_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
           used_at?: string | null
           used_with_addon_id?: number | null
@@ -343,6 +444,13 @@ export type Database = {
             columns: ["event_tickets_id"]
             isOneToOne: false
             referencedRelation: "event_tickets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_tickets_ticket_form_submits_id_fkey"
+            columns: ["ticket_form_submits_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_form_submits"
             referencedColumns: ["id"]
           },
           {
@@ -403,6 +511,12 @@ export type Database = {
         | "PAYMENT_PENDING"
         | "PAYMENT_SUCCEEDED"
         | "PAYMENT_FAILED"
+      ticket_form_templates_q_type:
+        | "TEXT"
+        | "EMAIL"
+        | "NUMBER"
+        | "DATE"
+        | "OPTIONS"
     }
     CompositeTypes: {
       [_ in never]: never

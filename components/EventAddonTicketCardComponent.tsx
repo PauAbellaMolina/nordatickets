@@ -1,32 +1,52 @@
 import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { EventTicket } from '../types/supabaseplain';
+import { EventTicket, TicketFormSubmit } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
 import { EntypoIcon, FeatherIcon } from './CustomIcons';
 import { useSupabase } from '../context/SupabaseProvider';
+import { useState } from 'react';
+import { CollapsableComponent } from './CollapsableComponent';
+import EventTicketCardFormComponent from './EventTicketCardFormComponent';
 
 export interface TicketCardComponentProps {
   eventSelling: boolean,
   quantityInCart: number,
   onRemoveTicket: (ticket: EventTicket) => void,
-  onAddTicket: (ticket: EventTicket) => void,
+  onAddTicket: (ticket: EventTicket, associatedTicketFormSubmit?: Partial<TicketFormSubmit>) => void,
   ticket: EventTicket
 }
 
 export default function EventAddonTicketCardComponent({ticket, eventSelling, quantityInCart, onRemoveTicket, onAddTicket}: TicketCardComponentProps) {
   const { i18n, theme } = useSupabase();
 
+  const [formExpanded, setFormExpanded] = useState<boolean>(false);
+  const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
+
+  const onExpandForm = () => {
+    setFormExpanded(!formExpanded);
+  };
+
   const onRemove = () => {
     if (quantityInCart === 0) {
       return;
     }
     onRemoveTicket(ticket);
+    setFormSubmitted(false);
+    setFormExpanded(false);
   };
   const onAdd = () => {
     if (quantityInCart === 5) {
       return;
     }
     onAddTicket(ticket);
+  };
+
+  const onFormSubmit = (ticketFormSubmit: Partial<TicketFormSubmit>) => {
+    if (quantityInCart === 5) {
+      return;
+    }
+    setFormSubmitted(true);
+    onAddTicket(ticket, ticketFormSubmit);
   };
   
   return (
@@ -44,15 +64,26 @@ export default function EventAddonTicketCardComponent({ticket, eventSelling, qua
         <View style={styles.ticketActions}>
           { eventSelling ? <>
             { ticket.selling ? <>
-              <Pressable onPress={quantityInCart === 1 ? onRemove : onAdd}>
-                <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={28} color={quantityInCart === 5 ? Colors[theme].text+'60' : Colors[theme].text} />
-              </Pressable>
+              { ticket.ticket_form_templates_id ?
+                <Pressable onPress={formSubmitted ? onRemove : onExpandForm}>
+                  <FeatherIcon name={formSubmitted ? 'x-circle' : formExpanded ? 'chevron-up' : 'chevron-down'} size={28} color={Colors[theme].text} />
+                </Pressable>
+              :
+                <Pressable onPress={quantityInCart === 1 ? onRemove : onAdd}>
+                  <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={28} color={quantityInCart === 5 ? Colors[theme].text+'60' : Colors[theme].text} />
+                </Pressable>
+              }
             </> :
               <Text style={styles.notAvailable}>{ i18n?.t('notAvailable') }</Text>
             }
           </> : <></> }
         </View>
       </View>
+      { ticket.ticket_form_templates_id ?
+        <CollapsableComponent expanded={formExpanded} maxHeight={200}>
+          <EventTicketCardFormComponent event_id={ticket.event_id} ticket_form_templates_id={ticket.ticket_form_templates_id} onSubmit={onFormSubmit} formSubmitted={formSubmitted} />
+        </CollapsableComponent>
+      : null }
     </View>
   );
 }

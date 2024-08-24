@@ -94,7 +94,7 @@ export const ca: { [key: string]: string } = {
   save: 'Guardar',
   alreadyHaveSetBirthdateTitle: 'Ja tenim la teva data de naixement',
   ifIncorrectGetInContactWithHelp: 'Si és incorrecta posa\'t en contacte amb help@elteutikt.com per rectificar-la.',
-  accessControlTickets: 'Entrades',
+  accessControlTickets: 'Inscripcions',
   requiredToGetIntoTheEvent: 'Necessari per entrar a l\'esdeveniment',
   walletTicketAccessExplanation: "Utilitza'l per accedir a l'esdeveniment",
   deactivateTicketOnAccessExplanation: "Desactivar ticket quan t'ho demanin per accedir a l'esdeveniment",
@@ -102,5 +102,8 @@ export const ca: { [key: string]: string } = {
   legalNotice: 'Avís legal',
   privacyPolicy: 'Política de privacitat',
   cookiePolicy: 'Política de cookies',
-  generalConditions: 'Condicions generals de contractació'
+  generalConditions: 'Condicions generals de contractació',
+  enterYourAnswer: 'Introdueix la teva resposta',
+  addToCart: 'Afegir al carretó',
+  showFormSubmit: 'Informació afegida'
 };
