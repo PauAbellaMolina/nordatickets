@@ -9,6 +9,7 @@ import BlobsBackground from "../../components/BlobsBackground";
 import { FeatherIcon } from "../../components/CustomIcons";
 import { AvailableLocales } from "../../assets/translations/translation";
 import { authEmailsTranslations } from "../../assets/translations/email";
+import { isValidEmail } from "../../utils/formValidationUtils";
 
 export default function Signup() {
   const { signInWithOTP, verifyOTP, i18n, theme } = useSupabase();
@@ -16,6 +17,7 @@ export default function Signup() {
 
   const [birthdate, setBirthdate] = useState<string>(null);
   const [termsChecked, setTermsChecked] = useState(false);
+  const [fullname, setFullname] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [emailSent, setEmailSent] = useState<boolean>(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState<string | undefined>(undefined);
@@ -38,7 +40,7 @@ export default function Signup() {
       email: email,
       options: {
         shouldCreateUser: true,
-        data: {emailData: langMetaData, birthdate: birthdate}
+        data: {emailData: langMetaData, birthdate: birthdate, fullname: fullname}
       }
     })
     .then(() => {
@@ -90,13 +92,21 @@ export default function Signup() {
         <View style={styles.inputContainer}>
           { !emailSent ? <>
             <TextInput
+              key="fullnameInput"
+              style={[styles.input, {color: Colors[theme].text, backgroundColor: Colors[theme].inputBackgroundColor, borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
+              textContentType="name"
+              autoComplete="name"
+              placeholder={ i18n?.t('fullname') }
+              onChangeText={(text) => setFullname(text.replace(/[<>&]/g, ''))}
+            />
+            <TextInput
               key="emailInput"
               style={[styles.input, {color: Colors[theme].text, backgroundColor: Colors[theme].inputBackgroundColor, borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
               textContentType="emailAddress"
               autoComplete="email"
               inputMode="email"
               placeholder={ i18n?.t('email') }
-              onChangeText={setEmail}
+              onChangeText={(text) => setEmail(text.replace(/[<>&]/g, ''))}
             />
             { Platform.OS === 'web' ?
               <View style={styles.datepickerWrapper}>
@@ -128,9 +138,10 @@ export default function Signup() {
             <TextInput
               key="oneTimeCodeInput"
               style={[styles.input, {color: Colors[theme].text, backgroundColor: Colors[theme].inputBackgroundColor, borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
+              textContentType="oneTimeCode"
               inputMode="numeric"
               placeholder={ i18n?.t('oneTimeCode') }
-              onChangeText={setOneTimeCode}
+              onChangeText={(text) => setOneTimeCode(text.replace(/[<>&]/g, ''))}
             />
           </>}
           { emailErrorMessage ?
@@ -145,9 +156,9 @@ export default function Signup() {
               <>
                 { !emailSent ?
                   <Pressable
-                    disabled={!email.includes('@') || !termsChecked || !birthdate}
+                    disabled={!fullname || !isValidEmail(email) || !termsChecked || !birthdate}
                     onPress={onEmailSignUp}
-                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') || !termsChecked || !birthdate ? 0.5 : 1}]}
+                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !fullname || !isValidEmail(email) || !termsChecked || !birthdate ? 0.5 : 1}]}
                   >
                     <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('send') }</Text>
                   </Pressable>

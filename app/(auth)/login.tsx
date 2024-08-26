@@ -8,6 +8,7 @@ import BlobsBackground from "../../components/BlobsBackground";
 import { FeatherIcon } from "../../components/CustomIcons";
 import { AvailableLocales } from "../../assets/translations/translation";
 import { authEmailsTranslations } from "../../assets/translations/email";
+import { isValidEmail } from "../../utils/formValidationUtils";
 
 export default function Login() {
   const { signInWithOTP, verifyOTP, i18n, theme } = useSupabase();
@@ -89,7 +90,7 @@ export default function Login() {
               autoComplete="email"
               inputMode="email"
               placeholder={ i18n?.t('email') }
-              onChangeText={setEmail}
+              onChangeText={(text) => setEmail(text.replace(/[<>&]/g, ''))}
             />
           : <>
             <View style={styles.emailSubmitted}>
@@ -103,9 +104,10 @@ export default function Login() {
             <TextInput
               key="oneTimeCodeInput"
               style={[styles.input, {color: Colors[theme].text, backgroundColor: Colors[theme].inputBackgroundColor, borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
+              textContentType="oneTimeCode"
               inputMode="numeric"
               placeholder={ i18n?.t('oneTimeCode') }
-              onChangeText={setOneTimeCode}
+              onChangeText={(text) => setOneTimeCode(text.replace(/[<>&]/g, ''))}
             />
           </>}
           { emailErrorMessage ?
@@ -120,9 +122,9 @@ export default function Login() {
               <>
                 { !emailSent ?
                   <Pressable
-                    disabled={!email.includes('@')}
+                    disabled={!isValidEmail(email)}
                     onPress={onEmailLogIn}
-                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !email.includes('@') ? 0.5 : 1}]}
+                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !isValidEmail(email) ? 0.5 : 1}]}
                   >
                     <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('send') }</Text>
                   </Pressable>

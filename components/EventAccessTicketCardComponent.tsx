@@ -21,6 +21,7 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
 
   const [formExpanded, setFormExpanded] = useState<boolean>(false);
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
+  const [priceMultiplier, setPriceMultiplier] = useState<number>(1);
 
   const onExpandForm = () => {
     setFormExpanded(!formExpanded);
@@ -35,18 +36,30 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
     setFormExpanded(false);
   };
   const onAdd = () => {
-    if (quantityInCart === 5) {
+    if (quantityInCart === 10) {
       return;
     }
-    onAddTicket(ticket);
+    const newTicket = {...ticket};
+    if (priceMultiplier > 1) {
+      newTicket.price = newTicket.price * priceMultiplier;
+    }
+    onAddTicket(newTicket);
+  };
+
+  const handlePriceMultiplierChange = (priceMultiplier: number) => {
+    setPriceMultiplier(priceMultiplier);
   };
 
   const onFormSubmit = (ticketFormSubmit: Partial<TicketFormSubmit>) => {
-    if (quantityInCart === 5) {
+    if (quantityInCart === 10) {
       return;
     }
     setFormSubmitted(true);
-    onAddTicket(ticket, ticketFormSubmit);
+    const newTicket = {...ticket};
+    if (priceMultiplier > 1) {
+      newTicket.price = newTicket.price * priceMultiplier;
+    }
+    onAddTicket(newTicket, ticketFormSubmit);
   };
   
   return (
@@ -56,7 +69,7 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
           <FontAwesome6Icon name="person-walking-arrow-right" size={20} color={Colors[theme].text} />
           <View style={styles.ticketInfoText}>
             <ScrollView horizontal>
-              <Text style={styles.ticketName}>{ticket.name} · {ticket.price/100}€</Text>
+              <Text style={styles.ticketName}>{ticket.name} · {ticket.price/100 * priceMultiplier}€</Text>
             </ScrollView>
             <Text style={styles.ticketSubtitle}>{ i18n?.t('requiredToGetIntoTheEvent') }</Text>
           </View>
@@ -70,7 +83,7 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
                 </Pressable>
               :
                 <Pressable onPress={quantityInCart === 1 ? onRemove : onAdd}>
-                  <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={28} color={quantityInCart === 5 ? Colors[theme].text+'60' : Colors[theme].text} />
+                  <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={28} color={quantityInCart === 10 ? Colors[theme].text+'60' : Colors[theme].text} />
                 </Pressable>
               }
             </> :
@@ -81,7 +94,7 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
       </View>
       { ticket.ticket_form_templates_id ?
         <CollapsableComponent expanded={formExpanded} maxHeight={200}>
-          <EventTicketCardFormComponent event_id={ticket.event_id} ticket_form_templates_id={ticket.ticket_form_templates_id} onSubmit={onFormSubmit} formSubmitted={formSubmitted} />
+          <EventTicketCardFormComponent event_id={ticket.event_id} ticket_form_templates_id={ticket.ticket_form_templates_id} formSubmitted={formSubmitted} onPriceMultiplierChange={handlePriceMultiplierChange} onSubmit={onFormSubmit} />
         </CollapsableComponent>
       : null }
     </View>

@@ -105,5 +105,7 @@ export const en: { [key: string]: string } = {
   generalConditions: 'General conditions',
   enterYourAnswer: 'Enter your answer',
   addToCart: 'Add to cart',
-  showFormSubmit: 'Information added'
+  showFormSubmit: 'Information added',
+  selectAnOption: 'Select an option',
+  fullname: 'Name and surnames'
 };

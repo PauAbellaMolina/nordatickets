@@ -298,17 +298,20 @@ export type Database = {
           created_at: string
           id: number
           q1: string | null
-          q1_max_length: number | null
+          q1_max_value: number | null
+          q1_multiplies_ticket_price: boolean
           q1_options: string[] | null
           q1_required: boolean
           q1_type: Database["public"]["Enums"]["ticket_form_templates_q_type"]
           q2: string | null
-          q2_max_length: number | null
+          q2_max_value: number | null
+          q2_multiplies_ticket_price: boolean
           q2_options: string[] | null
           q2_required: boolean
           q2_type: Database["public"]["Enums"]["ticket_form_templates_q_type"]
           q3: string | null
-          q3_max_length: number | null
+          q3_max_value: number | null
+          q3_multiplies_ticket_price: boolean
           q3_options: string[] | null
           q3_required: boolean
           q3_type: Database["public"]["Enums"]["ticket_form_templates_q_type"]
@@ -317,17 +320,20 @@ export type Database = {
           created_at?: string
           id?: number
           q1?: string | null
-          q1_max_length?: number | null
+          q1_max_value?: number | null
+          q1_multiplies_ticket_price?: boolean
           q1_options?: string[] | null
           q1_required?: boolean
           q1_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
           q2?: string | null
-          q2_max_length?: number | null
+          q2_max_value?: number | null
+          q2_multiplies_ticket_price?: boolean
           q2_options?: string[] | null
           q2_required?: boolean
           q2_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
           q3?: string | null
-          q3_max_length?: number | null
+          q3_max_value?: number | null
+          q3_multiplies_ticket_price?: boolean
           q3_options?: string[] | null
           q3_required?: boolean
           q3_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
@@ -336,17 +342,20 @@ export type Database = {
           created_at?: string
           id?: number
           q1?: string | null
-          q1_max_length?: number | null
+          q1_max_value?: number | null
+          q1_multiplies_ticket_price?: boolean
           q1_options?: string[] | null
           q1_required?: boolean
           q1_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
           q2?: string | null
-          q2_max_length?: number | null
+          q2_max_value?: number | null
+          q2_multiplies_ticket_price?: boolean
           q2_options?: string[] | null
           q2_required?: boolean
           q2_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
           q3?: string | null
-          q3_max_length?: number | null
+          q3_max_value?: number | null
+          q3_multiplies_ticket_price?: boolean
           q3_options?: string[] | null
           q3_required?: boolean
           q3_type?: Database["public"]["Enums"]["ticket_form_templates_q_type"]
@@ -359,6 +368,7 @@ export type Database = {
           created_at: string
           event_ids_following: number[] | null
           expiry_date: number | null
+          fullname: string | null
           id: string
         }
         Insert: {
@@ -366,6 +376,7 @@ export type Database = {
           created_at?: string
           event_ids_following?: number[] | null
           expiry_date?: number | null
+          fullname?: string | null
           id: string
         }
         Update: {
@@ -373,6 +384,7 @@ export type Database = {
           created_at?: string
           event_ids_following?: number[] | null
           expiry_date?: number | null
+          fullname?: string | null
           id?: string
         }
         Relationships: [

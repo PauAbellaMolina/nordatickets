@@ -5,9 +5,10 @@ import { supabase } from '../supabase';
 import { TextInput, StyleSheet, Pressable } from 'react-native';
 import { useSupabase } from '../context/SupabaseProvider';
 import Colors from '../constants/Colors';
-import { formatDateInput, isValidDate, isValidEmail } from '../utils/formValidationUtils';
+import { formatDateInput, isValidDate, isValidEmail, isValidNumber } from '../utils/formValidationUtils';
+import { Picker } from '@react-native-picker/picker';
 
-export default function EventAccessTicketCardFormComponent({ event_id, ticket_form_templates_id, onSubmit, formSubmitted }: { event_id: number, ticket_form_templates_id: number, onSubmit: (ticketFormSubmit: Partial<TicketFormSubmit>) => void, formSubmitted: boolean }) {
+export default function EventAccessTicketCardFormComponent({ event_id, ticket_form_templates_id, formSubmitted, onPriceMultiplierChange, onSubmit }: { event_id: number, ticket_form_templates_id: number, formSubmitted: boolean, onPriceMultiplierChange: (priceMultiplier: number) => void, onSubmit: (ticketFormSubmit: Partial<TicketFormSubmit>) => void }) {
   const { i18n, theme } = useSupabase();
   
   const [ticketFormTemplate, setTicketFormTemplate] = useState<TicketFormTemplate>(null);
@@ -46,6 +47,11 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
     .map(([key]) => key);
     const missingFields = requiredFields.filter(field => !formData[field]);
 
+    const invalidNumberFields = Object.entries(ticketFormTemplate)
+    .filter(([key, value]) => key.startsWith('q') && !key.includes('_') && ticketFormTemplate[`${key}_type`] === 'NUMBER')
+    .map(([key]) => key)
+    .filter(key => formData[key] && !isValidNumber(formData[key], ticketFormTemplate[`${key}_max_value`]));
+
     const invalidDateFields = Object.entries(ticketFormTemplate)
     .filter(([key, value]) => key.startsWith('q') && !key.includes('_') && ticketFormTemplate[`${key}_type`] === 'DATE')
     .map(([key]) => key)
@@ -56,7 +62,7 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
     .map(([key]) => key)
     .filter(key => formData[key] && !isValidEmail(formData[key]));
 
-    if (missingFields.length > 0 || invalidDateFields.length > 0 || invalidEmailFields.length > 0) {
+    if (missingFields.length > 0 || invalidNumberFields.length > 0 || invalidDateFields.length > 0 || invalidEmailFields.length > 0) {
       return;
     }
 
@@ -68,9 +74,32 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
     onSubmit(ticketFormSubmit);
   };
 
-  const renderInput = (key: string, question: string, type: string, required: boolean, options: string[] | null, formSubmitted: boolean) => {
+  const renderDropdown = (key: string, required: boolean, options: string[], formSubmitted: boolean) => {
+    return (
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={formData[key] || ''}
+          onValueChange={(itemValue) => itemValue !== 'misc' && setFormData(prev => ({ ...prev, [key]: itemValue }))}
+          enabled={!formSubmitted}
+          style={[
+            styles.optionsPicker,
+            { color: Colors[theme].text },
+            (attemptedSubmit && required && !formData[key]) ? styles.inputError : null,
+            formSubmitted ? styles.submittedInput : null
+          ]}
+        >
+          <Picker.Item label={ i18n?.t('selectAnOption') } value="misc" />
+          {options.map((option, index) => (
+            <Picker.Item key={index} label={option} value={option} />
+          ))}
+        </Picker>
+      </View>
+    );
+  };
+
+  const renderInput = (key: string, question: string, type: string, required: boolean, options: string[] | null, multipliesTicketPrice: boolean, formSubmitted: boolean) => {
     const isRequired = required ? ' *' : '';
-    const maxLength = ticketFormTemplate[`${key}_max_length`] as number | undefined;
+    const maxValue = ticketFormTemplate[`${key}_max_value`] as number | undefined;
 
     const getKeyboardType = () => {
       switch (type) {
@@ -92,8 +121,20 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
       if (type === 'DATE') {
         formattedText = formatDateInput(formattedText);
       }
+      if (type === 'NUMBER' && multipliesTicketPrice && isValidNumber(formattedText) && Number(formattedText) > 0) {
+        onPriceMultiplierChange(Number(formattedText));
+      }
       setFormData(prev => ({ ...prev, [key]: formattedText }));
     };
+
+    if (type === 'OPTIONS' && options) {
+      return (
+        <View key={key} style={styles.questionContainer}>
+          <Text style={styles.questionText}>{question}{isRequired}</Text>
+          {renderDropdown(key, required, options, formSubmitted)}
+        </View>
+      );
+    }
     
     return (
       <View key={key} style={styles.questionContainer}>
@@ -104,17 +145,19 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
           { color: Colors[theme].text, borderColor: Colors[theme].inputBorderColor },
           (attemptedSubmit && required && !formData[key]) ||
           (type === 'DATE' && formData[key] && !isValidDate(formData[key])) ||
-          (type === 'EMAIL' && formData[key] && !isValidEmail(formData[key])) 
+          (type === 'EMAIL' && formData[key] && !isValidEmail(formData[key])) ||
+          (type === 'NUMBER' && formData[key] && !isValidNumber(formData[key], maxValue))
             ? styles.inputError : null,
           formSubmitted ? styles.submittedInput : null
         ]}
+          textContentType={type === 'EMAIL' ? 'emailAddress' : 'none'}
           editable={!formSubmitted}
           placeholder={type === 'DATE' ? new Date().toLocaleDateString('es-ES') : i18n?.t('enterYourAnswer')}
           placeholderTextColor={Colors[theme].text+'99'}
           keyboardType={getKeyboardType()}
           value={formData[key] || ''}
           onChangeText={handleInputChange}
-          maxLength={type === 'DATE' ? 10 : maxLength}
+          maxLength={type === 'DATE' ? 10 : type === 'NUMBER' ? 25 : maxValue}
         />
       </View>
     );
@@ -128,7 +171,8 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
           const type = ticketFormTemplate[`${key}_type`];
           const required = ticketFormTemplate[`${key}_required`];
           const options = ticketFormTemplate[`${key}_options`];
-          return renderInput(key, String(question), type, required, options, formSubmitted);
+          const multipliesTicketPrice = ticketFormTemplate[`${key}_multiplies_ticket_price`];
+          return renderInput(key, String(question), type, required, options, multipliesTicketPrice, formSubmitted);
         })
       }
       <Pressable onPress={onPressSubmit} style={[styles.submitButton, { backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity, opacity: formSubmitted ? 0.5 : 1 }]}>
@@ -181,5 +225,18 @@ const styles = StyleSheet.create({
   submitButtonText: {
     fontSize: 14,
     fontWeight: 'bold'
-  }
+  },
+  pickerContainer: {
+    borderRadius: 8,
+    overflow: 'hidden',
+    maxWidth: 350
+  },
+  optionsPicker: {
+    maxWidth: 350,
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 8,
+    fontSize: 14,
+    backgroundColor: 'transparent'
+  },
 });

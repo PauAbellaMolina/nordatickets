@@ -88,6 +88,12 @@ export default function TabThreeScreen() {
       <View style={styles.profileContainer}>
         <Text style={styles.infoTitle}>{ i18n?.t('emailAndPaymentMethods') }</Text>
         <View style={styles.userInfo}>
+          { user?.user_metadata?.fullname ?
+            <View style={styles.singleLineContainer}>
+              <FeatherIcon name="user" size={18} color={Colors[theme].text} />
+              <Text>{user?.user_metadata?.fullname}</Text>
+            </View>
+          : null }
           <View style={styles.singleLineContainer}>
             <FeatherIcon name="at-sign" size={18} color={Colors[theme].text} />
             <Text>{user?.email}</Text>

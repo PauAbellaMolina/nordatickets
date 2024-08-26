@@ -31,3 +31,9 @@ export function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
+
+export function isValidNumber(number: string, maxValue?: number): boolean {
+  const numberRegex = /^[0-9]+$/;
+  if (Number(number) < 0 || (maxValue && Number(number) > maxValue)) return false;
+  return numberRegex.test(number);
+}

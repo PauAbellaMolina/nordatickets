@@ -36,7 +36,7 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
   setLanguage: (locale: AvailableLocales) => {},
   signInWithOTP: async () => {},
   verifyOTP: async () => {},
-  signOut: async () => {},
+  signOut: async () => {}
 });
 
 export const useSupabase = () => useContext(SupabaseContext);

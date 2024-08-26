@@ -105,5 +105,7 @@ export const ca: { [key: string]: string } = {
   generalConditions: 'Condicions generals de contractació',
   enterYourAnswer: 'Introdueix la teva resposta',
   addToCart: 'Afegir al carretó',
-  showFormSubmit: 'Informació afegida'
+  showFormSubmit: 'Informació afegida',
+  selectAnOption: 'Selecciona una opció',
+  fullname: 'Nom i cognoms'
 };
