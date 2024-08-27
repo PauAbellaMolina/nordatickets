@@ -94,7 +94,7 @@ export const es: { [key: string]: string } = {
   save: 'Guardar',
   alreadyHaveSetBirthdateTitle: 'Ya tenemos tu fecha de nacimiento',
   ifIncorrectGetInContactWithHelp: 'Si es incorrecta ponte en contacto con help@elteutikt.com para rectificarla.',
-  accessControlTickets: 'Inscripciones',
+  accessControlTickets: 'Entradas',
   requiredToGetIntoTheEvent: 'Necesario para entrar al evento',
   walletTicketAccessExplanation: 'Úsalo para acceder al evento',
   deactivateTicketOnAccessExplanation: 'Desactivar ticket cuando te lo pidan para acceder al evento',
@@ -107,5 +107,6 @@ export const es: { [key: string]: string } = {
   addToCart: 'Añadir al carrito',
   showFormSubmit: 'Información agregada',
   selectAnOption: 'Selecciona una opción',
-  fullname: 'Nombre y apellidos'
+  fullname: 'Nombre y apellidos',
+  registrations: 'Inscripciones'
 };

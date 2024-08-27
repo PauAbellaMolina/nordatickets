@@ -134,6 +134,8 @@ export type Database = {
       }
       events: {
         Row: {
+          access_tickets_section_expanded: boolean
+          access_tickets_section_title: string | null
           color_code_dark: string | null
           color_code_light: string | null
           created_at: string
@@ -148,6 +150,8 @@ export type Database = {
           tickets_deactivable: boolean
         }
         Insert: {
+          access_tickets_section_expanded?: boolean
+          access_tickets_section_title?: string | null
           color_code_dark?: string | null
           color_code_light?: string | null
           created_at?: string
@@ -162,6 +166,8 @@ export type Database = {
           tickets_deactivable?: boolean
         }
         Update: {
+          access_tickets_section_expanded?: boolean
+          access_tickets_section_title?: string | null
           color_code_dark?: string | null
           color_code_light?: string | null
           created_at?: string

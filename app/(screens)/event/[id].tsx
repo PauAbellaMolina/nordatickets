@@ -53,6 +53,7 @@ export default function EventDetailScreen() {
     .then(({ data: event, error }) => {
       if (unmounted || error || !event) return;
       setEvent(event);
+      setAccessEventTicketsExpanded(event.access_tickets_section_expanded);
     });
 
     return () => {
@@ -408,7 +409,7 @@ export default function EventDetailScreen() {
                   </View>
                 : null }
                 <Pressable style={styles.accessTicketsExpand} onPress={onAccessTicketsExpand}>
-                  <Text style={styles.subtitle}>{ i18n?.t('accessControlTickets') }</Text>
+                  <Text style={styles.subtitle}>{ !event.access_tickets_section_title ? i18n?.t('accessControlTickets') : i18n?.t(event.access_tickets_section_title) }</Text>
                   <FeatherIcon name={accessEventTicketsExpanded ? 'chevron-down' : 'chevron-right'} size={24} color={Colors[theme].text} />
                 </Pressable>
                 <CollapsableComponent expanded={accessEventTicketsExpanded} maxHeight={300}>
