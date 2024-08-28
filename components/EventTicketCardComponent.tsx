@@ -1,4 +1,4 @@
-import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Platform, Pressable, StyleSheet } from 'react-native';
 import { EventTicket } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
@@ -53,9 +53,7 @@ export default function EventTicketCardComponent({ticket, eventSelling, quantity
         <View style={styles.ticketInfo}>
           <FontAwesomeIcon name="ticket" size={23} color={Colors[theme].text} />
           <View style={styles.ticketInfoText}>
-            <ScrollView horizontal>
-              <Text style={styles.ticketName}>{ticket.name}</Text>
-            </ScrollView>
+            <Text style={styles.ticketName}>{ticket.name}</Text>
             <Text style={[styles.ticketPrice, {minWidth: getTicketPriceMinWidth()}]}> · {ticket.price/100}€</Text>
           </View>
         </View>

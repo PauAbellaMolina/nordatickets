@@ -1,4 +1,4 @@
-import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Platform, Pressable, StyleSheet } from 'react-native';
 import { EventTicket, TicketFormSubmit } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
@@ -68,9 +68,7 @@ export default function EventAddonTicketCardComponent({ticket, eventSelling, qua
         <View style={styles.ticketInfo}>
           <EntypoIcon name="cup" size={23} color={Colors[theme].text} />
           <View style={styles.ticketInfoText}>
-            <ScrollView horizontal>
-              <Text style={styles.ticketName}>{ticket.name} · {ticket.price/100 * priceMultiplier}€</Text>
-            </ScrollView>
+            <Text style={styles.ticketName}>{ticket.name} · {ticket.price/100 * priceMultiplier}€</Text>
             <Text style={styles.ticketSubtitle}>{ ticket.type === 'ADDON_REFUNDABLE' ? i18n?.t('eventTicketRefundableAddonExplanation') : i18n?.t('eventTicketNonRefundableAddonExplanation') }</Text>
           </View>
         </View>

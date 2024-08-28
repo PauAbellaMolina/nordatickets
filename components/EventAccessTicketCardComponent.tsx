@@ -1,4 +1,4 @@
-import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Platform, Pressable, StyleSheet } from 'react-native';
 import { EventTicket, TicketFormSubmit } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
@@ -68,9 +68,7 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
         <View style={styles.ticketInfo}>
           <FontAwesome6Icon name="person-walking-arrow-right" size={20} color={Colors[theme].text} />
           <View style={styles.ticketInfoText}>
-            <ScrollView horizontal>
-              <Text style={styles.ticketName}>{ticket.name} · {ticket.price/100 * priceMultiplier}€</Text>
-            </ScrollView>
+            <Text style={styles.ticketName}>{ticket.name} · {ticket.price/100 * priceMultiplier}€</Text>
             <Text style={styles.ticketSubtitle}>{ i18n?.t('requiredToGetIntoTheEvent') }</Text>
           </View>
         </View>
