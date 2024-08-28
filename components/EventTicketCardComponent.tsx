@@ -61,11 +61,11 @@ export default function EventTicketCardComponent({ticket, eventSelling, quantity
           { eventSelling ? <>
             { ticket.selling ? <>
               <Pressable onPress={onRemove}>
-                <FeatherIcon name="minus-circle" size={28} color={quantityInCart === 0 ? Colors[theme].text+'60' : Colors[theme].text} />
+                <FeatherIcon name="minus-circle" size={26} color={quantityInCart === 0 ? Colors[theme].text+'60' : Colors[theme].text} />
               </Pressable>
               <Text style={styles.quantityInCart}>{quantityInCart}</Text>
               <Pressable onPress={onAdd}>
-                <FeatherIcon name="plus-circle" size={28} color={quantityInCart === 10 ? Colors[theme].text+'60' : Colors[theme].text} />
+                <FeatherIcon name="plus-circle" size={26} color={quantityInCart === 10 ? Colors[theme].text+'60' : Colors[theme].text} />
               </Pressable>
             </> :
               <Text style={styles.notAvailable}>{ i18n?.t('notAvailable') }</Text>
@@ -112,12 +112,12 @@ const styles = StyleSheet.create({
   },
   quantityInCart: {
     width: 45,
-    fontSize: 18,
+    fontSize: 16,
     textAlign: 'center'
   },
   notAvailable: {
     textAlign: 'center',
-    fontSize: 13,
+    fontSize: 12,
     color: '#606175',
     width: 101
   },
@@ -132,11 +132,11 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   ticketName: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold'
   },
   ticketPrice: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold'
   },
   ticketDescription: {

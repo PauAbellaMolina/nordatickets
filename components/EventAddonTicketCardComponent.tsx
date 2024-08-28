@@ -81,7 +81,7 @@ export default function EventAddonTicketCardComponent({ticket, eventSelling, qua
                 </Pressable>
               :
                 <Pressable onPress={quantityInCart === 1 ? onRemove : onAdd}>
-                  <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={28} color={quantityInCart === 10 ? Colors[theme].text+'60' : Colors[theme].text} />
+                  <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={26} color={quantityInCart === 10 ? Colors[theme].text+'60' : Colors[theme].text} />
                 </Pressable>
               }
             </> :
@@ -134,12 +134,12 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   quantityInCart: {
-    fontSize: 18,
+    fontSize: 16,
     textAlign: 'center'
   },
   notAvailable: {
     textAlign: 'center',
-    fontSize: 13,
+    fontSize: 12,
     color: '#606175',
     width: 101
   },
@@ -154,15 +154,15 @@ const styles = StyleSheet.create({
     gap: 3
   },
   ticketName: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold'
   },
   ticketSubtitle: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#606175'
   },
   ticketPrice: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold'
   },
   ticketDescription: {
