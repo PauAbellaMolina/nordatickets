@@ -79,6 +79,7 @@ export type Database = {
           color_code_dark: string | null
           color_code_light: string | null
           created_at: string
+          description: string | null
           event_id: number | null
           hide_from_event_page: boolean
           id: number
@@ -95,6 +96,7 @@ export type Database = {
           color_code_dark?: string | null
           color_code_light?: string | null
           created_at?: string
+          description?: string | null
           event_id?: number | null
           hide_from_event_page?: boolean
           id?: number
@@ -111,6 +113,7 @@ export type Database = {
           color_code_dark?: string | null
           color_code_light?: string | null
           created_at?: string
+          description?: string | null
           event_id?: number | null
           hide_from_event_page?: boolean
           id?: number

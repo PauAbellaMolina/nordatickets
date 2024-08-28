@@ -53,19 +53,21 @@ export default function EventTicketCardComponent({ticket, eventSelling, quantity
         <View style={styles.ticketInfo}>
           <FontAwesomeIcon name="ticket" size={23} color={Colors[theme].text} />
           <View style={styles.ticketInfoText}>
-            <Text style={styles.ticketName}>{ticket.name}</Text>
-            <Text style={[styles.ticketPrice, {minWidth: getTicketPriceMinWidth()}]}> · {ticket.price/100}€</Text>
+            <Text style={styles.ticketName}>{ticket.name} · {ticket.price/100}€</Text>
+            { ticket?.description ?
+              <Text style={styles.ticketDescription}>{ i18n?.t(ticket.description) }</Text>
+            : null}
           </View>
         </View>
         <View style={styles.ticketActions}>
           { eventSelling ? <>
             { ticket.selling ? <>
               <Pressable onPress={onRemove}>
-                <FeatherIcon name="minus-circle" size={26} color={quantityInCart === 0 ? Colors[theme].text+'60' : Colors[theme].text} />
+                <FeatherIcon name="minus-circle" size={28} color={quantityInCart === 0 ? Colors[theme].text+'60' : Colors[theme].text} />
               </Pressable>
               <Text style={styles.quantityInCart}>{quantityInCart}</Text>
               <Pressable onPress={onAdd}>
-                <FeatherIcon name="plus-circle" size={26} color={quantityInCart === 10 ? Colors[theme].text+'60' : Colors[theme].text} />
+                <FeatherIcon name="plus-circle" size={28} color={quantityInCart === 10 ? Colors[theme].text+'60' : Colors[theme].text} />
               </Pressable>
             </> :
               <Text style={styles.notAvailable}>{ i18n?.t('notAvailable') }</Text>
@@ -112,7 +114,7 @@ const styles = StyleSheet.create({
   },
   quantityInCart: {
     width: 45,
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center'
   },
   notAvailable: {
@@ -127,19 +129,20 @@ const styles = StyleSheet.create({
     gap: 10
   },
   ticketInfoText: {
-    maxWidth: '90%',
-    flexDirection: 'row',
-    alignItems: 'center'
+    flexDirection: 'column',
+    maxWidth: '80%',
+    gap: 3
   },
   ticketName: {
-    fontSize: 18,
-    fontWeight: 'bold'
-  },
-  ticketPrice: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold'
   },
   ticketDescription: {
-    marginTop: 5
+    fontSize: 14,
+    color: '#606175'
+  },
+  ticketPrice: {
+    fontSize: 20,
+    fontWeight: 'bold'
   }
 });

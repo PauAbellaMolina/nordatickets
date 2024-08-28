@@ -69,7 +69,9 @@ export default function EventAddonTicketCardComponent({ticket, eventSelling, qua
           <EntypoIcon name="cup" size={23} color={Colors[theme].text} />
           <View style={styles.ticketInfoText}>
             <Text style={styles.ticketName}>{ticket.name} · {ticket.price/100 * priceMultiplier}€</Text>
-            <Text style={styles.ticketSubtitle}>{ ticket.type === 'ADDON_REFUNDABLE' ? i18n?.t('eventTicketRefundableAddonExplanation') : i18n?.t('eventTicketNonRefundableAddonExplanation') }</Text>
+            { ticket?.description ?
+              <Text style={styles.ticketDescription}>{ i18n?.t(ticket.description) }</Text>
+            : null}
           </View>
         </View>
         <View style={styles.ticketActions}>
@@ -81,7 +83,7 @@ export default function EventAddonTicketCardComponent({ticket, eventSelling, qua
                 </Pressable>
               :
                 <Pressable onPress={quantityInCart === 1 ? onRemove : onAdd}>
-                  <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={26} color={quantityInCart === 10 ? Colors[theme].text+'60' : Colors[theme].text} />
+                  <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={28} color={quantityInCart === 10 ? Colors[theme].text+'60' : Colors[theme].text} />
                 </Pressable>
               }
             </> :
@@ -134,7 +136,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   quantityInCart: {
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center'
   },
   notAvailable: {
@@ -154,18 +156,15 @@ const styles = StyleSheet.create({
     gap: 3
   },
   ticketName: {
-    fontSize: 18,
-    fontWeight: 'bold'
-  },
-  ticketSubtitle: {
-    fontSize: 13,
-    color: '#606175'
-  },
-  ticketPrice: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold'
   },
   ticketDescription: {
-    marginTop: 5
+    fontSize: 14,
+    color: '#606175'
+  },
+  ticketPrice: {
+    fontSize: 20,
+    fontWeight: 'bold'
   }
 });
