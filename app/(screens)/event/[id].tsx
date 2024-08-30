@@ -86,7 +86,7 @@ export default function EventDetailScreen() {
     });
 
     if (userIsMinor) {
-      supabase.from('event_tickets').select().eq('event_id', id).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).is('minor_restricted', false).order('type', { ascending: true }).order('name')
+      supabase.from('event_tickets').select().eq('event_id', id).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).is('minor_restricted', false).order('type', { ascending: true }).order('price', { ascending: false })
       .then(({ data: event_tickets, error }) => {
         if (unmounted || error || !event_tickets.length) return;
         const typeOrder = ['ADDON_REFUNDABLE', 'ADDON'];
@@ -99,7 +99,7 @@ export default function EventDetailScreen() {
         setEventTickets(orderedEventTickets);
       });
     } else {
-      supabase.from('event_tickets').select().eq('event_id', id).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).order('type', { ascending: true }).order('name')
+      supabase.from('event_tickets').select().eq('event_id', id).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).order('type', { ascending: true }).order('price', { ascending: false })
       .then(({ data: event_tickets, error }) => {
         if (unmounted || error || !event_tickets.length) return;
         const typeOrder = ['ADDON_REFUNDABLE', 'ADDON'];
@@ -594,7 +594,8 @@ const styles = StyleSheet.create({
     fontWeight: '500'
   },
   moreEventInfoText: {
-    fontSize: 16
+    fontSize: 16,
+    marginTop: 5
   },
   ticketsContainer: {
     flex: 1,
