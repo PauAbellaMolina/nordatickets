@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { LayoutChangeEvent, View, Dimensions, ScrollView, TouchableWithoutFeedback } from "react-native";
+import { LayoutChangeEvent, View, Dimensions, ScrollView } from "react-native";
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 export const CollapsableComponent = ({ children, expanded, maxHeight }: { children: React.ReactNode; expanded: boolean; maxHeight?: number }) => {
@@ -46,11 +46,9 @@ export const CollapsableComponent = ({ children, expanded, maxHeight }: { childr
         scrollEnabled={expanded}
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        <TouchableWithoutFeedback>
-          <View onLayout={onLayout}>
-            {children}
-          </View>
-        </TouchableWithoutFeedback>
+        <View onLayout={onLayout}>
+          {children}
+        </View>
       </ScrollView>
     </Animated.View>
   );
