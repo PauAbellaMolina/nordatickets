@@ -29,24 +29,6 @@ export default function EventTicketCardComponent({ticket, eventSelling, quantity
     onAddTicket(ticket);
   }
   
-  const getTicketPriceMinWidth = () => {
-    if (!ticket.price) return;
-    switch ((ticket.price/100).toString().length) {
-      case 1:
-        return 60;
-      case 2:
-      case 3:
-      case 4:
-        return 80;
-      case 5:
-        return 103;
-      case 6:
-        return 115;
-      default:
-        return 103;
-    }
-  }
-  
   return (
     <View style={[styles.ticketCard, {backgroundColor: Colors[theme].backgroundContrast}]}>
       <View style={styles.ticketContents}>

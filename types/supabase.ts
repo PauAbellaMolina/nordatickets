@@ -90,6 +90,7 @@ export type Database = {
           selling: boolean
           ticket_form_templates_id: number | null
           type: Database["public"]["Enums"]["event_ticket_type"]
+          wallet_tickets_limit: number | null
         }
         Insert: {
           buy_includes_event_tickets_ids?: number[] | null
@@ -107,6 +108,7 @@ export type Database = {
           selling?: boolean
           ticket_form_templates_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
+          wallet_tickets_limit?: number | null
         }
         Update: {
           buy_includes_event_tickets_ids?: number[] | null
@@ -124,6 +126,7 @@ export type Database = {
           selling?: boolean
           ticket_form_templates_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
+          wallet_tickets_limit?: number | null
         }
         Relationships: [
           {
@@ -488,6 +491,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      count_wallet_tickets_by_event_tickets_id: {
+        Args: {
+          p_event_tickets_id: number
+        }
+        Returns: number
+      }
       delete_secret: {
         Args: {
           secret_name: string
@@ -617,6 +626,7 @@ export type Database = {
           owner_id: string | null
           path_tokens: string[] | null
           updated_at: string | null
+          user_metadata: Json | null
           version: string | null
         }
         Insert: {
@@ -630,6 +640,7 @@ export type Database = {
           owner_id?: string | null
           path_tokens?: string[] | null
           updated_at?: string | null
+          user_metadata?: Json | null
           version?: string | null
         }
         Update: {
@@ -643,6 +654,7 @@ export type Database = {
           owner_id?: string | null
           path_tokens?: string[] | null
           updated_at?: string | null
+          user_metadata?: Json | null
           version?: string | null
         }
         Relationships: [
@@ -664,6 +676,7 @@ export type Database = {
           key: string
           owner_id: string | null
           upload_signature: string
+          user_metadata: Json | null
           version: string
         }
         Insert: {
@@ -674,6 +687,7 @@ export type Database = {
           key: string
           owner_id?: string | null
           upload_signature: string
+          user_metadata?: Json | null
           version: string
         }
         Update: {
@@ -684,6 +698,7 @@ export type Database = {
           key?: string
           owner_id?: string | null
           upload_signature?: string
+          user_metadata?: Json | null
           version?: string
         }
         Relationships: [

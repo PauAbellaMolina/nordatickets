@@ -200,6 +200,17 @@ export default function EventDetailScreen() {
       return;
     }
     setLoading(true);
+
+    //TODO PAU implement this here to check if any of the buyable tickets have reached their limit (keep in mind what to do if the user wants to buy more than one ticket of a type that when adding their tickets the limit is reached)
+    // supabase.rpc('count_wallet_tickets_by_event_tickets_id', { p_event_tickets_id: ticket.id })
+    // .then(({ data: count, error }) => {
+    //   console.log('count', count);
+    //   if (error || count >= ticket.wallet_tickets_limit) {
+    //     return;
+    //   }
+    //   onAddTicket(ticket);
+    // });
+
     getPaymentFormInfo();
   };
 
