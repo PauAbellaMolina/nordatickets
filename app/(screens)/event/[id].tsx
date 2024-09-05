@@ -34,6 +34,7 @@ export default function EventDetailScreen() {
   const [cart, setCart] = useState<Cart>();
   const [cartTotalPrice, setCartTotalPrice] = useState<number>(0);
   const [cartTotalQuantity, setCartTotalQuantity] = useState<number>(0);
+  const [eventTicketsWithLimit, setEventTicketsWithLimit] = useState<EventTicket[]>([]);
   const [loading, setLoading] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string>('misc');
@@ -166,6 +167,11 @@ export default function EventDetailScreen() {
   }, [user, cart]);
 
   const onAddTicketHandler = (ticket: EventTicket, associatedTicketFormSubmit?: Partial<TicketFormSubmit>) => {
+    if (ticket.wallet_tickets_limit) {
+      if (!eventTicketsWithLimit.some(t => t.id === ticket.id)) {
+        setEventTicketsWithLimit([...eventTicketsWithLimit, ticket]);
+      }
+    }
     if (!cart) {
       setCart([{eventTicket: ticket, quantity: 1, associatedTicketFormSubmit}]);
       return;
@@ -188,6 +194,9 @@ export default function EventDetailScreen() {
     }
     existingCartItem.quantity--;
     if (existingCartItem.quantity === 0) {
+      if (eventTicketsWithLimit.some((t) => t.id === ticket.id)) {
+        setEventTicketsWithLimit(eventTicketsWithLimit.filter((t) => t.id !== ticket.id));
+      }
       const newCart = cart.filter((cartTicket) => cartTicket.eventTicket.id !== ticket.id);
       setCart(newCart);
     } else {
@@ -201,17 +210,30 @@ export default function EventDetailScreen() {
     }
     setLoading(true);
 
-    //TODO PAU implement this here to check if any of the buyable tickets have reached their limit (keep in mind what to do if the user wants to buy more than one ticket of a type that when adding their tickets the limit is reached)
-    // supabase.rpc('count_wallet_tickets_by_event_tickets_id', { p_event_tickets_id: ticket.id })
-    // .then(({ data: count, error }) => {
-    //   console.log('count', count);
-    //   if (error || count >= ticket.wallet_tickets_limit) {
-    //     return;
-    //   }
-    //   onAddTicket(ticket);
-    // });
+    if (eventTicketsWithLimit?.length) {
+      checkForLimitedTickets();
+    } else {
+      getPaymentFormInfo();
+    }
+  };
 
-    getPaymentFormInfo();
+  const checkForLimitedTickets = async () => {
+    try {
+      const results = await Promise.all(eventTicketsWithLimit.map(async (ticket) => {
+        const cartItem = cart.find((item) => item.eventTicket.id === ticket.id);
+        const { data: count, error } = await supabase.rpc('count_wallet_tickets_by_event_tickets_id', { p_event_tickets_id: ticket.id });
+        
+        return !(error || count > ticket.wallet_tickets_limit || count + cartItem.quantity > ticket.wallet_tickets_limit);
+      }));
+  
+      if (results.every(Boolean)) {
+        getPaymentFormInfo();
+      } else {
+        setLoading(false);
+      }
+    } catch (error) {
+      setLoading(false);
+    }
   };
 
   const getPaymentFormInfo = () => {
