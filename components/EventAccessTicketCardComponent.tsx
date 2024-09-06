@@ -28,12 +28,12 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
   };
 
   const onRemove = () => {
+    setFormSubmitted(false);
+    setFormExpanded(false);
     if (quantityInCart === 0) {
       return;
     }
     onRemoveTicket(ticket);
-    setFormSubmitted(false);
-    setFormExpanded(false);
   };
   const onAdd = () => {
     if (quantityInCart === 10) {

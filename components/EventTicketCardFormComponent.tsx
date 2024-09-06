@@ -166,7 +166,7 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
   return (
     <View style={styles.container}>
       { ticketFormTemplate && Object.entries(ticketFormTemplate)
-        .filter(([key]) => key.startsWith('q') && !key.includes('_'))
+        .filter(([key, question]) => key.startsWith('q') && !key.includes('_') && typeof question === 'string' && question.length)
         .map(([key, question]) => {
           const type = ticketFormTemplate[`${key}_type`];
           const required = ticketFormTemplate[`${key}_required`];
