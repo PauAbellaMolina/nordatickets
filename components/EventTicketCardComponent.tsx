@@ -23,7 +23,7 @@ export default function EventTicketCardComponent({ticket, eventSelling, quantity
     onRemoveTicket(ticket);
   }
   const onAdd = () => {
-    if (quantityInCart === 10) {
+    if (quantityInCart === 100) {
       return;
     }
     onAddTicket(ticket);
@@ -49,7 +49,7 @@ export default function EventTicketCardComponent({ticket, eventSelling, quantity
               </Pressable>
               <Text style={styles.quantityInCart}>{quantityInCart}</Text>
               <Pressable onPress={onAdd}>
-                <FeatherIcon name="plus-circle" size={28} color={quantityInCart === 10 ? Colors[theme].text+'60' : Colors[theme].text} />
+                <FeatherIcon name="plus-circle" size={28} color={quantityInCart === 100 ? Colors[theme].text+'60' : Colors[theme].text} />
               </Pressable>
             </> :
               <Text style={styles.notAvailable}>{ i18n?.t('notAvailable') }</Text>

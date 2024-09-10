@@ -36,7 +36,7 @@ export default function EventAddonTicketCardComponent({ticket, eventSelling, qua
     setFormExpanded(false);
   };
   const onAdd = () => {
-    if (quantityInCart === 10) {
+    if (quantityInCart === 100) {
       return;
     }
     const newTicket = {...ticket};
@@ -51,7 +51,7 @@ export default function EventAddonTicketCardComponent({ticket, eventSelling, qua
   };
 
   const onFormSubmit = (ticketFormSubmit: Partial<TicketFormSubmit>) => {
-    if (quantityInCart === 10) {
+    if (quantityInCart === 100) {
       return;
     }
     setFormSubmitted(true);
@@ -83,7 +83,7 @@ export default function EventAddonTicketCardComponent({ticket, eventSelling, qua
                 </Pressable>
               :
                 <Pressable onPress={quantityInCart === 1 ? onRemove : onAdd}>
-                  <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={28} color={quantityInCart === 10 ? Colors[theme].text+'60' : Colors[theme].text} />
+                  <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={28} color={quantityInCart === 100 ? Colors[theme].text+'60' : Colors[theme].text} />
                 </Pressable>
               }
             </> :
