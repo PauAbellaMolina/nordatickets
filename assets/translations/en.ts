@@ -46,6 +46,7 @@ export const en: { [key: string]: string } = {
   usingCreditCard: 'Using credit card',
   usingCardWithExpiryDate: 'Using card with expiry date',
   noTicketsInCart: 'No tickets in cart',
+  saveCardForFuturePurchases: 'Save card for future purchases',
   notAvailable: 'Not available',
   buy: 'Buy',
   total: 'Total',

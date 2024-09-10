@@ -509,7 +509,7 @@ export default function EventDetailScreen() {
                           value={storeCreditCardChecked}
                           onValueChange={setStoreCreditCardChecked}
                         />
-                        <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>Guardar tarjeta per futures compres</Text>
+                        <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('saveCardForFuturePurchases') }</Text>
                       </View>
                     }
                   <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground, marginTop: !cardNumber ? 5 : 3}]} onPress={onBuyCart}>
