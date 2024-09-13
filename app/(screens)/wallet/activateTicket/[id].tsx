@@ -244,15 +244,6 @@ export default function ActivateTicketScreen() {
           deactivateWalletTicket();
         });
       });
-
-      // supabase.from('wallet_tickets').update({ used_at: new Date().toISOString() }).eq('id', addonTicket.id).select().single()
-      // .then(({ data: wallet_ticket, error }) => {
-      //   supabase.from('wallet_tickets').update({ used_at: new Date().toISOString() }).eq('id', id).select().single()
-      //   .then(({ data: wallet_ticket, error }) => {
-      //     if (error || !wallet_ticket) return;
-      //     deactivateWalletTicket();
-      //   });
-      // });
       return;
     }
     deactivateWalletTicket();
@@ -265,14 +256,6 @@ export default function ActivateTicketScreen() {
       setTicketUsedAt(usedAt);
       setLoading(false);
     });
-
-
-    // supabase.from('wallet_tickets').update({ used_at: new Date().toISOString(), used_with_addon_id: addonTicket ? addonTicket.id : null }).eq('id', id).select().single()
-    // .then(({ data: wallet_ticket, error }) => {
-    //   if (error || !wallet_ticket) return;
-    //   setTicketUsedAt(wallet_ticket.used_at);
-    //   setLoading(false);
-    // });
   }
 
   const scale = useRef(new Animated.Value(1));
