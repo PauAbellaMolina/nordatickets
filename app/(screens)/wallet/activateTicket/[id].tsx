@@ -237,26 +237,42 @@ export default function ActivateTicketScreen() {
     setShowConfirm(false);
     setLoading(true);
     if (addonTicket) {
-      supabase.from('wallet_tickets').update({ used_at: new Date().toISOString() }).eq('id', addonTicket.id).select().single()
-      .then(({ data: wallet_ticket, error }) => {
-        supabase.from('wallet_tickets').update({ used_at: new Date().toISOString() }).eq('id', id).select().single()
-        .then(({ data: wallet_ticket, error }) => {
-          if (error || !wallet_ticket) return;
+      supabase.rpc('update_wallet_tickets_used_at', { wallet_tickets_id: addonTicket.id, addon_id: null })
+      .then(() => {
+        supabase.rpc('update_wallet_tickets_used_at', { wallet_tickets_id: +id, addon_id: null })
+        .then(() => {
           deactivateWalletTicket();
         });
       });
+
+      // supabase.from('wallet_tickets').update({ used_at: new Date().toISOString() }).eq('id', addonTicket.id).select().single()
+      // .then(({ data: wallet_ticket, error }) => {
+      //   supabase.from('wallet_tickets').update({ used_at: new Date().toISOString() }).eq('id', id).select().single()
+      //   .then(({ data: wallet_ticket, error }) => {
+      //     if (error || !wallet_ticket) return;
+      //     deactivateWalletTicket();
+      //   });
+      // });
       return;
     }
     deactivateWalletTicket();
   };
 
   const deactivateWalletTicket = () => {
-    supabase.from('wallet_tickets').update({ used_at: new Date().toISOString(), used_with_addon_id: addonTicket ? addonTicket.id : null }).eq('id', id).select().single()
-    .then(({ data: wallet_ticket, error }) => {
-      if (error || !wallet_ticket) return;
-      setTicketUsedAt(wallet_ticket.used_at);
+    supabase.rpc('update_wallet_tickets_used_at', { wallet_tickets_id: +id, addon_id: addonTicket ? addonTicket.id : null })
+    .then(({ data: usedAt }) => {
+      if (!usedAt) return;
+      setTicketUsedAt(usedAt);
       setLoading(false);
     });
+
+
+    // supabase.from('wallet_tickets').update({ used_at: new Date().toISOString(), used_with_addon_id: addonTicket ? addonTicket.id : null }).eq('id', id).select().single()
+    // .then(({ data: wallet_ticket, error }) => {
+    //   if (error || !wallet_ticket) return;
+    //   setTicketUsedAt(wallet_ticket.used_at);
+    //   setLoading(false);
+    // });
   }
 
   const scale = useRef(new Animated.Value(1));
