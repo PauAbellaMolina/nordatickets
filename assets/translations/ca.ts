@@ -85,7 +85,7 @@ export const ca: { [key: string]: string } = {
   ticketUnactive: 'Ticket desactivat',
   ticketAlreadyUsedExplanation: 'Aquest ticket ja ha estat utilitzat',
   ticketUsedTimeAgoExplanation: 'Aquest ticket ha estat utilitzat fa',
-  yourOneTimeCode: "És el teu codi per un sol ús",
+  yourOneTimeCode: "El teu codi per un sol ús",
   yourOneTimeCodeGreeting: "Hola! Aquest és el teu codi d'un sol ús:",
   yourOneTimeCodeExplanation: "Utilitza'l per iniciar sessió a ElTeuTikt",
   moreInfo: 'Més informació',
