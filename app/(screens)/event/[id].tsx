@@ -239,11 +239,6 @@ export default function EventDetailScreen() {
   const getPaymentFormInfo = () => {
     const finalAmount = cartTotalPrice + ((event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0));
 
-    // if (finalAmount === 0) { //TODO PAU keep in mind this use case!
-    //   addPendingTicketsToUser('free');
-    //   return;
-    // }
-
     fetch(process.env.EXPO_PUBLIC_FIREBASE_FUNC_GET_FORM_INFO_URL, {
       method: 'POST',
       headers: {
@@ -277,7 +272,6 @@ export default function EventDetailScreen() {
       const Ds_Signature: string = data.Ds_Signature.replace(/\//g, '%2F');
       const Ds_SignatureVersion: string = data.Ds_SignatureVersion.replace(/\//g, '%2F');
 
-      // addPendingTicketsToUser(data.orderId);
       setTimeout(() => {
         setLoading(false);
         setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
@@ -290,67 +284,6 @@ export default function EventDetailScreen() {
       setLoading(false);
     });
   }
-
-  // type NewWalletTicket = {
-  //   event_id: WalletTicket['event_id'];
-  //   event_tickets_id: WalletTicket['event_tickets_id'];
-  //   event_tickets_name: WalletTicket['event_tickets_name'];
-  //   order_id: WalletTicket['order_id'];
-  //   price: WalletTicket['price'];
-  //   used_at: WalletTicket['used_at'];
-  //   user_id: WalletTicket['user_id'];
-  //   iva: WalletTicket['iva'];
-  //   type: WalletTicket['type'];
-  //   ticket_form_submits_id?: WalletTicket['ticket_form_submits_id'];
-  // };
-
-  // const addPendingTicketsToUser = (orderId: string) => {
-  //   if (!cart?.length || !event || !user) {
-  //     return;
-  //   }
-
-  //   cart.forEach((cartItem) => {
-  //     for (let i = 0; i < cartItem.quantity; i++) {
-  //       if (cartItem.associatedTicketFormSubmit) {
-  //         const ticketFormSubmit: Partial<TicketFormSubmit> & { user_id: string, event_id: number, tickets_form_templates_id: number } = {
-  //           entries: cartItem.associatedTicketFormSubmit.entries,
-  //           event_id: cartItem.eventTicket.event_id,
-  //           tickets_form_templates_id: cartItem.associatedTicketFormSubmit.tickets_form_templates_id,
-  //           user_id: user.id
-  //         };
-  //         supabase.from('ticket_form_submits').insert(ticketFormSubmit).select().single()
-  //         .then(({ data: ticket_form_submit, error }) => {
-  //           if (error || !ticket_form_submit) return;
-  //           const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, event_tickets_name: cartItem.eventTicket.name, order_id: orderId, price: cartItem.eventTicket.price, used_at: null, user_id: user.id, iva: cartItem.eventTicket.iva, type: cartItem.eventTicket.type, ticket_form_submits_id: ticket_form_submit.id };
-  //           supabase.from('wallet_tickets').insert(ticketToInsert).then();
-  //         });
-  //       } else {
-  //         const ticketToInsert: NewWalletTicket = { event_id: cartItem.eventTicket.event_id, event_tickets_id: cartItem.eventTicket.id, event_tickets_name: cartItem.eventTicket.name, order_id: orderId, price: cartItem.eventTicket.price, used_at: null, user_id: user.id, iva: cartItem.eventTicket.iva, type: cartItem.eventTicket.type };
-  //         supabase.from('wallet_tickets').insert(ticketToInsert).then();
-  //       }
-
-  //       const buyIncludesIds = cartItem.eventTicket.buy_includes_event_tickets_ids;
-  //       if (buyIncludesIds?.length) {
-  //         buyIncludesIds.forEach((id) => {
-  //           let eventTicketToInclude = eventTickets.find((eventTicket) => eventTicket.id === id);
-  //           if (!eventTicketToInclude) {
-  //             eventTicketToInclude = accessEventTickets.find((eventTicket) => eventTicket.id === id);
-  //           }
-  //           if (eventTicketToInclude) {
-  //             const ticketToInsert: NewWalletTicket = { event_id: eventTicketToInclude.event_id, event_tickets_id: eventTicketToInclude.id, event_tickets_name: eventTicketToInclude.name, order_id: orderId, price: 0, used_at: null, user_id: user.id, iva: eventTicketToInclude.iva, type: eventTicketToInclude.type };
-  //             supabase.from('wallet_tickets').insert(ticketToInsert).select().then();
-  //           }
-  //         });
-  //       }
-  //     }
-  //   });
-
-  //   setTimeout(() => {
-  //     setLoading(false);
-  //     setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
-  //     setCart(null);
-  //   }, 3000);
-  // };
 
   const onGoToWallet = () => {
     router.navigate('/(tabs)/wallet');
