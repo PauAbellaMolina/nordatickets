@@ -52,7 +52,7 @@ export default function ActivateTicketScreen() {
   }, [theme]);
 
   const calculateTimeAgo = () => {
-    const usedAt = new Date(ticketUsedAt);
+    const usedAt = new Date(new Date(ticketUsedAt).setMilliseconds(0));
     const now = new Date();
     const diff = now.getTime() - usedAt.getTime();
     const seconds = Math.floor(diff / 1000) % 60;

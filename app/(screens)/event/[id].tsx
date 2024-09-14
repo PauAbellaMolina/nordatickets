@@ -263,6 +263,15 @@ export default function EventDetailScreen() {
       if (!data) {
         return;
       }
+      if (data.zeroAmount) {
+        setTimeout(() => {
+          setLoading(false);
+          setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
+          setCart(null);
+        }, 700);
+        return;
+      }
+
       const formUrl: string = data.formUrl.replace(/\//g, '%2F');
       const Ds_MerchantParameters: string = data.Ds_MerchantParameters.replace(/\//g, '%2F');
       const Ds_Signature: string = data.Ds_Signature.replace(/\//g, '%2F');
