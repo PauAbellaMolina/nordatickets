@@ -237,12 +237,9 @@ export default function ActivateTicketScreen() {
     setShowConfirm(false);
     setLoading(true);
     if (addonTicket) {
-      supabase.rpc('update_wallet_tickets_used_at', { wallet_tickets_id: addonTicket.id, addon_id: null })
+      supabase.rpc('update_wallet_tickets_used_at', { req_user_id: user.id, wallet_tickets_id: addonTicket.id, addon_id: null })
       .then(() => {
-        supabase.rpc('update_wallet_tickets_used_at', { wallet_tickets_id: +id, addon_id: null })
-        .then(() => {
-          deactivateWalletTicket();
-        });
+        deactivateWalletTicket();
       });
       return;
     }
@@ -250,7 +247,7 @@ export default function ActivateTicketScreen() {
   };
 
   const deactivateWalletTicket = () => {
-    supabase.rpc('update_wallet_tickets_used_at', { wallet_tickets_id: +id, addon_id: addonTicket ? addonTicket.id : null })
+    supabase.rpc('update_wallet_tickets_used_at', { req_user_id: user.id, wallet_tickets_id: +id, addon_id: addonTicket ? addonTicket.id : null })
     .then(({ data: usedAt }) => {
       if (!usedAt) return;
       setTicketUsedAt(usedAt);

@@ -516,12 +516,6 @@ export type Database = {
         }
         Returns: string
       }
-      old_update_wallet_tickets_used_at: {
-        Args: {
-          wallet_tickets_id: number
-        }
-        Returns: undefined
-      }
       organizer_email_exists: {
         Args: {
           email_to_check: string
@@ -536,6 +530,7 @@ export type Database = {
       }
       update_wallet_tickets_used_at: {
         Args: {
+          req_user_id: string
           wallet_tickets_id: number
           addon_id: number
         }
