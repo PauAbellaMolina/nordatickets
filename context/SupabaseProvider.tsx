@@ -6,6 +6,7 @@ import { I18n } from 'i18n-js';
 import { AvailableLocales, dict } from "../assets/translations/translation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Appearance, ColorSchemeName } from "react-native";
+import { authEmailsTranslations } from "../assets/translations/email";
 
 type SupabaseContextProps = {
   user: User | null;
@@ -70,6 +71,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
     if (error) {
       throw error;
     }
+    storeLocaleUserMetadata(i18n?.locale as AvailableLocales);
   }
 
   const signOut = async () => {
@@ -87,8 +89,19 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
     } catch (e) { }
   };
 
+  const storeLocaleUserMetadata = async (locale: AvailableLocales) => {
+    const emailData = authEmailsTranslations[locale];
+    if (!locale || !emailData) return;
+    try {
+      await supabase.auth.updateUser({
+        data: {lang: locale, emailData: emailData}
+      });
+    } catch (e) { }
+  };
+
   const setLanguage = (locale: AvailableLocales) => {
     storeLocaleCookie(locale);
+    storeLocaleUserMetadata(locale);
   };
 
   const getLocaleFromCookie = async () => {

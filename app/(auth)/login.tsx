@@ -35,8 +35,7 @@ export default function Login() {
     signInWithOTP({
       email: email,
       options: {
-        shouldCreateUser: false,
-        data: langMetaData
+        shouldCreateUser: false
       }
     })
     .then(() => {
