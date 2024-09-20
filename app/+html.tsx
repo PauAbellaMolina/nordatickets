@@ -29,7 +29,30 @@ export default function Root({ children }: { children: React.ReactNode }) {
         {/* Using raw CSS styles as an escape-hatch to ensure the background color never flickers in dark-mode. */}
         <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
         {/* Add any additional <head> elements that you want globally available on web... */}
-        {/* TODO PAU add meta elements here! */}
+        {/* SEO Meta Tags */}
+        <title>ElTeuTikt - Your Event Ticketing Solution</title>
+        <meta name="description" content="ElTeuTikt is your go-to website for selling and managing tickets for drinks and consumables on your events." />
+        <meta name="keywords" content="event tickets, ticketing, event management, ElTeuTikt, mobile ticketing, event drinks, consumable ticketing" />
+        <meta name="author" content="ElTeuTikt" />
+        
+        {/* Open Graph Meta Tags */}
+        <meta property="og:title" content="ElTeuTikt - Event Drinks & Consumables Ticketing Solution" />
+        <meta property="og:description" content="Sell, and manage event tickets for drinks and consumables easily with ElTeuTikt. Your go-to platform for seamless event experiences." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.elteutikt.com" />
+        <meta property="og:image" content="https://waniuunkeiqwqatzunof.supabase.co/storage/v1/object/public/assets/og-image.png" />
+        
+        {/* iOS Meta Tags */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="ElTeuTikt" />
+        
+        {/* Social Media Links */}
+        <link rel="instagram" href="https://www.instagram.com/elteutikt" />
+        <link rel="linkedin" href="https://linkedin.com/company/elteutikt" />
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href="https://www.elteutikt.com" />
       </head>
       <body>{children}</body>
     </html>
