@@ -31,11 +31,12 @@ export default function Login() {
     setLoading(true);
     
     //One time password (OTP)
-    const langMetaData = authEmailsTranslations[i18n.locale as AvailableLocales];
+    const emailData = authEmailsTranslations[i18n?.locale as AvailableLocales];
     signInWithOTP({
       email: email,
       options: {
-        shouldCreateUser: false
+        shouldCreateUser: false,
+        data: {lang: i18n?.locale as AvailableLocales, emailData: emailData}
       }
     })
     .then(() => {
