@@ -71,6 +71,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
     if (error) {
       throw error;
     }
+    storeLocaleUserMetadata(i18n?.locale as AvailableLocales);
   }
 
   const signOut = async () => {
