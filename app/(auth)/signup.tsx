@@ -8,6 +8,8 @@ import { useSupabase } from "../../context/SupabaseProvider";
 import BlobsBackground from "../../components/BlobsBackground";
 import { FeatherIcon } from "../../components/CustomIcons";
 import { isValidEmail } from "../../utils/formValidationUtils";
+import { authEmailsTranslations } from "../../assets/translations/email";
+import { AvailableLocales } from "../../assets/translations/translation";
 
 export default function Signup() {
   const { signInWithOTP, verifyOTP, i18n, theme } = useSupabase();
@@ -33,11 +35,12 @@ export default function Signup() {
     setLoading(true);
 
     //One time password (OTP)
+    const emailData = authEmailsTranslations[i18n?.locale as AvailableLocales];
     signInWithOTP({
       email: email,
       options: {
         shouldCreateUser: true,
-        data: {birthdate: birthdate, fullname: fullname}
+        data: {lang: i18n?.locale as AvailableLocales, emailData: emailData, birthdate: birthdate, fullname: fullname}
       }
     })
     .then(() => {
