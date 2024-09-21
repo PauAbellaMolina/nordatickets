@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     fontSize: 13.5
   },
   termsActionLink: {
-    fontSize: 16,
+    fontSize: 14,
     textDecorationLine: 'underline',
     textAlign: 'center'
   },
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   },
   bottomActionContainer: {
     position: 'absolute',
-    bottom: 50
+    bottom: 35
   },
   bottomActionTitle: {
     fontSize: 16

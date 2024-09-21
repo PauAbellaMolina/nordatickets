@@ -30,14 +30,14 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
         {/* Add any additional <head> elements that you want globally available on web... */}
         {/* SEO Meta Tags */}
-        <title>ElTeuTikt - Your Event Ticketing Solution</title>
-        <meta name="description" content="ElTeuTikt is your go-to website for selling and managing tickets for drinks and consumables on your events." />
+        <title>ElTeuTikt - Digitalitzem el procés de venda de consumicions per als esdeveniments i festes</title>
+        <meta name="description" content="Ven i gestiona els tickets de consumicions dels teus esdeveniments i festes amb ElTeuTikt. La millor experiència de compra per l'organitzador i l'assistent." />
         <meta name="keywords" content="event tickets, ticketing, event management, ElTeuTikt, mobile ticketing, event drinks, consumable ticketing" />
         <meta name="author" content="ElTeuTikt" />
         
         {/* Open Graph Meta Tags */}
-        <meta property="og:title" content="ElTeuTikt - Event Drinks & Consumables Ticketing Solution" />
-        <meta property="og:description" content="Sell, and manage event tickets for drinks and consumables easily with ElTeuTikt. Your go-to platform for seamless event experiences." />
+        <meta property="og:title" content="ElTeuTikt - Digitalitzem el procés de venda de consumicions per als esdeveniments i festes" />
+        <meta property="og:description" content="Ven i gestiona els tickets de consumicions dels teus esdeveniments i festes amb ElTeuTikt. La millor experiència de compra per l'organitzador i l'assistent." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.elteutikt.com" />
         <meta property="og:image" content="https://waniuunkeiqwqatzunof.supabase.co/storage/v1/object/public/assets/og-image.png" />

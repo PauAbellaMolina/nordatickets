@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   },
   bottomActionContainer: {
     position: 'absolute',
-    bottom: 50
+    bottom: 35
   },
   bottomActionTitle: {
     fontSize: 16
