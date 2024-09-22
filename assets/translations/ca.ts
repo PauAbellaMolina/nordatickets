@@ -83,6 +83,7 @@ export const ca: { [key: string]: string } = {
   ticketActive: 'Ticket actiu',
   deactivateTicketOnDrinkExplanation: 'Desactivar ticket al rebre la beguda',
   ticketUnactive: 'Ticket desactivat',
+  ticketRefundedExplanation: 'Aquest ticket ha estat reemborsat',
   ticketAlreadyUsedExplanation: 'Aquest ticket ja ha estat utilitzat',
   ticketUsedTimeAgoExplanation: 'Aquest ticket ha estat utilitzat fa',
   yourOneTimeCode: "El teu codi per un sol ús",

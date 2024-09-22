@@ -32,7 +32,7 @@ export default function TabTwoScreen() {
   );
 
   const fetchWalletTickets = (unmounted: boolean) => {
-    supabase.from('wallet_tickets').select().eq('user_id', user.id).is('used_at', null).order('type', { ascending: true })
+    supabase.from('wallet_tickets').select().eq('user_id', user.id).is('used_at', null).is('refunded_at', null).order('type', { ascending: true })
     .then(({ data: wallet_tickets, error }) => {
       if (unmounted || error) return;
       const typeOrder = ['ADDON_REFUNDABLE', 'ADDON', 'ACCESS'];

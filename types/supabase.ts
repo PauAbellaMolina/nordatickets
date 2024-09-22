@@ -419,6 +419,7 @@ export type Database = {
           iva: number
           order_id: string
           price: number | null
+          refunded_at: string | null
           ticket_form_submits_id: number | null
           type: Database["public"]["Enums"]["event_ticket_type"]
           used_at: string | null
@@ -434,6 +435,7 @@ export type Database = {
           iva?: number
           order_id: string
           price?: number | null
+          refunded_at?: string | null
           ticket_form_submits_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
           used_at?: string | null
@@ -449,6 +451,7 @@ export type Database = {
           iva?: number
           order_id?: string
           price?: number | null
+          refunded_at?: string | null
           ticket_form_submits_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
           used_at?: string | null
@@ -540,7 +543,7 @@ export type Database = {
         Args: {
           user_id: string
         }
-        Returns: string
+        Returns: Record<string, unknown>
       }
     }
     Enums: {
@@ -557,7 +560,10 @@ export type Database = {
         | "OPTIONS"
     }
     CompositeTypes: {
-      [_ in never]: never
+      user_email_lang: {
+        email: string | null
+        lang: string | null
+      }
     }
   }
   storage: {

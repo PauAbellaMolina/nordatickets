@@ -23,7 +23,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
     useCallback(() => {
       let unmounted = false;
       if (triggerNextFocus.current) {
-        if (!walletTicket || walletTicket?.used_at != null) return;
+        if (!walletTicket || walletTicket?.used_at != null || walletTicket?.refunded_at != null) return;
         fetchTicketOrderStatus(unmounted);
       }
 
@@ -135,7 +135,7 @@ export default function WalletTicketCardComponent({ walletTicket }: { walletTick
   };
 
   return (<>
-    { walletTicket?.used_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEEDED' || (eventTicketOrderStatus === 'PAYMENT_PENDING')) ? <>
+    { walletTicket?.used_at == null && walletTicket?.refunded_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEEDED' || (eventTicketOrderStatus === 'PAYMENT_PENDING')) ? <>
       { eventTicketOrderStatus === 'PAYMENT_PENDING' ?
         <View style={[styles.singleTicketContainer, {opacity: .6, backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
           <View style={styles.ticketIconWrapper}>

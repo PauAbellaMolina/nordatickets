@@ -21,6 +21,7 @@ export default function ActivateTicketScreen() {
   const [ticketDeactivable, setTicketDeactivable] = useState<boolean>(false);
   const [ticketName, setTicketName] = useState<string>('');
   const [ticketUsedAt, setTicketUsedAt] = useState<string>(undefined);
+  const [ticketRefundedAt, setTicketRefundedAt] = useState<string>(undefined);
   const [ticketUsedTimeAgo, setTicketUsedTimeAgo] = useState<string>();
   const [ticketType, setTicketType] = useState<string>();
   const [addonTicket, setAddonTicket] = useState<WalletTicket>(undefined);
@@ -119,6 +120,7 @@ export default function ActivateTicketScreen() {
 
     setTicketName(wallet_ticket.event_tickets_name);
     setTicketUsedAt(wallet_ticket.used_at);
+    setTicketRefundedAt(wallet_ticket.refunded_at);
     setTicketType(wallet_ticket.type);
 
     supabase.from('event_tickets').select().eq('id', wallet_ticket.event_tickets_id)
@@ -149,8 +151,8 @@ export default function ActivateTicketScreen() {
     });
 
     if (wallet_ticket.type === 'CONSUMABLE') {
-      if (wallet_ticket.used_at === null) {
-        supabase.from('wallet_tickets').select().eq('event_id', wallet_ticket.event_id).eq('user_id', user.id).in('type', ['ADDON', 'ADDON_REFUNDABLE']).is('used_at', null)
+      if (wallet_ticket.used_at === null && wallet_ticket.refunded_at === null) {
+        supabase.from('wallet_tickets').select().eq('event_id', wallet_ticket.event_id).eq('user_id', user.id).in('type', ['ADDON', 'ADDON_REFUNDABLE']).is('used_at', null).is('refunded_at', null)
         .then(async ({ data: addon_wallet_tickets, error }) => {
           if (unmounted || error || !addon_wallet_tickets.length) {
             setAddonTicket(null);
@@ -276,7 +278,7 @@ export default function ActivateTicketScreen() {
         <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
           <View style={[styles.ticketInfoContainer, { gap: ticketFormSubmit ? 20 : 8 }]}>
             <Animated.View style={[styles.pulseContainer, {transform: [{ scale: scale.current }], opacity: opacity.current }]}>
-              <View style={[styles.pulseDot, {backgroundColor: ticketUsedAt === undefined ? 'transparent' : ticketUsedAt != null ? '#ff3737' : '#3fde7a'}]} />
+              <View style={[styles.pulseDot, {backgroundColor: ticketUsedAt === undefined || ticketRefundedAt === undefined ? 'transparent' : ticketUsedAt != null || ticketRefundedAt != null ? '#ff3737' : '#3fde7a'}]} />
             </Animated.View>
             <View style={[styles.ticketInfoTextsContainer, addonTicket || ticketFormSubmit ? {justifyContent: 'flex-end'} : {justifyContent: 'center'}]}>
               <Text style={styles.ticketName} numberOfLines={4}>{ ticketName }</Text>
@@ -319,22 +321,28 @@ export default function ActivateTicketScreen() {
             <View style={[styles.ticketDivider, {backgroundColor: Colors[theme].background}]}></View>
             <View style={[styles.ticketRightCutout, {backgroundColor: Colors[theme].background}]}></View>
           </View>
-          <View style={[styles.ticketStatusContainer, {backgroundColor: ticketUsedAt === undefined ? 'transparent' : ticketUsedAt != null ? '#ff3737' : '#3fde7a', paddingVertical: ticketUsedAt === undefined || !ticketUsedTimeAgo ? 30 : 21.25}]}>
-            { ticketUsedAt === undefined ? <>
+          <View style={[styles.ticketStatusContainer, {backgroundColor: ticketUsedAt === undefined || ticketRefundedAt === undefined ? 'transparent' : ticketUsedAt != null || ticketRefundedAt != null ? '#ff3737' : '#3fde7a', paddingVertical: ticketUsedAt === undefined || ticketRefundedAt === undefined || !ticketUsedTimeAgo ? 30 : 21.25}]}>
+            { ticketUsedAt === undefined || ticketRefundedAt === undefined ? <>
               <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('loading') } ticket...</Text>
               <Text style={styles.statusInfoText}> </Text>
-            </> : <>{ ticketUsedAt === null ? <>
+            </> : <>{ ticketUsedAt === null && ticketRefundedAt === null ? <>
                 <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketActive') }</Text>
                 <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ ticketType === 'CONSUMABLE' ? i18n?.t('deactivateTicketOnDrinkExplanation') : i18n?.t('deactivateTicketOnAccessExplanation') }</Text>
               </> : <>
                 <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUnactive') }</Text>
                 <View style={{ alignItems: 'center' }}>
-                  { !ticketUsedTimeAgo ?
-                    <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketAlreadyUsedExplanation') }</Text>
-                  : <>
-                    <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUsedTimeAgoExplanation') }</Text>
-                    <Text style={[styles.statusInfoTextTime, {color: Colors['light'].text}]}>{ ticketUsedTimeAgo }</Text>
-                  </>}
+                  { ticketRefundedAt != null ? <>
+                    <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketRefundedExplanation') }</Text>
+                    { ticketUsedAt != null ? <>
+                      <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ !ticketUsedTimeAgo ? i18n?.t('ticketAlreadyUsedExplanation') : i18n?.t('ticketUsedTimeAgoExplanation') }</Text>
+                      <Text style={[styles.statusInfoTextTime, {color: Colors['light'].text}]}>{ ticketUsedTimeAgo }</Text>
+                    </> : null }
+                  </> : <>
+                    { ticketUsedAt != null ? <>
+                      <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ !ticketUsedTimeAgo ? i18n?.t('ticketAlreadyUsedExplanation') : i18n?.t('ticketUsedTimeAgoExplanation') }</Text>
+                      <Text style={[styles.statusInfoTextTime, {color: Colors['light'].text}]}>{ ticketUsedTimeAgo }</Text>
+                    </> : null }
+                  </> }
                 </View>
               </>}</>
             }
@@ -345,7 +353,7 @@ export default function ActivateTicketScreen() {
             <Pressable disabled={loading} onPress={() => router.navigate('/(tabs)/wallet')} style={[styles.button, loading ? {opacity: .7} : {}, {height: '100%', flex: 1, justifyContent: 'center'}, {backgroundColor: eventBackgroundColor}]}>
               <FeatherIcon name="arrow-left" size={38} color={Colors[theme].text} />
             </Pressable>
-            <Pressable disabled={!ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null} onPress={onDeactivateTicket} style={[styles.button, !ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null || loading ? {opacity: .7} : {}, {backgroundColor: eventBackgroundColor}]}>
+            <Pressable disabled={!ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null || ticketRefundedAt === undefined || ticketRefundedAt != null} onPress={onDeactivateTicket} style={[styles.button, !ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null || ticketRefundedAt === undefined || ticketRefundedAt != null || loading ? {opacity: .7} : {}, {backgroundColor: eventBackgroundColor}]}>
               {loading ?
                 <ActivityIndicator style={styles.buttonLoading} size="large" />
               :

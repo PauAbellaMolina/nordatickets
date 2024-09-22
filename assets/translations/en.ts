@@ -83,6 +83,7 @@ export const en: { [key: string]: string } = {
   ticketActive: 'Ticket active',
   deactivateTicketOnDrinkExplanation: 'Deactivate ticket upon receiving drink',
   ticketUnactive: 'Ticket unactive',
+  ticketRefundedExplanation: 'This ticket has been refunded',
   ticketAlreadyUsedExplanation: 'This ticket has already been used',
   ticketUsedTimeAgoExplanation: 'Time passed since ticket used',
   yourOneTimeCode: 'Your one-time code',
