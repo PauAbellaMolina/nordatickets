@@ -6,7 +6,7 @@ import { ScrollViewStyleReset } from 'expo-router/html';
 // do not have access to the DOM or browser APIs.
 export default function Root({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -31,13 +31,13 @@ export default function Root({ children }: { children: React.ReactNode }) {
         {/* Add any additional <head> elements that you want globally available on web... */}
         {/* SEO Meta Tags */}
         <title>ElTeuTikt</title>
-        <meta name="description" content="Digitalitza el procés de venda i gestió els tickets de consumicions dels teus esdeveniments i festes amb ElTeuTikt. La millor experiència de compra per l'organitzador i l'assistent." />
+        <meta name="description" content="Digitaliza el proceso de venta y gestión de bebidas y consumiciones de tus eventos y fiestas con ElTeuTikt. La mejor experiencia de compra desde el móvil para el organizador y el asistente." />
         <meta name="keywords" content="event tickets, ticketing, event management, ElTeuTikt, mobile ticketing, event drinks, consumable ticketing" />
         <meta name="author" content="ElTeuTikt" />
         
         {/* Open Graph Meta Tags */}
         <meta property="og:title" content="ElTeuTikt" />
-        <meta property="og:description" content="Digitalitza el procés de venda i gestió els tickets de consumicions dels teus esdeveniments i festes amb ElTeuTikt. La millor experiència de compra per l'organitzador i l'assistent." />
+        <meta property="og:description" content="Digitaliza el proceso de venta y gestión de bebidas y consumiciones de tus eventos y fiestas con ElTeuTikt. La mejor experiencia de compra desde el móvil para el organizador y el asistente." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.elteutikt.com" />
         <meta property="og:image" content="https://waniuunkeiqwqatzunof.supabase.co/storage/v1/object/public/assets/og-image.png" />
