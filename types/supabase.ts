@@ -420,6 +420,7 @@ export type Database = {
           order_id: string
           price: number | null
           refunded_at: string | null
+          refunded_partial_price: number | null
           ticket_form_submits_id: number | null
           type: Database["public"]["Enums"]["event_ticket_type"]
           used_at: string | null
@@ -436,6 +437,7 @@ export type Database = {
           order_id: string
           price?: number | null
           refunded_at?: string | null
+          refunded_partial_price?: number | null
           ticket_form_submits_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
           used_at?: string | null
@@ -452,6 +454,7 @@ export type Database = {
           order_id?: string
           price?: number | null
           refunded_at?: string | null
+          refunded_partial_price?: number | null
           ticket_form_submits_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
           used_at?: string | null

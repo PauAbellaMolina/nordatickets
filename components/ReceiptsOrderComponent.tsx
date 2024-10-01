@@ -12,6 +12,7 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
   const { i18n, theme } = useSupabase();
   const [total, setTotal] = useState<number>(null);
   const [orderDbId, setOrderDbId] = useState<number>(null);
+  const [thereIsRefundedTicket, setThereIsRefundedTicket] = useState<boolean>(false);
 
   useEffect(() => {
     let unmounted = false;
@@ -20,6 +21,7 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
     const totalTickets = order.reduce((acc, ticket) => acc + ticket.price, 0);
     const totalFees = eventTicketFee ? eventTicketFee * order.length : 0;
     setTotal((totalTickets + totalFees) / 100);
+    setThereIsRefundedTicket(order.some(ticket => ticket.refunded_at));
 
     supabase.from('redsys_orders').select('id').eq('order_id', order[0].order_id).single()
     .then(({ data: redsys_order, error }) => {
@@ -34,6 +36,10 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
 
   const onGoToReceiptDetail = () => {
     router.navigate(`/profile/receipts/${order[0].order_id}`);
+  }
+
+  const onGoToRefundedReceiptDetail = () => {
+    router.navigate(`/profile/receipts/refund/${order[0].order_id}`);
   }
 
   const renderItem = useCallback(({item}: {item: WalletTicket}) => (
@@ -71,6 +77,11 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
       <Pressable style={styles.goToReceiptContainer} onPress={onGoToReceiptDetail}>
         <FeatherIcon name="file-text" size={25} color={Colors[theme].text} />
       </Pressable>
+      { thereIsRefundedTicket ?
+        <Pressable style={styles.goToRefundReceiptContainer} onPress={onGoToRefundedReceiptDetail}>
+          <FeatherIcon name="file-plus" size={25} color={Colors[theme].text} />
+        </Pressable>
+      : null }
     </View>
   );
 
@@ -118,6 +129,11 @@ const styles = StyleSheet.create({
   goToReceiptContainer: {
     position: 'absolute',
     right: 15,
+    bottom: 15
+  },
+  goToRefundReceiptContainer: {
+    position: 'absolute',
+    right: 45,
     bottom: 15
   }
 });

@@ -68,6 +68,7 @@ function RootLayoutNav() {
           <Stack.Screen name="(screens)/wallet/activateTicket/[id]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: i18n?.t('activateTicket'), headerShown: false }} />
           <Stack.Screen name="(screens)/profile/receipts/index" options={{ title: i18n?.t('purchaseReceipts'), headerShown: false }} />
           <Stack.Screen name="(screens)/profile/receipts/[id]" options={{ title: i18n?.t('purchaseReceiptsDetails'), headerShown: false }} />
+          <Stack.Screen name="(screens)/profile/receipts/refund/[id]" options={{ title: i18n?.t('refundReceiptsDetails'), headerShown: false }} />
           <Stack.Screen name="(screens)/profile/help/index" options={{ title: i18n?.t('helpAndFaqs'), headerShown: false }} />
           <Stack.Screen name="(screens)/profile/birthdate/index" options={{ title: i18n?.t('birthdateConfig'), headerShown: false }} />
           <Stack.Screen name="(screens)/profile/terms/index" options={{ title: i18n?.t('termsAndPrivacy'), headerShown: false }} />
