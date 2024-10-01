@@ -14,9 +14,11 @@ export default function ActivateTicketScreen() {
   const { i18n, user, theme } = useSupabase();
   const [loading, setLoading] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
-  const [lightEventBackgroundColor, setLightEventBackgroundColor] = useState<string>();
-  const [darkEventBackgroundColor, setDarkEventBackgroundColor] = useState<string>();
-  const [eventBackgroundColor, setEventBackgroundColor] = useState<string>();
+  const [lightTicketThemeColor, setLightTicketThemeColor] = useState<string>();
+  const [darkTicketThemeColor, setDarkTicketThemeColor] = useState<string>();
+  const [ticketThemeColor, setTicketThemeColor] = useState<string>();
+  const [buttonTicketBackgroundColor, setButtonTicketBackgroundColor] = useState<string>();
+  const [buttonTicketBorderColor, setButtonTicketBorderColor] = useState<string>();
   const [eventName, setEventName] = useState<string>('');
   const [ticketDeactivable, setTicketDeactivable] = useState<boolean>(false);
   const [ticketName, setTicketName] = useState<string>('');
@@ -49,8 +51,20 @@ export default function ActivateTicketScreen() {
   }, [ticketUsedAt]);
 
   useEffect(() => {
-    setEventBackgroundColor(theme === 'dark' ? darkEventBackgroundColor : lightEventBackgroundColor);
+    setTicketThemeColor(theme === 'dark' ? darkTicketThemeColor : lightTicketThemeColor);
   }, [theme]);
+
+  useEffect(() => {
+    if (!ticketThemeColor) return;
+    if (theme === 'dark') {
+      const fullOpacityHex = ticketThemeColor.slice(0, 7);
+      setButtonTicketBackgroundColor(fullOpacityHex + '47');
+      setButtonTicketBorderColor(fullOpacityHex + '66');
+    } else {
+      setButtonTicketBackgroundColor(ticketThemeColor + 'BF');
+      setButtonTicketBorderColor('#00000040');
+    }
+  }, [ticketThemeColor]);
 
   const calculateTimeAgo = () => {
     const usedAt = new Date(new Date(ticketUsedAt).setMilliseconds(0));
@@ -127,19 +141,19 @@ export default function ActivateTicketScreen() {
     .then(({ data: event_tickets, error }) => {
       if (unmounted || error || !event_tickets.length) return;
       if ((theme === 'dark' && !event_tickets[0]?.color_code_dark) || (theme === 'light' && !event_tickets[0]?.color_code_light)) {
-        setEventBackgroundColor(getThemeRandomColor(theme));
-        setDarkEventBackgroundColor(getThemeRandomColor('dark'));
-        setLightEventBackgroundColor(getThemeRandomColor('light'));
+        setTicketThemeColor(getThemeRandomColor(theme));
+        setDarkTicketThemeColor(getThemeRandomColor('dark'));
+        setLightTicketThemeColor(getThemeRandomColor('light'));
         return;
       };
 
-      setDarkEventBackgroundColor(event_tickets[0]?.color_code_dark ? event_tickets[0].color_code_dark : getThemeRandomColor('dark'));
-      setLightEventBackgroundColor(event_tickets[0]?.color_code_light ? event_tickets[0].color_code_light : getThemeRandomColor('light'));
+      setDarkTicketThemeColor(event_tickets[0]?.color_code_dark ? event_tickets[0].color_code_dark : getThemeRandomColor('dark'));
+      setLightTicketThemeColor(event_tickets[0]?.color_code_light ? event_tickets[0].color_code_light : getThemeRandomColor('light'));
 
       if (theme === 'dark') {
-        setEventBackgroundColor(event_tickets[0].color_code_dark);
+        setTicketThemeColor(event_tickets[0].color_code_dark);
       } else {
-        setEventBackgroundColor(event_tickets[0].color_code_light);
+        setTicketThemeColor(event_tickets[0].color_code_light);
       }
     });
     
@@ -272,10 +286,10 @@ export default function ActivateTicketScreen() {
   return (
     <View style={styles.container}>
       { Platform.OS !== 'web' ? <View style={styles.expanderNotch}></View> : <></> }
-      { !eventBackgroundColor || !eventName || !ticketName || addonTicket === undefined ? <>
+      { !ticketThemeColor || !eventName || !ticketName || addonTicket === undefined ? <>
         <ActivityIndicator size="large" />
       </> : <>
-        <View style={[styles.ticketContainer, {backgroundColor: eventBackgroundColor}]}>
+        <View style={[styles.ticketContainer, {backgroundColor: ticketThemeColor}]}>
           <View style={[styles.ticketInfoContainer, { gap: ticketFormSubmit ? 20 : 8 }]}>
             <Animated.View style={[styles.pulseContainer, {transform: [{ scale: scale.current }], opacity: opacity.current }]}>
               <View style={[styles.pulseDot, {backgroundColor: ticketUsedAt === undefined || ticketRefundedAt === undefined ? 'transparent' : ticketUsedAt != null || ticketRefundedAt != null ? '#ff3737' : '#3fde7a'}]} />
@@ -350,12 +364,12 @@ export default function ActivateTicketScreen() {
         </View>
         { !showConfirm ? <>
           <View style={styles.actionsButtonsContainer}>
-            <Pressable disabled={loading} onPress={() => router.navigate('/(tabs)/wallet')} style={[styles.button, loading ? {opacity: .7} : {}, {height: '100%', flex: 1, justifyContent: 'center'}, {backgroundColor: eventBackgroundColor}]}>
-              <FeatherIcon name="arrow-left" size={38} color={Colors[theme].text} />
+            <Pressable disabled={loading} onPress={() => router.navigate('/(tabs)/wallet')} style={[styles.button, loading ? {opacity: .7} : {}, {height: '100%', flex: 1, justifyContent: 'center'}, {borderColor: buttonTicketBorderColor, backgroundColor: buttonTicketBackgroundColor}]}>
+              <FeatherIcon name="arrow-left" size={28} color={Colors[theme].text} />
             </Pressable>
-            <Pressable disabled={!ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null || ticketRefundedAt === undefined || ticketRefundedAt != null} onPress={onDeactivateTicket} style={[styles.button, !ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null || ticketRefundedAt === undefined || ticketRefundedAt != null || loading ? {opacity: .7} : {}, {backgroundColor: eventBackgroundColor}]}>
+            <Pressable disabled={!ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null || ticketRefundedAt === undefined || ticketRefundedAt != null} onPress={onDeactivateTicket} style={[styles.button, !ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null || ticketRefundedAt === undefined || ticketRefundedAt != null || loading ? {opacity: .7} : {}, {borderColor: buttonTicketBorderColor, backgroundColor: buttonTicketBackgroundColor}]}>
               {loading ?
-                <ActivityIndicator style={styles.buttonLoading} size="large" />
+                <ActivityIndicator style={styles.buttonLoading} size="small" />
               :
                 <Text style={styles.buttonText}>{ i18n?.t('deactivateTicket') }</Text>
               }
@@ -365,10 +379,10 @@ export default function ActivateTicketScreen() {
           <View style={styles.actionsConfirmContainer}>
             <Text style={styles.confirmPrompt}>{ i18n?.t('deactivateTicketConfirmationQuestion') }</Text>
             <View style={styles.actionsConfirmButtonsContainer}>
-              <Pressable onPress={() => setShowConfirm(false)} style={[styles.button, styles.buttonConfirm, {borderColor: '#E84F44', backgroundColor: eventBackgroundColor}]}>
+              <Pressable onPress={() => setShowConfirm(false)} style={[styles.button, styles.buttonConfirm, {flex: 1, borderWidth: 1.25, borderColor: '#E84F44', backgroundColor: buttonTicketBackgroundColor}]}>
                 <Text style={styles.buttonText}>No</Text>
               </Pressable>
-              <Pressable onPress={onConfirmDeactivateTicket} style={[styles.button, styles.buttonConfirm, {borderColor: '#79D475', backgroundColor: eventBackgroundColor}]}>
+              <Pressable onPress={onConfirmDeactivateTicket} style={[styles.button, styles.buttonConfirm, {flex: 1.5, borderColor: '#79D475', backgroundColor: buttonTicketBackgroundColor}]}>
                 <Text style={styles.buttonText}>{ i18n?.t('yesDeactivate') }</Text>
               </Pressable>
             </View>
@@ -590,34 +604,34 @@ const styles = StyleSheet.create({
     marginTop: 8,
     width: '100%',
     flexDirection: 'column',
-    gap: 7
+    gap: 5
   },
   actionsConfirmButtonsContainer: {
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10
+    gap: 8
   },
   confirmPrompt: {
-    fontSize: 18,
-    fontWeight: 'bold'
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center'
   },
   actionsButtonsContainer: {
-    marginTop: 15,
+    marginTop: 13,
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10
+    gap: 8
   },
   button: {
-    height: 82.5,
+    height: 60,
     verticalAlign: 'bottom',
-    borderRadius: 28,
-    borderWidth: 5,
-    borderColor: '#0000001A',
+    borderRadius: 20,
+    borderWidth: 3,
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 3,
+    flex: 4,
     ...Platform.select({
       web: {
         boxShadow: '1px 2px 5px rgba(0, 0, 0, 0.2)'
@@ -627,8 +641,8 @@ const styles = StyleSheet.create({
     })
   },
   buttonConfirm: {
-    height: 61,
-    borderRadius: 23,
+    height: 42,
+    borderRadius: 13,
     borderWidth: 2
   },
   buttonLoading: {

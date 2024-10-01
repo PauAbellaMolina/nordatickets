@@ -82,7 +82,7 @@ export const es: { [key: string]: string } = {
   description: 'Descripción',
   amount: 'Importe',
   quantity: 'Cantidad',
-  deactivateTicketConfirmationQuestion: 'Confirma para desactivar este ticket:',
+  deactivateTicketConfirmationQuestion: '¿Estás seguro de querer desactivar este ticket?',
   deactivateTicket: 'Desactivar ticket',
   yesDeactivate: 'Sí, desactivar',
   ticketActive: 'Ticket activo',
