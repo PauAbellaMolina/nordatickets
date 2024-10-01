@@ -6,8 +6,7 @@ import { View, Text} from "../../components/Themed";
 import { useSupabase } from "../../context/SupabaseProvider";
 import BlobsBackground from "../../components/BlobsBackground";
 import { FeatherIcon } from "../../components/CustomIcons";
-import { AvailableLocales } from "../../assets/translations/translation";
-import { authEmailsTranslations } from "../../assets/translations/email";
+import OneTimeCodeInput from '../../components/OneTimeCodeInput';
 import { isValidEmail } from "../../utils/formValidationUtils";
 
 export default function Login() {
@@ -83,7 +82,7 @@ export default function Login() {
           { !emailSent ?
             <TextInput
               key="emailInput"
-              style={[styles.input, {color: Colors[theme].text, backgroundColor: Colors[theme].inputBackgroundColor, borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
+              style={[styles.input, {color: Colors[theme].text + (!email ? 'B3' : ''), backgroundColor: Colors[theme].inputBackgroundColor, borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
               textContentType="emailAddress"
               autoComplete="email"
               inputMode="email"
@@ -99,13 +98,11 @@ export default function Login() {
                 <FeatherIcon name="edit-2" size={18} color={Colors[theme].text} />
               </Pressable>
             </View>
-            <TextInput
-              key="oneTimeCodeInput"
-              style={[styles.input, {color: Colors[theme].text, backgroundColor: Colors[theme].inputBackgroundColor, borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
-              textContentType="oneTimeCode"
-              inputMode="numeric"
-              placeholder={ i18n?.t('oneTimeCode') }
-              onChangeText={(text) => setOneTimeCode(text.replace(/[<>&]/g, ''))}
+            <OneTimeCodeInput
+              value={oneTimeCode}
+              onChange={(code) => setOneTimeCode(code.replace(/[<>&]/g, ''))}
+              theme={theme}
+              errorState={emailErrorMessage !== undefined}
             />
           </>}
           { emailErrorMessage ?

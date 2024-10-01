@@ -16,6 +16,7 @@ export default {
     separatorBackgroundColor: '#0000001A',
     contrastSeparatorBackgroundColor: '#00000040',
     inputBackgroundColor: '#E8E8E8BF',
+    inputFocusedBackgroundColor: '#F0F0F0BF',
     inputBorderColor: '#20222833'
   },
   dark: {
@@ -35,6 +36,7 @@ export default {
     separatorBackgroundColor: '#FFFFFF1A',
     contrastSeparatorBackgroundColor: '#00000040',
     inputBackgroundColor: '#181818BF',
+    inputFocusedBackgroundColor: '#202020BF',
     inputBorderColor: '#FCFCFC33'
   },
   utilBackgroundColorsArray: {
