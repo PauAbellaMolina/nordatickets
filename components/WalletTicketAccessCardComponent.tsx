@@ -147,7 +147,6 @@ export default function WalletTicketAccessCardComponent({ walletTicket }: { wall
               <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ shouldDisplayPendingTicket ? i18n?.t('paymentProcessing')+'...' : i18n?.t('paymentFailed') }</Text>
             </View>
           </View>
-          <View style={[styles.separator, {backgroundColor: Colors[theme].contrastSeparatorBackgroundColor}]} />
         </View>
       :
         <View style={styles.wrapperContainer}>
@@ -160,7 +159,6 @@ export default function WalletTicketAccessCardComponent({ walletTicket }: { wall
               <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ i18n?.t('walletTicketAccessExplanation') }</Text>
             </View>
           </Pressable>
-          <View style={[styles.separator, {backgroundColor: Colors[theme].contrastSeparatorBackgroundColor}]} />
         </View>
       }</>
     : null }</>
@@ -171,11 +169,6 @@ const styles = StyleSheet.create({
   wrapperContainer: {
     width: '100%',
     alignItems: 'center',
-  },
-  separator: {
-    marginTop: 10,
-    height: 1,
-    width: '96%'
   },
   singleTicketContainer: {
     width: '100%',

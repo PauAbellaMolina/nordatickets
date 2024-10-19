@@ -139,7 +139,6 @@ export default function WalletTicketAddonCardComponent({ walletTicket }: { walle
             <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ eventTicketOrderStatus === 'PAYMENT_PENDING' ? shouldDisplayPendingTicket ? i18n?.t('paymentProcessing')+'...' : i18n?.t('paymentFailed') : i18n?.t('walletTicketAddonExplanation') }</Text>
           </View>
         </View>
-        <View style={[styles.separator, {backgroundColor: Colors[theme].contrastSeparatorBackgroundColor}]} />
       </View>
     : null }
   </>);
@@ -149,11 +148,6 @@ const styles = StyleSheet.create({
   wrapperContainer: {
     width: '100%',
     alignItems: 'center',
-  },
-  separator: {
-    marginTop: 10,
-    height: 1,
-    width: '96%'
   },
   singleTicketContainer: {
     width: '100%',
