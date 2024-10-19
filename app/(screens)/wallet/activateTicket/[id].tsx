@@ -321,9 +321,9 @@ export default function ActivateTicketScreen() {
                   </View>
                 </Pressable>
                 <CollapsableComponent expanded={formSubmitExpanded} maxHeight={125}>
-                  <View style={{maxWidth: 280}}>
+                  <View style={[styles.formSubmitContent, {backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
                     { ticketFormSubmit.entries.map((entry, index) => {
-                      return <Text key={index} style={index % 2 === 0 ? styles.formSubmitQuestion : styles.formSubmitAnswer}>{ entry }</Text>
+                      return <View style={{flexBasis: '48%', minWidth: 125, flexWrap: 'wrap', alignItems: index % 2 === 0 ? 'flex-end' : 'flex-start'}}><Text key={index} style={index % 2 === 0 ? styles.formSubmitQuestion : styles.formSubmitAnswer}>{ entry + (index % 2 === 0 ? ':' : '') }</Text></View>
                     })}
                   </View>
                 </CollapsableComponent>
@@ -499,13 +499,25 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 10
   },
-  formSubmitAnswer: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8
+  formSubmitContent: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    columnGap: 5,
+    rowGap: 6,
+    marginHorizontal: 15,
+    paddingVertical: 13,
+    paddingHorizontal: 5,
+    borderRadius: 16,
+    borderWidth: 2
   },
   formSubmitQuestion: {
     fontSize: 14
+  },
+  formSubmitAnswer: {
+    fontSize: 16,
+    fontWeight: 'bold'
   },
   ticketDecorContainer: {
     flexDirection: 'row',
