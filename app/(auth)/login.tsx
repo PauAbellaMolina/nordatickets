@@ -8,6 +8,7 @@ import BlobsBackground from "../../components/BlobsBackground";
 import { FeatherIcon } from "../../components/CustomIcons";
 import OneTimeCodeInput from '../../components/OneTimeCodeInput';
 import { isValidEmail } from "../../utils/formValidationUtils";
+import Animated, { Easing, FadeIn, ReduceMotion } from "react-native-reanimated";
 
 export default function Login() {
   const { signInWithOTP, verifyOTP, i18n, theme } = useSupabase();
@@ -75,7 +76,7 @@ export default function Login() {
 
   return (
     <BlobsBackground style={styles.container}>
-      <View style={[styles.wrapper, {backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity}]}>
+      <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.wrapper, {backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity}]}>
         <Text style={styles.title}>{ i18n?.t('logIn') }</Text>
         <Text style={styles.explanation}>{ i18n?.t('emailCodeExplanation') }</Text>
         <View style={styles.inputContainer}>
@@ -136,11 +137,11 @@ export default function Login() {
             }
           </View>
         </View>
-      </View>
-      <View style={styles.bottomActionContainer}>
+      </Animated.View>
+      <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.bottomActionContainer}>
         <Text style={styles.bottomActionTitle}>{ i18n?.t('noAccountQuestion') }</Text>
         <Pressable onPress={onGoToSignUp}><Text style={styles.bottomActionLink}>{ i18n?.t('signUp') }</Text></Pressable>
-      </View>
+      </Animated.View>
     </BlobsBackground>
   );
 }
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
   input: {
     pointerEvents: 'box-only',
     borderRadius: 15,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     paddingVertical: 10,
     paddingHorizontal: 20,
     fontSize: 20,

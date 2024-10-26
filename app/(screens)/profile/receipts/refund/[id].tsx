@@ -259,7 +259,7 @@ export default function RefundReceiptDetailScreen() {
       { !printMode ? 
         <Pressable
           onPress={onDownload}
-          style={[styles.downloadButton, {borderWidth: 1, borderColor: Colors[theme].text}]}
+          style={[styles.downloadButton, {borderWidth: StyleSheet.hairlineWidth, borderColor: Colors[theme].text}]}
         ><Text>{ i18n?.t('download') }</Text></Pressable>
       : null }
     </View>
