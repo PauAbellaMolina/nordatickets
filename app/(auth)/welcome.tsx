@@ -10,6 +10,7 @@ import { FeatherIcon } from "../../components/CustomIcons";
 import { Picker } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
 import { AvailableLocales } from "../../assets/translations/translation";
+import Animated, { Easing, FadeIn, ReduceMotion } from "react-native-reanimated";
 
 export default function Welcome() {
   const { i18n, setLanguage, theme } = useSupabase();
@@ -38,16 +39,18 @@ export default function Welcome() {
 
   return (
     <BlobsBackground style={styles.container}>
-      { theme === 'dark' ? <TiktDark width={165} height={165} /> : <TiktLight width={165} height={165} /> }
-      <View style={styles.buttonsContainer}>
+      <Animated.View entering={FadeIn.duration(225).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)}>
+        { theme === 'dark' ? <TiktDark width={165} height={165} /> : <TiktLight width={165} height={165} /> }
+      </Animated.View>
+      <Animated.View entering={FadeIn.duration(350).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.buttonsContainer}>
         <Pressable onPress={onGoToSignUp} style={[styles.button, {backgroundColor: Colors[theme].text}]}>
           <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('createAccount') }</Text>
         </Pressable>
-        <Pressable onPress={onGoToLogIn} style={[styles.button, {borderWidth: 1, borderColor: Colors[theme].text}]}>
+        <Pressable onPress={onGoToLogIn} style={[styles.button, {borderWidth: StyleSheet.hairlineWidth, borderColor: Colors[theme].text}]}>
           <Text style={[styles.buttonText, {color: Colors[theme].text}]}>{ i18n?.t('logIn') }</Text>
         </Pressable>
-      </View>
-      <View style={styles.bottomActionContainer}>
+      </Animated.View>
+      <Animated.View entering={FadeIn.duration(225).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.bottomActionContainer}>
         <Pressable style={styles.languageButton}><FeatherIcon name="globe" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('changeLanguage') }</Text></Pressable>
         <Picker
           style={styles.languagePicker}
@@ -58,7 +61,7 @@ export default function Welcome() {
           <Picker.Item label="Castellano" value="es" />
           <Picker.Item label="English" value="en" />
         </Picker>
-      </View>
+      </Animated.View>
     </BlobsBackground>
   );
 }

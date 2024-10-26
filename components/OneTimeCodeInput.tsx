@@ -74,6 +74,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     textAlign: 'center',
     pointerEvents: 'box-only',
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
   },
 });

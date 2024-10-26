@@ -11,6 +11,7 @@ import { isValidEmail } from "../../utils/formValidationUtils";
 import { authEmailsTranslations } from "../../assets/translations/email";
 import { AvailableLocales } from "../../assets/translations/translation";
 import OneTimeCodeInput from "../../components/OneTimeCodeInput";
+import Animated, { Easing, FadeIn, ReduceMotion } from "react-native-reanimated";
 
 export default function Signup() {
   const { signInWithOTP, verifyOTP, i18n, theme } = useSupabase();
@@ -87,7 +88,7 @@ export default function Signup() {
 
   return (
     <BlobsBackground style={styles.container}>
-      <View style={[styles.wrapper, {backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity}]}>
+      <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.wrapper, {backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity}]}>
         <Text style={styles.title}>{ i18n?.t('accountCreation') }</Text>
         <Text style={styles.explanation}>{ i18n?.t('emailCodeExplanation') }</Text>
         <View style={styles.inputContainer}>
@@ -174,11 +175,11 @@ export default function Signup() {
             }
           </View>
         </View>
-      </View>
-      <View style={styles.bottomActionContainer}>
+      </Animated.View>
+      <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.bottomActionContainer}>
         <Text style={styles.bottomActionTitle}>{ i18n?.t('alreadyAccountQuestion') }</Text>
         <Pressable onPress={onGoToLogIn}><Text style={styles.bottomActionLink}>{ i18n?.t('logIn') }</Text></Pressable>
-      </View>
+      </Animated.View>
     </BlobsBackground>
   );
 }
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     padding: 10,
     borderRadius: 15,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderStyle: 'solid',
     backgroundColor: '#E8E8E8BF',
     borderColor: '#20222833',
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     padding: 11.25,
     borderRadius: 15,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderStyle: 'solid',
     backgroundColor: '#181818BF',
     borderColor: '#FCFCFC33',
@@ -287,7 +288,7 @@ const styles = StyleSheet.create({
   input: {
     pointerEvents: 'box-only',
     borderRadius: 15,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     paddingVertical: 10,
     paddingHorizontal: 20,
     fontSize: 20,

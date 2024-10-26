@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   },
   input: {
     maxWidth: 350,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 8,
     padding: 8,
     fontSize: 14
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   inputError: {
     borderColor: 'red',
-    borderWidth: 1
+    borderWidth: StyleSheet.hairlineWidth
   },
   submitButton: {
     width: '100%',
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   },
   optionsPicker: {
     maxWidth: 350,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 8,
     padding: 8,
     fontSize: 14,

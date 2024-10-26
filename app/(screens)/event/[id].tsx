@@ -15,6 +15,7 @@ import { CollapsableComponent } from '../../../components/CollapsableComponent';
 import EventAddonTicketCardComponent from '../../../components/EventAddonTicketCardComponent';
 import EventAccessTicketCardComponent from '../../../components/EventAccessTicketCardComponent';
 import Checkbox from 'expo-checkbox';
+import Animated, { Easing, FadeIn, FadeInDown, FadeInUp, FadeOutDown, ReduceMotion } from 'react-native-reanimated';
 
 type CartItem = { eventTicket: EventTicket, quantity: number, associatedTicketFormSubmit?: Partial<TicketFormSubmit> };
 type Cart = CartItem[] | null;
@@ -347,7 +348,7 @@ export default function EventDetailScreen() {
       { !event || userIsMinor === undefined ? <>
         <ActivityIndicator size="large" />
       </> : <>
-        <View style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor, paddingBottom: event.more_info_content ? 40 : 10}]}>
+        <Animated.View entering={FadeInUp.duration(205).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor, paddingBottom: event.more_info_content ? 40 : 10}]}>
           <GoBackArrow />
           <View style={styles.stopFollowingButton}>
             <FeatherIcon name="more-horizontal" size={35} color={Colors['light'].text} />
@@ -377,9 +378,9 @@ export default function EventDetailScreen() {
               <Text style={[styles.moreEventInfoText, {color: Colors['light'].text}]}>{event.more_info_content}</Text>
             </CollapsableComponent>
           </> }
-        </View>
+        </Animated.View>
         { eventTickets ? <>
-          <View style={[styles.ticketsContainer, {marginTop: event.more_info_content ? 167 : 177}]}>
+          <Animated.View entering={FadeIn.duration(220).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.ticketsContainer, {marginTop: event.more_info_content ? 167 : 177}]}>
             { accessEventTickets ? <>
               <View style={styles.accessTickets}>
                 { accessEventTicketsExpanded ?
@@ -413,7 +414,7 @@ export default function EventDetailScreen() {
                 renderItem={renderItemTickets}
               />
             </View>
-          </View>
+          </Animated.View>
           { orderConfirmed ?
             <Pressable style={[styles.orderConfirmedContainer, {backgroundColor: Colors[theme].cartContainerBackground}]} onPress={onGoToWallet}>
               <Pressable onPress={onDismissAddedToWallet} style={styles.dismissAddedToWallet}>
@@ -422,10 +423,16 @@ export default function EventDetailScreen() {
               <FeatherIcon name="check-circle" size={40} color={Colors[theme].text} />
               <View style={styles.orderConfirmedTextContainer}><Text style={styles.orderConfirmedSubtitle}>{ i18n?.t('ticketsAddedToWallet') }</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
             </Pressable>
-          :
-            <View style={[styles.cartContainer, {backgroundColor: Colors[theme].cartContainerBackground}]}>
-              <View style={styles.cartTitleRowContainer}><Text style={styles.subtitle}>{ i18n?.t('cart') }</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
-              { cart?.length ? <>
+          : <>
+            { cart?.length ?
+              <Animated.View
+                entering={FadeInDown.duration(200).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)}
+                exiting={FadeOutDown.duration(150).easing(Easing.out(Easing.exp)).reduceMotion(ReduceMotion.Never)}
+                style={[styles.cartContainer, {backgroundColor: Colors[theme].cartContainerBackground}]}
+              >
+                <View style={styles.cartTitleRowContainer}><Text style={styles.subtitle}>{ i18n?.t('cart') }</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
+                {/* Uncomment below if we want to show the cart even if it's empty */}
+                {/* { cart?.length ? <> */}
                   <FlatList
                     style={styles.cartList}
                     data={cart}
@@ -466,11 +473,12 @@ export default function EventDetailScreen() {
                     <Text style={styles.buyButtonText}>{(cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)) / 100 + '€  ·  '}{ i18n?.t('buy') }</Text>
                   }
                   </Pressable>
-              </> :
-                <Text style={[styles.emptyCard, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('noTicketsInCart') }</Text>
-              }
-            </View>
-          }
+                {/* </> :
+                  <Text style={[styles.emptyCard, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('noTicketsInCart') }</Text>
+                } */}
+              </Animated.View>
+            : null }
+          </> }
         </> : null }
       </>}
 

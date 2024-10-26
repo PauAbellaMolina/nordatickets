@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet} from 'react-native';
+import { ActivityIndicator, Animated as RNAnimated, Platform, Pressable, StyleSheet} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import Colors from '../../../../constants/Colors';
 import { Text, View } from '../../../../components/Themed';
@@ -9,6 +9,7 @@ import { useSupabase } from '../../../../context/SupabaseProvider';
 import { getThemeRandomColor } from '../../../../utils/chooseRandomColor';
 import { TicketFormSubmit, WalletTicket } from '../../../../types/supabaseplain';
 import { CollapsableComponent } from '../../../../components/CollapsableComponent';
+import Animated, { Easing, FadeIn, FadeInDown, ReduceMotion } from 'react-native-reanimated';
 
 export default function ActivateTicketScreen() {
   const { i18n, user, theme } = useSupabase();
@@ -271,14 +272,14 @@ export default function ActivateTicketScreen() {
     });
   }
 
-  const scale = useRef(new Animated.Value(1));
-  const opacity = useRef(new Animated.Value(1));
+  const scale = useRef(new RNAnimated.Value(1));
+  const opacity = useRef(new RNAnimated.Value(1));
 
   useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity.current, { toValue: .1, duration: 800, useNativeDriver: true }),
-        Animated.timing(opacity.current, { toValue: 1, duration: 750, useNativeDriver: true })
+    RNAnimated.loop(
+      RNAnimated.sequence([
+        RNAnimated.timing(opacity.current, { toValue: .1, duration: 800, useNativeDriver: true }),
+        RNAnimated.timing(opacity.current, { toValue: 1, duration: 750, useNativeDriver: true })
       ])
     ).start();
   }, []);
@@ -289,11 +290,11 @@ export default function ActivateTicketScreen() {
       { !ticketThemeColor || !eventName || !ticketName || addonTicket === undefined ? <>
         <ActivityIndicator size="large" />
       </> : <>
-        <View style={[styles.ticketContainer, {backgroundColor: ticketThemeColor}]}>
+        <Animated.View entering={FadeInDown.duration(300).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.ticketContainer, {backgroundColor: ticketThemeColor}]}>
           <View style={[styles.ticketInfoContainer, { gap: ticketFormSubmit ? 20 : 8 }]}>
-            <Animated.View style={[styles.pulseContainer, {transform: [{ scale: scale.current }], opacity: opacity.current }]}>
+            <RNAnimated.View style={[styles.pulseContainer, {transform: [{ scale: scale.current }], opacity: opacity.current }]}>
               <View style={[styles.pulseDot, {backgroundColor: ticketUsedAt === undefined || ticketRefundedAt === undefined ? 'transparent' : ticketUsedAt != null || ticketRefundedAt != null ? '#ff3737' : '#3fde7a'}]} />
-            </Animated.View>
+            </RNAnimated.View>
             <View style={[styles.ticketInfoTextsContainer, addonTicket || ticketFormSubmit ? {justifyContent: 'flex-end'} : {justifyContent: 'center'}]}>
               <Text style={styles.ticketName} numberOfLines={4}>{ ticketName }</Text>
               <Text style={styles.eventName}>{ eventName }</Text>
@@ -323,7 +324,7 @@ export default function ActivateTicketScreen() {
                 <CollapsableComponent expanded={formSubmitExpanded} maxHeight={125}>
                   <View style={[styles.formSubmitContent, {backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
                     { ticketFormSubmit.entries.map((entry, index) => {
-                      return <View style={{flexBasis: '48%', minWidth: 125, flexWrap: 'wrap', alignItems: index % 2 === 0 ? 'flex-end' : 'flex-start'}}><Text key={index} style={index % 2 === 0 ? styles.formSubmitQuestion : styles.formSubmitAnswer}>{ entry + (index % 2 === 0 ? ':' : '') }</Text></View>
+                      return <View key={index} style={{flexBasis: '48%', minWidth: 125, flexWrap: 'wrap', alignItems: index % 2 === 0 ? 'flex-end' : 'flex-start'}}><Text key={index} style={index % 2 === 0 ? styles.formSubmitQuestion : styles.formSubmitAnswer}>{ entry + (index % 2 === 0 ? ':' : '') }</Text></View>
                     })}
                   </View>
                 </CollapsableComponent>
@@ -361,9 +362,9 @@ export default function ActivateTicketScreen() {
               </>}</>
             }
           </View>
-        </View>
+        </Animated.View>
         { !showConfirm ? <>
-          <View style={styles.actionsButtonsContainer}>
+          <Animated.View entering={FadeIn.delay(255).duration(200).easing(Easing.inOut(Easing.quad)).withInitialValues({opacity: 0}).reduceMotion(ReduceMotion.Never)} style={[styles.actionsButtonsContainer, {opacity: 1}]} >
             <Pressable disabled={loading} onPress={() => router.navigate('/(tabs)/wallet')} style={[styles.button, loading ? {opacity: .7} : {}, {height: '100%', flex: 1, justifyContent: 'center'}, {borderColor: buttonTicketBorderColor, backgroundColor: buttonTicketBackgroundColor}]}>
               <FeatherIcon name="arrow-left" size={28} color={Colors[theme].text} />
             </Pressable>
@@ -374,7 +375,7 @@ export default function ActivateTicketScreen() {
                 <Text style={styles.buttonText}>{ i18n?.t('deactivateTicket') }</Text>
               }
             </Pressable>
-          </View>
+          </Animated.View>
         </> : <>
           <View style={styles.actionsConfirmContainer}>
             <Text style={styles.confirmPrompt}>{ i18n?.t('deactivateTicketConfirmationQuestion') }</Text>
@@ -425,7 +426,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 25,
-    paddingBottom: 15
+    paddingTop: 15,
+    paddingBottom: 10
   },
   expanderNotch: {
     position: 'absolute',
