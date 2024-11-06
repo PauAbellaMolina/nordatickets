@@ -12,7 +12,7 @@ export default function TabOneScreen() {
   const [events, setEvents] = useState<Event[]>();
 
   let triggerNextFocus = useRef<boolean>(true);
-  useFocusEffect(
+  useFocusEffect( //TODO PAU can't this be done on the provider on init?
     useCallback(() => {
       let unmounted = false;
       if (triggerNextFocus.current) {
@@ -26,7 +26,7 @@ export default function TabOneScreen() {
             user.event_ids_following.every(id => followingEvents.includes(id)) &&
             followingEvents.every(id => user.event_ids_following.includes(id))
           ) return;
-          storeFollowingEventsCookie(user.event_ids_following ?? [], true);
+          storeFollowingEventsCookie(user.event_ids_following ?? [], false, true);
         });
       }
 
@@ -41,7 +41,9 @@ export default function TabOneScreen() {
   );
 
   useEffect(() => {
-    if (!followingEvents.length) return;
+    console.log('followingEvents', followingEvents);
+    if (!followingEvents) return;
+
     let unmounted = false;
     supabase.from('events').select().in('id', followingEvents)
     .then(({ data: events, error }) => {

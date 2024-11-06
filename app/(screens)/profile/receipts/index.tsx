@@ -6,6 +6,7 @@ import { useSupabase } from '../../../../context/SupabaseProvider';
 import { WalletTicket } from '../../../../types/supabaseplain';
 import { supabase } from '../../../../supabase';
 import ReceiptsOrderComponent from '../../../../components/ReceiptsOrderComponent';
+import { router } from 'expo-router';
 
 export default function ReceiptsScreen() {
   const { user, i18n, theme } = useSupabase();
@@ -73,11 +74,18 @@ export default function ReceiptsScreen() {
       <GoBackArrow light={theme === 'dark'} />
       <Text style={styles.title}>{ i18n?.t('purchaseReceipts') }</Text>
       <View style={styles.wrapper}>
-        <FlatList
-          data={orderIdGroupedWalletTickets}
-          renderItem={renderItem}
-          ItemSeparatorComponent={() => <View style={{height: 14}} />}
-        />
+        { !user ?
+          <View style={styles.loginToSeeContainer}>
+            <Text style={styles.loginToSee}>TODO Log in to see your receipts</Text>
+            <Text style={styles.loginToSee} onPress={() => router.push('/welcome')}>Log in</Text>
+          </View>
+        :
+          <FlatList
+            data={orderIdGroupedWalletTickets}
+            renderItem={renderItem}
+            ItemSeparatorComponent={() => <View style={{height: 14}} />}
+          />
+        }
       </View>
     </View>
   );
@@ -98,5 +106,14 @@ const styles = StyleSheet.create({
   wrapper: {
     marginTop: 30,
     marginHorizontal: 2
+  },
+  loginToSeeContainer: {
+    marginTop: 30,
+    gap: 20
+  },
+  loginToSee: {
+    textAlign: 'center',
+    color: 'grey',
+    fontStyle: 'italic'
   }
 });

@@ -16,7 +16,7 @@ type SupabaseContextProps = {
   i18n: I18n | null;
   followingEvents: number[];
   setLanguage: (locale: AvailableLocales) => void;
-  storeFollowingEventsCookie: (followingEvents: number[], updateLocalFollowingEvents?: boolean) => void;
+  storeFollowingEventsCookie: (followingEvents: number[], redirectHome?: boolean, updateLocalFollowingEvents?: boolean) => void;
   storeFollowingEventsUserData: (followingEvents: number[], redirectHome?: boolean, updateLocalFollowingEvents?: boolean) => void;
   signInWithOTP: (options: SignInWithPasswordlessCredentials) => Promise<void>;
   verifyOTP: (email: string, code: string) => Promise<void>;
@@ -35,7 +35,7 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
   i18n: null,
   followingEvents: [],
   setLanguage: (locale: AvailableLocales) => {},
-  storeFollowingEventsCookie: (followingEvents: number[], updateLocalFollowingEvents?: boolean) => {},
+  storeFollowingEventsCookie: (followingEvents: number[], redirectHome?: boolean, updateLocalFollowingEvents?: boolean) => {},
   storeFollowingEventsUserData: (followingEvents: number[], redirectHome?: boolean, updateLocalFollowingEvents?: boolean) => {}, 
   signInWithOTP: async () => {},
   verifyOTP: async () => {},
@@ -51,7 +51,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [theme, setTheme] = useState<ColorSchemeName>(Appearance.getColorScheme() ?? 'light');
   const [i18n, setI18n] = useState<I18n | null>(null);
-  const [followingEvents, setFollowingEvents] = useState<number[]>([]);
+  const [followingEvents, setFollowingEvents] = useState<number[]>(undefined);
 
   const params = useGlobalSearchParams();
   const segments = useSegments();
@@ -65,7 +65,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   };
 
   const verifyOTP = async (email: string, code: string) => {
-    const { error } = await supabase.auth.verifyOtp({
+    const { data, error } = await supabase.auth.verifyOtp({
       email,
       token: code,
       type: 'email'
@@ -74,7 +74,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
       throw error;
     }
     storeLocaleUserMetadata(i18n?.locale as AvailableLocales);
-    storeFollowingEventsUserData(followingEvents);
+    storeFollowingEventsUserData(followingEvents, false, true, data.user.id);
   }
 
   const signOut = async () => {
@@ -109,20 +109,21 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   };
 
 
-  const storeFollowingEventsCookie = async (followingEvents: number[], updateLocalFollowingEvents?: boolean) => {
+  const storeFollowingEventsCookie = async (followingEvents: number[], redirectHome?: boolean, updateLocalFollowingEvents?: boolean) => {
     try {
       await AsyncStorage.setItem('followingEvents', JSON.stringify(followingEvents));
       if (updateLocalFollowingEvents) setFollowingEvents(followingEvents);
+      if (redirectHome) router.navigate('/');
     } catch (e) { }
   };
   
-  const storeFollowingEventsUserData = async (followingEvents: number[], redirectHome?: boolean, updateLocalFollowingEvents?: boolean) => {
+  const storeFollowingEventsUserData = async (followingEvents: number[], redirectHome?: boolean, updateLocalFollowingEvents?: boolean, hardcodedUserId?: string) => {
     try {
       await supabase.from('users')
       .update({
         event_ids_following: followingEvents
       })
-      .eq('id', user?.id).select()
+      .eq('id', hardcodedUserId || user?.id).select()
       .then(({ data, error }) => {
         if (error) throw error;
         if (redirectHome) router.navigate('/');
@@ -157,6 +158,8 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
       const value = await AsyncStorage.getItem('followingEvents');
       if (value !== null) {
         setFollowingEvents(JSON.parse(value).map(Number));
+      } else {
+        setFollowingEvents([]);
       }
     } catch (e) { }
   };
@@ -200,26 +203,27 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
     }
   }, [session, realSession]);
 
-  useEffect(() => {
+  useEffect(() => { //redirects to auth wall and "deeplink" after auth
     if (!initialized) return;
     
     //TODO PAU this seems to work, but test deeply and make sure theres no security issues
-    const cleanParamsId = params.id && typeof params.id === "string" ? params.id : null;
-    const cleanParamsEventId = params.event && typeof params.event === "string" ? params.event : null;
+    // const cleanParamsId = params.id && typeof params.id === "string" ? params.id : null;
+    // const cleanParamsEventId = params.event && typeof params.event === "string" ? params.event : null;
 
-    if (!session && segments[0] !== "(auth)") {
-      router.replace("/welcome");
-      if (segments[0] === "(screens)" && segments[1] === "event" && segments[2] === "[id]") {
-        if (!cleanParamsId) return;
-        router.setParams({ event: cleanParamsId });
-      }
-    } else if (session && segments[0] === "(auth)") {
-      if (cleanParamsEventId) {
+    // if (!session && segments[0] !== "(auth)") {
+    //   router.replace("/welcome");
+    //   if (segments[0] === "(screens)" && segments[1] === "event" && segments[2] === "[id]") {
+    //     if (!cleanParamsId) return;
+    //     router.setParams({ event: cleanParamsId });
+    //   }
+    // } else 
+    if (session && segments[0] === "(auth)") {
+      // if (cleanParamsEventId) {
+      //   router.replace("/");
+      //   router.navigate(`/event/${cleanParamsEventId}`);
+      // } else {
         router.replace("/");
-        router.navigate(`/event/${cleanParamsEventId}`);
-      } else {
-        router.replace("/");
-      }
+      // }
     } else if (session && segments[0] !== "(auth)" && !session.user.user_metadata?.birthdate) {
       router.navigate('/profile/birthdate');
     }
