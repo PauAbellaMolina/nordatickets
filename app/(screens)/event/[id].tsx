@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Platform, Pressable, ScrollView, StyleSheet, Appearance} from 'react-native';
+import { ActivityIndicator, FlatList, Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text, View } from '../../../components/Themed';
 import EventTicketCardComponent from '../../../components/EventTicketCardComponent';
@@ -22,7 +22,7 @@ type Cart = CartItem[] | null;
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { user, session, i18n, swapFollowingEventsChanged, theme } = useSupabase();
+  const { user, session, i18n, followingEvents, storeFollowingEventsUserData, storeFollowingEventsCookie, theme } = useSupabase();
   const [userIsMinor, setUserIsMinor] = useState<boolean>(undefined);
   const [cardNumber, setCardNumber] = useState<string>();
   const [expiryDate, setExpiryDate] = useState<string>();
@@ -43,12 +43,6 @@ export default function EventDetailScreen() {
 
   useEffect(() => {
     if (!user) return;
-    if (user.user_metadata?.birthdate) {
-      const userBirthdate = new Date(user.user_metadata.birthdate);
-      setUserIsMinor(new Date(Date.now() - userBirthdate.getTime()).getUTCFullYear() - 1970 < 18);
-    } else {
-      setUserIsMinor(true); //fallback set to true if no birthdate
-    }
 
     let unmounted = false;
     supabase.from('events').select().eq('id', id as string).single()
@@ -56,6 +50,30 @@ export default function EventDetailScreen() {
       if (unmounted || error || !event) return;
       setEvent(event);
       setAccessEventTicketsExpanded(event.access_tickets_section_expanded);
+      if (!followingEvents.includes(+event.id)) {
+        storeFollowingEventsCookie([...followingEvents, +event.id], !user);
+        if (user) { //TODO PAU this is for when we support not signed in users
+          storeFollowingEventsUserData([...followingEvents, +event.id], false, true);
+        }
+      }
+    });
+
+    if (user.user_metadata?.birthdate) {
+      const userBirthdate = new Date(user.user_metadata.birthdate);
+      setUserIsMinor(new Date(Date.now() - userBirthdate.getTime()).getUTCFullYear() - 1970 < 18);
+    } else {
+      setUserIsMinor(true); //fallback set to true if no birthdate
+    }
+
+    supabase.from('users').select().eq('id', user?.id).single()
+    .then(({ data: user, error }) => {
+      if (error || !user) return;
+      if (!unmounted) {
+        setCardNumber(user.card_number);
+        if (user.expiry_date) {
+          setExpiryDate(user.expiry_date.toString().slice(2) + '/' + user.expiry_date.toString().slice(0, 2));
+        }
+      }
     });
 
     return () => {
@@ -119,40 +137,6 @@ export default function EventDetailScreen() {
       unmounted = true;
     };
   }, [user, event, userIsMinor]);
-
-  useEffect(() => {
-    if (!user) return;
-    let unmounted = false;
-    if (!user || !event) return;
-    supabase.from('users').select().eq('id', user?.id).single()
-    .then(({ data: user, error }) => {
-      if (error || !user) return;
-      if (!unmounted) {
-        setCardNumber(user.card_number);
-        if (user.expiry_date) {
-          setExpiryDate(user.expiry_date.toString().slice(2) + '/' + user.expiry_date.toString().slice(0, 2));
-        }
-      }
-      
-      const userEventIdsFollowing = user.event_ids_following ?? [];
-      if (userEventIdsFollowing.includes(+id)) {
-        return;
-      }
-      supabase.from('users')
-      .update({
-        event_ids_following: [...userEventIdsFollowing, +id]
-      })
-      .eq('id', user?.id).select()
-      .then(({ data: users, error }) => {
-        if (error || !users.length) return;
-        swapFollowingEventsChanged();
-      });
-    });
-
-    return () => {
-      unmounted = true;
-    };
-  }, [user, event]);
 
   useEffect(() => {
     if (!user) return;
@@ -290,26 +274,10 @@ export default function EventDetailScreen() {
 
   const onStopFollowingEvent = () => {
     setSelectedOption('misc');
-    if (!user || !event) return;
-    supabase.from('users').select().eq('id', user?.id)
-    .then(({ data: users, error }) => {
-      if (error || !users.length || !users[0].event_ids_following?.length) return;
-      const userEventIdsFollowing = users[0].event_ids_following;
-      if (!userEventIdsFollowing.includes(+id)) {
-        return;
-      }
-      const filteredUserEventIdsFollowing = userEventIdsFollowing.filter((eventId) => eventId !== +id);
-      supabase.from('users')
-      .update({
-        event_ids_following: filteredUserEventIdsFollowing
-      })
-      .eq('id', user?.id).select()
-      .then(({ data: users, error }) => {
-        if (error || !users.length) return;
-        swapFollowingEventsChanged();
-        router.navigate('/');
-      });
-    });
+    storeFollowingEventsCookie(followingEvents.filter((eventId) => eventId !== +id), !user);
+    if (user) { //TODO PAU this is for when we support not signed in users
+      storeFollowingEventsUserData(followingEvents.filter((eventId) => eventId !== +id), true, true);
+    }
   };
 
   const onMoreInfo = () => {

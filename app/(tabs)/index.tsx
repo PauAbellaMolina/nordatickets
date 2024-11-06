@@ -1,41 +1,58 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import EventCardComponent from '../../components/EventCardComponent';
 import { supabase } from "../../supabase";
 import { useSupabase } from '../../context/SupabaseProvider';
 import { Event } from '../../types/supabaseplain';
+import { useFocusEffect } from 'expo-router';
 
 export default function TabOneScreen() {
-  const { user, i18n, followingEventsChanged } = useSupabase();
+  const { user, i18n, storeFollowingEventsCookie, followingEvents } = useSupabase();
   const [events, setEvents] = useState<Event[]>();
-  const [userEventIdsFollowing, setUserEventIdsFollowing] = useState<number[]>([]);
+
+  let triggerNextFocus = useRef<boolean>(true);
+  useFocusEffect(
+    useCallback(() => {
+      let unmounted = false;
+      if (triggerNextFocus.current) {
+        if (!user) return;
+        supabase.from('users').select().eq('id', user?.id).single()
+        .then(({ data: user, error }) => {
+          if (unmounted ||
+            error ||
+            !user ||
+            user.event_ids_following.length === followingEvents.length &&
+            user.event_ids_following.every(id => followingEvents.includes(id)) &&
+            followingEvents.every(id => user.event_ids_following.includes(id))
+          ) return;
+          storeFollowingEventsCookie(user.event_ids_following ?? [], true);
+        });
+      }
+
+      return () => {
+        unmounted = true;
+        triggerNextFocus.current = false;
+        setTimeout(() => {
+          triggerNextFocus.current = true;
+        }, 3500); //This is to prevent fetching every time we focus, just fetching when focused and after every 3.5 seconds
+      };
+    }, [user])
+  );
 
   useEffect(() => {
-    if (!user) return;
+    if (!followingEvents.length) return;
     let unmounted = false;
-    supabase.from('users').select().eq('id', user?.id).single()
-    .then(({ data: user, error }) => {
-      if (unmounted || error || !user) return;
-      if (userEventIdsFollowing.length && !user.event_ids_following?.length) {
-        setUserEventIdsFollowing([]);
-        setEvents([]);
-        return;
-      }
-      const auxUserEventIdsFollowing = user.event_ids_following ?? [];
-      setUserEventIdsFollowing(auxUserEventIdsFollowing);
-      if (!auxUserEventIdsFollowing.length) return;
-      supabase.from('events').select().in('id', auxUserEventIdsFollowing)
-      .then(({ data: events, error }) => {
-        if (unmounted || error) return;
-        setEvents(events);
-      });
+    supabase.from('events').select().in('id', followingEvents)
+    .then(({ data: events, error }) => {
+      if (unmounted || error) return;
+      setEvents(events);
     });
 
     return () => {
       unmounted = true;
     };
-  }, [user, followingEventsChanged]);
+  }, [followingEvents]);
 
   const renderItem = useCallback(({item}: {item: Event}) => (
     <EventCardComponent {...item} />
@@ -50,7 +67,7 @@ export default function TabOneScreen() {
         </View>
       </View>
       <View style={styles.eventsContainer}>
-        { userEventIdsFollowing?.length ? <>
+        { followingEvents?.length ? <>
           { !events ?
             <ActivityIndicator style={{marginTop: '25%'}} size="large" />
             :
