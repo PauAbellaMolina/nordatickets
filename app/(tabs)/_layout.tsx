@@ -1,9 +1,7 @@
 import { Tabs } from 'expo-router';
-import { useSupabase } from '../../context/SupabaseProvider';
 import TabBarComponent from '../../components/TabBarComponent';
 
 export default function TabLayout() {
-  const { theme } = useSupabase();
 
   return (
     <Tabs tabBar={(props) => <TabBarComponent {...props} />} >

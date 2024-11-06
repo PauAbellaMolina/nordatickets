@@ -40,41 +40,39 @@ export default function EventDetailScreen() {
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string>('misc');
   const [storeCreditCardChecked, setStoreCreditCardChecked] = useState(false);
+  const [previousFollowingEvents, setPreviousFollowingEvents] = useState<number[]>(undefined);
 
   useEffect(() => {
-    if (!user) return;
-
     let unmounted = false;
+
     supabase.from('events').select().eq('id', id as string).single()
     .then(({ data: event, error }) => {
       if (unmounted || error || !event) return;
       setEvent(event);
       setAccessEventTicketsExpanded(event.access_tickets_section_expanded);
-      if (!followingEvents.includes(+event.id)) {
-        storeFollowingEventsCookie([...followingEvents, +event.id], !user);
-        if (user) { //TODO PAU this is for when we support not signed in users
-          storeFollowingEventsUserData([...followingEvents, +event.id], false, true);
-        }
-      }
     });
 
-    if (user.user_metadata?.birthdate) {
-      const userBirthdate = new Date(user.user_metadata.birthdate);
-      setUserIsMinor(new Date(Date.now() - userBirthdate.getTime()).getUTCFullYear() - 1970 < 18);
+    if (user) {
+      if (user.user_metadata?.birthdate) {
+        const userBirthdate = new Date(user.user_metadata.birthdate);
+        setUserIsMinor(new Date(Date.now() - userBirthdate.getTime()).getUTCFullYear() - 1970 < 18);
+      } else {
+        setUserIsMinor(true); //fallback set to true if no birthdate
+      }
+  
+      supabase.from('users').select().eq('id', user?.id).single()
+      .then(({ data: user, error }) => {
+        if (error || !user) return;
+        if (!unmounted) {
+          setCardNumber(user.card_number);
+          if (user.expiry_date) {
+            setExpiryDate(user.expiry_date.toString().slice(2) + '/' + user.expiry_date.toString().slice(0, 2));
+          }
+        }
+      });
     } else {
-      setUserIsMinor(true); //fallback set to true if no birthdate
+      setUserIsMinor(true);
     }
-
-    supabase.from('users').select().eq('id', user?.id).single()
-    .then(({ data: user, error }) => {
-      if (error || !user) return;
-      if (!unmounted) {
-        setCardNumber(user.card_number);
-        if (user.expiry_date) {
-          setExpiryDate(user.expiry_date.toString().slice(2) + '/' + user.expiry_date.toString().slice(0, 2));
-        }
-      }
-    });
 
     return () => {
       setCart(null);
@@ -83,7 +81,20 @@ export default function EventDetailScreen() {
   }, [user]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!event || !followingEvents) return;
+
+    setPreviousFollowingEvents(followingEvents);
+    if (followingEvents && previousFollowingEvents) return;
+
+    if (!followingEvents.includes(+event.id)) {
+      storeFollowingEventsCookie([...followingEvents, +event.id], false, !user);
+      if (user) { //TODO PAU this is for when we support not signed in users
+        storeFollowingEventsUserData([...followingEvents, +event.id], false, true);
+      }
+    }
+  }, [user, event, followingEvents]);
+
+  useEffect(() => {
     if (!event || (theme === 'dark' && !event?.color_code_dark) || (theme === 'light' && !event?.color_code_light)) {
       setEventBackgroundColor(getThemeRandomColor(theme));
       return;
@@ -93,10 +104,10 @@ export default function EventDetailScreen() {
     } else {
       setEventBackgroundColor(event.color_code_light);
     }
-  }, [user, event, theme]);
+  }, [event, theme]);
 
   useEffect(() => {
-    if (!user || userIsMinor === undefined || !event) return;
+    if (userIsMinor === undefined || !event) return;
     let unmounted = false;
 
     supabase.from('event_tickets').select().eq('event_id', id).eq('type', 'ACCESS').order('price')
@@ -105,8 +116,8 @@ export default function EventDetailScreen() {
       setAccessEventTickets(event_tickets);
     });
 
-    if (userIsMinor) {
-      supabase.from('event_tickets').select().eq('event_id', id).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).is('minor_restricted', false).order('type', { ascending: true }).order('price', { ascending: false })
+    const queryAllTickets = () => {
+      supabase.from('event_tickets').select().eq('event_id', id).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).order('type', { ascending: true }).order('price', { ascending: false })
       .then(({ data: event_tickets, error }) => {
         if (unmounted || error || !event_tickets.length) return;
         const typeOrder = ['ADDON_REFUNDABLE', 'ADDON'];
@@ -118,8 +129,12 @@ export default function EventDetailScreen() {
         });
         setEventTickets(orderedEventTickets);
       });
+    };
+
+    if (!user || (user && !userIsMinor)) {
+      queryAllTickets();
     } else {
-      supabase.from('event_tickets').select().eq('event_id', id).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).order('type', { ascending: true }).order('price', { ascending: false })
+      supabase.from('event_tickets').select().eq('event_id', id).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).is('minor_restricted', false).order('type', { ascending: true }).order('price', { ascending: false })
       .then(({ data: event_tickets, error }) => {
         if (unmounted || error || !event_tickets.length) return;
         const typeOrder = ['ADDON_REFUNDABLE', 'ADDON'];
@@ -139,7 +154,6 @@ export default function EventDetailScreen() {
   }, [user, event, userIsMinor]);
 
   useEffect(() => {
-    if (!user) return;
     if (!cart) {
       setCartTotalPrice(0);
       setCartTotalQuantity(0);
@@ -149,7 +163,7 @@ export default function EventDetailScreen() {
     setCartTotalPrice(totalPrice);
     const totalQuantity = cart.reduce((acc, cartItem) => acc + cartItem.quantity, 0);
     setCartTotalQuantity(totalQuantity);
-  }, [user, cart]);
+  }, [cart]);
 
   const onAddTicketHandler = (ticket: EventTicket, associatedTicketFormSubmit?: Partial<TicketFormSubmit>) => {
     if (ticket.wallet_tickets_limit) {
@@ -274,7 +288,7 @@ export default function EventDetailScreen() {
 
   const onStopFollowingEvent = () => {
     setSelectedOption('misc');
-    storeFollowingEventsCookie(followingEvents.filter((eventId) => eventId !== +id), !user);
+    storeFollowingEventsCookie(followingEvents.filter((eventId) => eventId !== +id), true, !user);
     if (user) { //TODO PAU this is for when we support not signed in users
       storeFollowingEventsUserData(followingEvents.filter((eventId) => eventId !== +id), true, true);
     }

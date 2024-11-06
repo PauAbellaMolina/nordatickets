@@ -5,7 +5,7 @@ import { useCallback, useRef, useState } from 'react';
 import { supabase } from "../../supabase";
 import { useSupabase } from '../../context/SupabaseProvider';
 import { WalletTicket } from '../../types/supabaseplain';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 
 export default function TabTwoScreen() {
   const { user, i18n } = useSupabase();
@@ -72,16 +72,23 @@ export default function TabTwoScreen() {
       </View>
       <View style={styles.ticketsContainer}>
         <Text style={styles.ticketsTitle}>Tickets</Text>
-        { eventGroupedWalletTickets?.length ?
-          <FlatList
-            style={styles.walletTicketList}
-            data={eventGroupedWalletTickets}
-            renderItem={renderItem}
-            ItemSeparatorComponent={() => <View style={{height: 10}} />}
-          />
-        :
-          <Text style={styles.emptyWallet}>{ i18n?.t('noTicketsInWallet') }</Text>
-        }
+        { !user ?
+          <View style={styles.loginToSeeContainer}>
+            <Text style={styles.loginToSee}>TODO Log in to see your wallet</Text>
+            <Text style={styles.loginToSee} onPress={() => router.push('/welcome')}>Log in</Text>
+          </View>
+        : <>
+          { eventGroupedWalletTickets?.length ?
+            <FlatList
+              style={styles.walletTicketList}
+              data={eventGroupedWalletTickets}
+              renderItem={renderItem}
+              ItemSeparatorComponent={() => <View style={{height: 10}} />}
+            />
+          :
+            <Text style={styles.emptyWallet}>{ i18n?.t('noTicketsInWallet') }</Text>
+          }
+        </> }
       </View>
     </View>
   );
@@ -125,6 +132,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'grey',
     marginTop: 50,
+    fontStyle: 'italic'
+  },
+  loginToSeeContainer: {
+    marginTop: 70,
+    gap: 20
+  },
+  loginToSee: {
+    textAlign: 'center',
+    color: 'grey',
     fontStyle: 'italic'
   }
 });

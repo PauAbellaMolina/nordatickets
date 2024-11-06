@@ -87,39 +87,44 @@ export default function TabThreeScreen() {
       </View>
       <View style={styles.profileContainer}>
         <Text style={styles.infoTitle}>{ i18n?.t('emailAndPaymentMethods') }</Text>
-        <View style={styles.userInfo}>
-          { user?.user_metadata?.fullname ?
+        { !user ? <>
+          {/* <Text style={styles.loginToSee}>TODO Log in to see your profile</Text> */}
+          <Text style={styles.loginToSee} onPress={() => router.push('/welcome')}>Log in</Text>
+        </> : <>
+          <View style={styles.userInfo}>
+            { user?.user_metadata?.fullname ?
+              <View style={styles.singleLineContainer}>
+                <FeatherIcon name="user" size={18} color={Colors[theme].text} />
+                <Text>{user?.user_metadata?.fullname}</Text>
+              </View>
+            : null }
             <View style={styles.singleLineContainer}>
-              <FeatherIcon name="user" size={18} color={Colors[theme].text} />
-              <Text>{user?.user_metadata?.fullname}</Text>
+              <FeatherIcon name="at-sign" size={18} color={Colors[theme].text} />
+              <Text>{user?.email}</Text>
             </View>
-          : null }
-          <View style={styles.singleLineContainer}>
-            <FeatherIcon name="at-sign" size={18} color={Colors[theme].text} />
-            <Text>{user?.email}</Text>
+            { card ?
+              <View style={styles.singleLineContainer}>
+                <FeatherIcon name="credit-card" size={18} color={Colors[theme].text} />
+                <View style={styles.cardLineContainer}>
+                  <Text>{card}  ·  </Text>
+                  <Pressable onPress={onDeleteUserCard}>
+                    <Text style={{color: '#ff3737'}}>{ i18n?.t('delete') }</Text>
+                  </Pressable>
+                </View>
+              </View>
+            : expiryDate ?
+              <View style={styles.singleLineContainer}>
+                <FeatherIcon name="credit-card" size={18} color={Colors[theme].text} />
+                <View style={styles.cardLineContainer}>
+                  <Text>{ i18n?.t('cardWithExpiryDate') }: {expiryDate}  ·  </Text>
+                  <Pressable onPress={onDeleteUserCard}>
+                    <Text style={{color: '#ff3737'}}>{ i18n?.t('delete') }</Text>
+                  </Pressable>
+                </View>
+              </View>
+            : null }
           </View>
-          { card ?
-            <View style={styles.singleLineContainer}>
-              <FeatherIcon name="credit-card" size={18} color={Colors[theme].text} />
-              <View style={styles.cardLineContainer}>
-                <Text>{card}  ·  </Text>
-                <Pressable onPress={onDeleteUserCard}>
-                  <Text style={{color: '#ff3737'}}>{ i18n?.t('delete') }</Text>
-                </Pressable>
-              </View>
-            </View>
-          : expiryDate ?
-            <View style={styles.singleLineContainer}>
-              <FeatherIcon name="credit-card" size={18} color={Colors[theme].text} />
-              <View style={styles.cardLineContainer}>
-                <Text>{ i18n?.t('cardWithExpiryDate') }: {expiryDate}  ·  </Text>
-                <Pressable onPress={onDeleteUserCard}>
-                  <Text style={{color: '#ff3737'}}>{ i18n?.t('delete') }</Text>
-                </Pressable>
-              </View>
-            </View>
-          : null }
-        </View>
+        </> }
         <View style={[styles.separator, {backgroundColor: Colors[theme].separatorBackgroundColor}]} />
         <View style={styles.entriesContainer}>
           <Pressable style={styles.entryButton} onPress={() => router.navigate('/profile/receipts')}><FeatherIcon name="file-text" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('purchaseReceipts') }</Text></Pressable>
@@ -137,7 +142,9 @@ export default function TabThreeScreen() {
               <Picker.Item label="English" value="en" />
             </Picker>
           </View>
-          <Pressable style={styles.entryButton} onPress={() => signOut()}><FeatherIcon name="log-out" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('logOut') }</Text></Pressable>
+          { user ?
+            <Pressable style={styles.entryButton} onPress={() => signOut()}><FeatherIcon name="log-out" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('logOut') }</Text></Pressable>
+          : null }
         </View>
       </View>
     </View>
@@ -211,5 +218,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     opacity: 0
+  },
+  loginToSee: {
+    textAlign: 'center',
+    color: 'grey',
+    marginTop: 10,
+    fontStyle: 'italic'
   }
 });
