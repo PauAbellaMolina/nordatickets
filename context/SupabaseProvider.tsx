@@ -14,9 +14,10 @@ type SupabaseContextProps = {
   initialized?: boolean;
   theme: ColorSchemeName;
   i18n: I18n | null;
-  followingEventsChanged?: boolean;
-  swapFollowingEventsChanged: () => void;
+  followingEvents: number[];
   setLanguage: (locale: AvailableLocales) => void;
+  storeFollowingEventsCookie: (followingEvents: number[], updateLocalFollowingEvents?: boolean) => void;
+  storeFollowingEventsUserData: (followingEvents: number[], redirectHome?: boolean, updateLocalFollowingEvents?: boolean) => void;
   signInWithOTP: (options: SignInWithPasswordlessCredentials) => Promise<void>;
   verifyOTP: (email: string, code: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -32,9 +33,10 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
   initialized: false,
   theme: Appearance.getColorScheme() ?? 'light',
   i18n: null,
-  followingEventsChanged: false,
-  swapFollowingEventsChanged: () => {},
+  followingEvents: [],
   setLanguage: (locale: AvailableLocales) => {},
+  storeFollowingEventsCookie: (followingEvents: number[], updateLocalFollowingEvents?: boolean) => {},
+  storeFollowingEventsUserData: (followingEvents: number[], redirectHome?: boolean, updateLocalFollowingEvents?: boolean) => {}, 
   signInWithOTP: async () => {},
   verifyOTP: async () => {},
   signOut: async () => {}
@@ -49,7 +51,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [theme, setTheme] = useState<ColorSchemeName>(Appearance.getColorScheme() ?? 'light');
   const [i18n, setI18n] = useState<I18n | null>(null);
-  const [auxFollowingEventsChanged, setAuxFollowingEventsChanged] = useState<boolean>(false);
+  const [followingEvents, setFollowingEvents] = useState<number[]>([]);
 
   const params = useGlobalSearchParams();
   const segments = useSegments();
@@ -72,6 +74,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
       throw error;
     }
     storeLocaleUserMetadata(i18n?.locale as AvailableLocales);
+    storeFollowingEventsUserData(followingEvents);
   }
 
   const signOut = async () => {
@@ -81,9 +84,8 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
     }
   };
 
+
   const storeLocaleCookie = async (locale: AvailableLocales) => {
-    if (!locale) return;
-    i18n.locale = locale;
     try {
       await AsyncStorage.setItem('locale', locale);
     } catch (e) { }
@@ -100,9 +102,35 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   };
 
   const setLanguage = (locale: AvailableLocales) => {
+    if (!locale) return;
+    i18n.locale = locale;
     storeLocaleCookie(locale);
     storeLocaleUserMetadata(locale);
   };
+
+
+  const storeFollowingEventsCookie = async (followingEvents: number[], updateLocalFollowingEvents?: boolean) => {
+    try {
+      await AsyncStorage.setItem('followingEvents', JSON.stringify(followingEvents));
+      if (updateLocalFollowingEvents) setFollowingEvents(followingEvents);
+    } catch (e) { }
+  };
+  
+  const storeFollowingEventsUserData = async (followingEvents: number[], redirectHome?: boolean, updateLocalFollowingEvents?: boolean) => {
+    try {
+      await supabase.from('users')
+      .update({
+        event_ids_following: followingEvents
+      })
+      .eq('id', user?.id).select()
+      .then(({ data, error }) => {
+        if (error) throw error;
+        if (redirectHome) router.navigate('/');
+        if (updateLocalFollowingEvents) setFollowingEvents(followingEvents);
+      });
+    } catch (e) { }
+  };
+
 
   const getLocaleFromCookie = async () => {
     const i18n = new I18n(dict);
@@ -124,8 +152,13 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
     }
   };
 
-  const swapFollowingEventsChanged = () => {
-    setAuxFollowingEventsChanged(!auxFollowingEventsChanged);
+  const getFollowingEventsFromCookie = async () => {
+    try {
+      const value = await AsyncStorage.getItem('followingEvents');
+      if (value !== null) {
+        setFollowingEvents(JSON.parse(value).map(Number));
+      }
+    } catch (e) { }
   };
 
   useEffect(() => {
@@ -138,6 +171,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 
   useEffect(() => {
     getLocaleFromCookie();
+    getFollowingEventsFromCookie();
 
     const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
@@ -204,8 +238,9 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
         initialized,
         theme,
         i18n,
-        followingEventsChanged: auxFollowingEventsChanged,
-        swapFollowingEventsChanged,
+        followingEvents,
+        storeFollowingEventsCookie,
+        storeFollowingEventsUserData,
         setLanguage,
         signInWithOTP,
         verifyOTP,
