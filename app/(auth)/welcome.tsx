@@ -1,16 +1,16 @@
-import { StyleSheet, Pressable } from "react-native";
+import { StyleSheet, Pressable, Platform } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
 import TiktDark from '../../assets/svgs/tiktdark.svg';
 import TiktLight from '../../assets/svgs/tiktlight.svg';
-import BlobsBackground from "../../components/BlobsBackground";
 import { useSupabase } from "../../context/SupabaseProvider";
 import { FeatherIcon } from "../../components/CustomIcons";
 import { Picker } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
 import { AvailableLocales } from "../../assets/translations/translation";
 import Animated, { Easing, FadeIn, ReduceMotion } from "react-native-reanimated";
+import PurpleBlob from '../../assets/svgs/blobs/purple.svg';
 
 export default function Welcome() {
   const { i18n, setLanguage, theme } = useSupabase();
@@ -38,10 +38,13 @@ export default function Welcome() {
   }
 
   return (
-    <BlobsBackground style={styles.container}>
-      <Animated.View entering={FadeIn.duration(225).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)}>
-        { theme === 'dark' ? <TiktDark width={165} height={165} /> : <TiktLight width={165} height={165} /> }
-      </Animated.View>
+    <View style={styles.container}>
+      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <View style={[styles.blob, { opacity: theme === 'dark' ? .25 : .45 }]}><PurpleBlob width={280} height={280} /></View>
+        <Animated.View style={{ alignItems: 'center', justifyContent: 'center' }} entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)}>
+          { theme === 'dark' ? <TiktDark width={165} height={165} /> : <TiktLight width={165} height={165} /> }
+        </Animated.View>
+      </View>
       <Animated.View entering={FadeIn.duration(350).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.buttonsContainer}>
         <Pressable onPress={onGoToSignUp} style={[styles.button, {backgroundColor: Colors[theme].text}]}>
           <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('createAccount') }</Text>
@@ -50,7 +53,7 @@ export default function Welcome() {
           <Text style={[styles.buttonText, {color: Colors[theme].text}]}>{ i18n?.t('logIn') }</Text>
         </Pressable>
       </Animated.View>
-      <Animated.View entering={FadeIn.duration(225).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.bottomActionContainer}>
+      <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.bottomActionContainer}>
         <Pressable style={styles.languageButton}><FeatherIcon name="globe" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('changeLanguage') }</Text></Pressable>
         <Picker
           style={styles.languagePicker}
@@ -62,17 +65,30 @@ export default function Welcome() {
           <Picker.Item label="English" value="en" />
         </Picker>
       </Animated.View>
-    </BlobsBackground>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    height: '100%',
+    overflow: 'hidden',
     paddingBottom: 50,
     paddingHorizontal: 15,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 100
+  },
+  blob: {
+    position: 'absolute',
+    zIndex: -1,
+    ...Platform.select({
+      web: {
+        filter: 'blur(65px);'
+      },
+      ios: {},
+      android: {}
+    })
   },
   buttonsContainer: {
     width: '100%',
