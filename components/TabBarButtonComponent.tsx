@@ -34,24 +34,24 @@ export default function TabBarButtonComponent({ onPress, onLongPress, isFocused,
 
   useEffect(() => {
     scale.value = withSpring(
-      isFocused ? 1 : 0,
-      { duration: 300 }
+      isFocused ? 1 : .3,
+      { duration: 200 }
     );
   }, [isFocused]);
 
   const animatedIconStyle = useAnimatedStyle(()=>{
     const scaleValue = interpolate(
       scale.value,
-      [0, 1],
-      [1, 1.15]
+      [0, .9],
+      [.9, 1]
     );
     const backgroundColor = interpolateColor(
       isFocused ? 1 : 0,
       [0, 1],
       ['transparent', Colors[theme].tabIconActiveBackground]
     );
-    return { transform: [{scale: scaleValue}], backgroundColor }
-})
+    return { transform: [{scale: scaleValue}], backgroundColor };
+  });
 
   const handlePress = () => {
     scale.value = withSpring(0.8, { damping: isFocused ? 0 : 15 }, () => {
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 50,
-    margin: 13,
-    height: 48
+    margin: 7,
+    height: 54
   }
 });

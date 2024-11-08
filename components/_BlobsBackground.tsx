@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Platform } from "react-native";
 import BlueBlob from '../assets/svgs/blobs/blue.svg';
 import RedBlob from '../assets/svgs/blobs/red.svg';
 import OrangeBlob from '../assets/svgs/blobs/orange.svg';
@@ -25,7 +25,13 @@ const styles = StyleSheet.create({
   blob: {
     position: 'absolute',
     zIndex: -1,
-    filter: 'blur(45px);'
+    ...Platform.select({
+      web: {
+        filter: 'blur(65px);'
+      },
+      ios: {},
+      android: {}
+    })
   },
   orangeBlob: {
     top: -50,

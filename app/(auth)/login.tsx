@@ -4,7 +4,6 @@ import { router, useGlobalSearchParams } from "expo-router";
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
 import { useSupabase } from "../../context/SupabaseProvider";
-import BlobsBackground from "../../components/BlobsBackground";
 import { FeatherIcon } from "../../components/CustomIcons";
 import OneTimeCodeInput from '../../components/OneTimeCodeInput';
 import { isValidEmail } from "../../utils/formValidationUtils";
@@ -75,7 +74,7 @@ export default function Login() {
   };
 
   return (
-    <BlobsBackground style={styles.container}>
+    <View style={styles.container}>
       <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.wrapper, {backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity}]}>
         <Text style={styles.title}>{ i18n?.t('logIn') }</Text>
         <Text style={styles.explanation}>{ i18n?.t('emailCodeExplanation') }</Text>
@@ -142,12 +141,14 @@ export default function Login() {
         <Text style={styles.bottomActionTitle}>{ i18n?.t('noAccountQuestion') }</Text>
         <Pressable onPress={onGoToSignUp}><Text style={styles.bottomActionLink}>{ i18n?.t('signUp') }</Text></Pressable>
       </Animated.View>
-    </BlobsBackground>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    height: '100%',
+    overflow: 'hidden',
     paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center'
