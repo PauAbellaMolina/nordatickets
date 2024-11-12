@@ -41,7 +41,6 @@ export default function TabOneScreen() {
   );
 
   useEffect(() => {
-    console.log('followingEvents', followingEvents);
     if (!followingEvents) return;
 
     let unmounted = false;
