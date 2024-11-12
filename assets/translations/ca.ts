@@ -115,5 +115,6 @@ export const ca: { [key: string]: string } = {
   showFormSubmit: 'Informació afegida',
   selectAnOption: 'Selecciona una opció',
   fullname: 'Nom i cognoms',
-  registrations: 'Inscripcions'
+  registrations: 'Inscripcions',
+  loginRequired: 'Requereix iniciar sessió'
 };

@@ -115,5 +115,6 @@ export const es: { [key: string]: string } = {
   showFormSubmit: 'Información agregada',
   selectAnOption: 'Selecciona una opción',
   fullname: 'Nombre y apellidos',
-  registrations: 'Inscripciones'
+  registrations: 'Inscripciones',
+  loginRequired: 'Requiere iniciar sesión'
 };

@@ -1,20 +1,23 @@
 import { useEffect } from 'react';
 import { Pressable, StyleSheet, Platform } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 // import { WebView } from 'react-native-webview'; // Install package when adding support to ios and android
 import { View } from '../../../../components/Themed';
 import GoBackArrow from '../../../../components/GoBackArrow';
 import { FeatherIcon } from '../../../../components/CustomIcons';
 import Colors from '../../../../constants/Colors';
 import { useSupabase } from '../../../../context/SupabaseProvider';
+import { useEventScreens } from '../../../../context/EventScreensProvider';
 
 export default function PaymentModalScreen() {
   const { i18n, theme } = useSupabase();
-  const { bg, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion, savedCard } = useLocalSearchParams<{ bg: string, formUrl: string, Ds_MerchantParameters: string, Ds_Signature: string, Ds_SignatureVersion: string, savedCard: 'true' | 'false' }>();
+  const { eventBackgroundColor, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion, cardNumber, expiryDate } = useEventScreens();
+
   const parsedFormUrl = formUrl.replace(/%2F/g, '/');
   const parsedDs_MerchantParameters = Ds_MerchantParameters.replace(/%2F/g, '/');
   const parsedDs_Signature = Ds_Signature.replace(/%2F/g, '/');
   const parsedDs_SignatureVersion = Ds_SignatureVersion.replace(/%2F/g, '/');
+  const savedCard = !!cardNumber || !!expiryDate;
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -31,7 +34,7 @@ export default function PaymentModalScreen() {
     <View style={[styles.container, Platform.OS !== 'web' ? {marginTop: 50} : {paddingHorizontal: 10, paddingVertical: 11}]}>
       { Platform.OS === 'web' ? <>
         <View style={styles.fakeBackground}>
-          <View style={[styles.eventInfoContainer, {backgroundColor: bg}]}>
+          <View style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor}]}>
             <GoBackArrow />
           </View>
         </View>
@@ -43,10 +46,10 @@ export default function PaymentModalScreen() {
           style={styles.iframe}
           srcDoc={`
             <html>
-              <body onload='${ savedCard === 'true' ? 'document.forms[0].submit();' : null }'>
-                <h1>${ savedCard === 'true' ? (i18n?.t('loading') + '...') : i18n?.t('payment') }</h1>
-                <p>${ savedCard === 'true' ? i18n?.t('clickIfNoRedirectExplanation') : i18n?.t('clickToGoToPaymentExplanation') }</p>
-                <form action='${parsedFormUrl}' method='post' target='${ savedCard === 'true' ? '_self' : '_blank' }'>
+              <body onload='${ savedCard ? 'document.forms[0].submit();' : null }'>
+                <h1>${ savedCard ? (i18n?.t('loading') + '...') : i18n?.t('payment') }</h1>
+                <p>${ savedCard ? i18n?.t('clickIfNoRedirectExplanation') : i18n?.t('clickToGoToPaymentExplanation') }</p>
+                <form action='${parsedFormUrl}' method='post' target='${ savedCard ? '_self' : '_blank' }'>
                   <input type='hidden' name='Ds_MerchantParameters' value='${parsedDs_MerchantParameters}' />
                   <input type='hidden' name='Ds_Signature' value='${parsedDs_Signature}' />
                   <input type='hidden' name='Ds_SignatureVersion' value='${parsedDs_SignatureVersion}' />

@@ -53,7 +53,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   const [i18n, setI18n] = useState<I18n | null>(null);
   const [followingEvents, setFollowingEvents] = useState<number[]>(undefined);
 
-  const params = useGlobalSearchParams();
+  // const params = useGlobalSearchParams();
   const segments = useSegments();
   const router = useRouter();
 

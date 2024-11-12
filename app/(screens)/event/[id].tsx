@@ -7,7 +7,7 @@ import Colors from '../../../constants/Colors';
 import { FeatherIcon } from '../../../components/CustomIcons';
 import GoBackArrow from '../../../components/GoBackArrow';
 import { supabase } from "../../../supabase";
-import { Event, WalletTicket, EventTicket, TicketFormSubmit } from '../../../types/supabaseplain';
+import { Event, EventTicket, TicketFormSubmit } from '../../../types/supabaseplain';
 import { useSupabase } from '../../../context/SupabaseProvider';
 import { Picker } from '@react-native-picker/picker';
 import { getThemeRandomColor } from '../../../utils/chooseRandomColor';
@@ -16,23 +16,21 @@ import EventAddonTicketCardComponent from '../../../components/EventAddonTicketC
 import EventAccessTicketCardComponent from '../../../components/EventAccessTicketCardComponent';
 import Checkbox from 'expo-checkbox';
 import Animated, { Easing, FadeIn, FadeInDown, FadeInUp, FadeOutDown, ReduceMotion } from 'react-native-reanimated';
+import { useEventScreens } from '../../../context/EventScreensProvider';
 
-type CartItem = { eventTicket: EventTicket, quantity: number, associatedTicketFormSubmit?: Partial<TicketFormSubmit> };
-type Cart = CartItem[] | null;
+type CartItem = { eventTicket: EventTicket, quantity: number, associatedTicketFormSubmit?: Partial<TicketFormSubmit> }; //TODO PAU can be imported from EventScreensProvider?
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user, session, i18n, followingEvents, storeFollowingEventsUserData, storeFollowingEventsCookie, theme } = useSupabase();
+  const { cart, setCart, eventBackgroundColor, setEventBackgroundColor, setFormUrl, setDs_MerchantParameters, setDs_Signature, setDs_SignatureVersion, cardNumber, setCardNumber, expiryDate, setExpiryDate } = useEventScreens();
+
   const [userIsMinor, setUserIsMinor] = useState<boolean>(undefined);
-  const [cardNumber, setCardNumber] = useState<string>();
-  const [expiryDate, setExpiryDate] = useState<string>();
-  const [eventBackgroundColor, setEventBackgroundColor] = useState<string>(Colors[theme].backgroundContrast);
   const [event, setEvent] = useState<Event>();
   const [eventTickets, setEventTickets] = useState<EventTicket[]>();
   const [accessEventTickets, setAccessEventTickets] = useState<EventTicket[]>();
   const [accessEventTicketsExpanded, setAccessEventTicketsExpanded] = useState<boolean>(false);
   const [moreInfoExpanded, setMoreInfoExpanded] = useState<boolean>(false);
-  const [cart, setCart] = useState<Cart>();
   const [cartTotalPrice, setCartTotalPrice] = useState<number>(0);
   const [cartTotalQuantity, setCartTotalQuantity] = useState<number>(0);
   const [eventTicketsWithLimit, setEventTicketsWithLimit] = useState<EventTicket[]>([]);
@@ -71,7 +69,7 @@ export default function EventDetailScreen() {
         }
       });
     } else {
-      setUserIsMinor(true);
+      setUserIsMinor(false);
     }
 
     return () => {
@@ -204,6 +202,10 @@ export default function EventDetailScreen() {
   };
   
   const onBuyCart = () => {
+    if (!user) {
+      router.navigate('/event/authModal');
+      return;
+    }
     if (loading) {
       return;
     }
@@ -264,10 +266,10 @@ export default function EventDetailScreen() {
         return;
       }
 
-      const formUrl: string = data.formUrl.replace(/\//g, '%2F');
-      const Ds_MerchantParameters: string = data.Ds_MerchantParameters.replace(/\//g, '%2F');
-      const Ds_Signature: string = data.Ds_Signature.replace(/\//g, '%2F');
-      const Ds_SignatureVersion: string = data.Ds_SignatureVersion.replace(/\//g, '%2F');
+      setFormUrl(data.formUrl.replace(/\//g, '%2F'));
+      setDs_MerchantParameters(data.Ds_MerchantParameters.replace(/\//g, '%2F'));
+      setDs_Signature(data.Ds_Signature.replace(/\//g, '%2F'));
+      setDs_SignatureVersion(data.Ds_SignatureVersion.replace(/\//g, '%2F'));
 
       setTimeout(() => {
         setLoading(false);
@@ -275,7 +277,7 @@ export default function EventDetailScreen() {
         setCart(null);
       }, 3000);
 
-      router.navigate({ pathname: '/event/paymentModal', params: { bg: eventBackgroundColor, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion, savedCard: cardNumber || expiryDate ? 'true' : 'false' } });
+      router.navigate('/event/paymentModal');
     })
     .catch(() => {
       setLoading(false);
@@ -324,7 +326,7 @@ export default function EventDetailScreen() {
   ), []);
 
   return (
-    <View style={[styles.container, !event ? { justifyContent: 'center' } : null]}>
+    <View style={[styles.container, !event || userIsMinor === undefined ? { justifyContent: 'center' } : null]}>
       { !event || userIsMinor === undefined ? <>
         <ActivityIndicator size="large" />
       </> : <>
@@ -422,18 +424,18 @@ export default function EventDetailScreen() {
                   { event.ticket_fee ?
                     <View style={{marginHorizontal: 8, flexDirection: 'row', alignItems: 'flex-end'}}>
                       <Text style={[styles.transactionFeePrice, {color: Colors[theme].cartContainerBackgroundContrast}]}>+ {event.ticket_fee * cartTotalQuantity / 100}€ </Text>
-                      <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('serviceFee') }</Text>
+                      <Text style={[styles.creditCardText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('serviceFee') }</Text>
                     </View>
                   : null }
                     { cardNumber ?
                       <View style={styles.usingCreditCardContainer}>
                         <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
-                        <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCreditCard') } {cardNumber.slice(-7)}</Text>
+                        <Text style={[styles.creditCardText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCreditCard') } {cardNumber.slice(-7)}</Text>
                       </View>
                     : expiryDate ?
                       <View style={styles.usingCreditCardContainer}>
                         <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
-                        <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCardWithExpiryDate') } {expiryDate}</Text>
+                        <Text style={[styles.creditCardText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCardWithExpiryDate') } {expiryDate}</Text>
                       </View>
                     :
                       <View style={styles.storeCreditCardContainer}>
@@ -443,14 +445,19 @@ export default function EventDetailScreen() {
                           value={storeCreditCardChecked}
                           onValueChange={setStoreCreditCardChecked}
                         />
-                        <Text style={[styles.transactionFeeText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('saveCardForFuturePurchases') }</Text>
+                        <Text style={[styles.creditCardText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('saveCardForFuturePurchases') }</Text>
                       </View>
                     }
-                  <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground, marginTop: !cardNumber ? 5 : 3}]} onPress={onBuyCart}>
+                  <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground, marginTop: !cardNumber ? 5 : 3, paddingTop: !user ? 5 : 10, paddingBottom: !user ? 7 : 10}]} onPress={onBuyCart}>
                   { loading ?
                     <ActivityIndicator style={{marginVertical: 1.75}} size="small" />
                   :
-                    <Text style={styles.buyButtonText}>{(cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)) / 100 + '€  ·  '}{ i18n?.t('buy') }</Text>
+                    <View style={{flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                      { !user ?
+                        <Text style={styles.buyButtonTextLoginRequired}>{ i18n?.t('loginRequired') }</Text>
+                      : null }
+                      <Text style={styles.buyButtonText}>{(cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)) / 100 + '€  ·  '}{ i18n?.t('buy') }</Text>
+                    </View>
                   }
                   </Pressable>
                 {/* </> :
@@ -684,7 +691,7 @@ const styles = StyleSheet.create({
   transactionFeePrice: {
     fontSize: 16
   },
-  transactionFeeText: {
+  creditCardText: {
     fontSize: 14
   },
   buyButton: {
@@ -697,6 +704,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center'
+  },
+  buyButtonTextLoginRequired: {
+    fontSize: 12,
+    color: '#ffffffBF',
+    fontWeight: '500'
   },
   emptyCard: {
     textAlign: 'center'
