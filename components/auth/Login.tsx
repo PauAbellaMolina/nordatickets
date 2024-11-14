@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, TextInput, ActivityIndicator, Pressable, ScrollView } from "react-native";
-import { router, useGlobalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
 import { useSupabase } from "../../context/SupabaseProvider";
@@ -11,7 +11,6 @@ import Animated, { Easing, FadeIn, ReduceMotion } from "react-native-reanimated"
 
 export default function Login() {
   const { signInWithOTP, verifyOTP, i18n, theme } = useSupabase();
-  const params = useGlobalSearchParams();
 
   const [email, setEmail] = useState<string>('');
   const [emailSent, setEmailSent] = useState<boolean>(false);
@@ -69,8 +68,7 @@ export default function Login() {
   };
 
   const onGoToSignUp = () => {
-    router.navigate('/signup');
-    router.setParams(params as Record<string, string>);
+    router.setParams({ action:'signup' });
   };
 
   return (

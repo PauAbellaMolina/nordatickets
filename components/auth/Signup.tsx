@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, TextInput, ActivityIndicator, Pressable, ScrollView, Platform } from "react-native";
-import { router, useGlobalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import Checkbox from 'expo-checkbox';
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
@@ -14,7 +14,6 @@ import Animated, { Easing, FadeIn, ReduceMotion } from "react-native-reanimated"
 
 export default function Signup() {
   const { signInWithOTP, verifyOTP, i18n, theme } = useSupabase();
-  const params = useGlobalSearchParams();
 
   const [birthdate, setBirthdate] = useState<string>(null);
   const [termsChecked, setTermsChecked] = useState(false);
@@ -77,8 +76,7 @@ export default function Signup() {
   };
 
   const onGoToLogIn = () => {
-    router.navigate('/login');
-    router.setParams(params as Record<string, string>);
+    router.setParams({ action:'login' });
   };
 
   const onGoToTerms = () => {

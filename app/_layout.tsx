@@ -60,8 +60,6 @@ function RootLayoutNav() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="(auth)/welcome" options={{ title: 'ElTeuTikt' }} />
-          <Stack.Screen name="(auth)/login" options={{ title: i18n?.t('logIn') }} />
-          <Stack.Screen name="(auth)/signup" options={{ title: i18n?.t('accountCreation') }} />
           <Stack.Screen name="(auth)/terms" options={{ title: i18n?.t('termsAndPrivacy') }} />
           <Stack.Screen name="(screens)" />
           <Stack.Screen name="(screens)/wallet/activateTicket/[id]" options={{ contentStyle: { backgroundColor: 'transparent' }, presentation: 'modal', title: i18n?.t('activateTicket') }} />
