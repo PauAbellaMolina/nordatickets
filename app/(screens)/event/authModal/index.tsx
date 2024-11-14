@@ -1,20 +1,35 @@
 import { useEffect } from 'react';
 import { Pressable, StyleSheet, Platform } from 'react-native';
-import { router } from 'expo-router';
+import { router, useGlobalSearchParams } from 'expo-router';
 // import { WebView } from 'react-native-webview'; // Install package when adding support to ios and android
-import { View, Text } from '../../../../components/Themed';
+import { View } from '../../../../components/Themed';
 import GoBackArrow from '../../../../components/GoBackArrow';
 import { FeatherIcon } from '../../../../components/CustomIcons';
 import Colors from '../../../../constants/Colors';
 import { useSupabase } from '../../../../context/SupabaseProvider';
 import { useEventScreens } from '../../../../context/EventScreensProvider';
+import Welcome from '../../../../components/auth/Welcome';
+import Signup from '../../../../components/auth/Signup';
+import Login from '../../../../components/auth/Login';
 
 export default function AuthModalScreen() {
-  const { i18n, theme } = useSupabase();
+  const { action } = useGlobalSearchParams();
+  const { theme } = useSupabase();
   const { eventBackgroundColor, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion, cardNumber, expiryDate } = useEventScreens();
 
   useEffect(() => {
   }, []);
+
+  const renderAuthComponent = () => {
+    switch(action) {
+      case 'signup':
+        return <Signup />;
+      case 'login':
+        return <Login />;
+      default:
+        return <Welcome />;
+    }
+  };
   
   return (
     <View style={[styles.container, Platform.OS !== 'web' ? {marginTop: 50} : {paddingHorizontal: 10, paddingVertical: 11}]}>
@@ -27,8 +42,8 @@ export default function AuthModalScreen() {
         <Pressable onPress={() => router.back()} style={styles.closeBttnWeb}>
           <FeatherIcon name="x" size={30} color={Colors[theme].text} />
         </Pressable>
-        <View style={styles.welcomeContainer}>
-          <Text style={{color: 'red'}}>welcome screen here! create components so it can be reused here and in the actual (auth) screens</Text>
+        <View style={[styles.welcomeContainer, {backgroundColor: Colors[theme].background}]}>
+          {renderAuthComponent()}
         </View>
       </>:<> {/* Implement when adding support to ios and android */} </>}
     </View>
@@ -59,8 +74,7 @@ const styles = StyleSheet.create({
     height: 'auto',
     flex: 1,
     borderRadius: 25,
-    borderWidth: 0,
-    backgroundColor: 'white'
+    borderWidth: 0
   },
   fakeBackground: {
     width: '100%',
