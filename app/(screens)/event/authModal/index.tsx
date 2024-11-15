@@ -14,11 +14,14 @@ import Login from '../../../../components/auth/Login';
 
 export default function AuthModalScreen() {
   const { action } = useGlobalSearchParams();
-  const { theme } = useSupabase();
-  const { eventBackgroundColor, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion, cardNumber, expiryDate } = useEventScreens();
+  const { theme, user } = useSupabase();
+  const { eventBackgroundColor } = useEventScreens();
 
   useEffect(() => {
-  }, []);
+    if (user) {
+      router.back();
+    }
+  }, [user]);
 
   const renderAuthComponent = () => {
     switch(action) {

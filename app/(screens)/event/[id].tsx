@@ -73,7 +73,6 @@ export default function EventDetailScreen() {
     }
 
     return () => {
-      setCart(null);
       unmounted = true;
     };
   }, [user]);
