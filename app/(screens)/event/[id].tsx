@@ -247,8 +247,6 @@ export default function EventDetailScreen() {
         'Authorization': 'Bearer ' + session.access_token
       },
       body: JSON.stringify({
-        amount: finalAmount,
-        userId: user.id,
         eventId: event.id,
         requestToken: storeCreditCardChecked,
         cart: cart
