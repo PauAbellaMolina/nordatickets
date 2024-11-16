@@ -12,7 +12,7 @@ import { AvailableLocales } from "../../assets/translations/translation";
 import Animated, { Easing, FadeIn, ReduceMotion } from "react-native-reanimated";
 import PurpleBlob from '../../assets/svgs/blobs/purple.svg';
 
-export default function Welcome() {
+export default function Welcome({ showLocaleSelector = true }: { showLocaleSelector?: boolean }) {
   const { i18n, setLanguage, theme } = useSupabase();
 
   const [selectedLanguage, setSelectedLanguage] = useState<AvailableLocales>();
@@ -50,18 +50,20 @@ export default function Welcome() {
           <Text style={[styles.buttonText, {color: Colors[theme].text}]}>{ i18n?.t('logIn') }</Text>
         </Pressable>
       </Animated.View>
-      <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.bottomActionContainer}>
-        <Pressable style={styles.languageButton}><FeatherIcon name="globe" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('changeLanguage') }</Text></Pressable>
-        <Picker
-          style={styles.languagePicker}
-          selectedValue={selectedLanguage}
-          onValueChange={(itemValue) => onSelectedLanguage(itemValue)}
-        >
-          <Picker.Item label="Català" value="ca" />
-          <Picker.Item label="Castellano" value="es" />
-          <Picker.Item label="English" value="en" />
-        </Picker>
-      </Animated.View>
+      { showLocaleSelector ?
+          <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.bottomActionContainer}>
+            <Pressable style={styles.languageButton}><FeatherIcon name="globe" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('changeLanguage') }</Text></Pressable>
+          <Picker
+            style={styles.languagePicker}
+            selectedValue={selectedLanguage}
+            onValueChange={(itemValue) => onSelectedLanguage(itemValue)}
+          >
+            <Picker.Item label="Català" value="ca" />
+            <Picker.Item label="Castellano" value="es" />
+            <Picker.Item label="English" value="en" />
+          </Picker>
+        </Animated.View>
+      : null }
     </View>
   );
 }

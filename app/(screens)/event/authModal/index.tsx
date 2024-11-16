@@ -15,11 +15,11 @@ import Login from '../../../../components/auth/Login';
 export default function AuthModalScreen() {
   const { action } = useGlobalSearchParams();
   const { theme, user } = useSupabase();
-  const { eventBackgroundColor } = useEventScreens();
+  const { eventBackgroundColor, buyCartProcess } = useEventScreens();
 
   useEffect(() => {
     if (user) {
-      router.back();
+      buyCartProcess();
     }
   }, [user]);
 
@@ -30,7 +30,7 @@ export default function AuthModalScreen() {
       case 'login':
         return <Login />;
       default:
-        return <Welcome />;
+        return <Welcome showLocaleSelector={false} />;
     }
   };
   
