@@ -11,7 +11,7 @@ import { useEventScreens } from '../../../../context/EventScreensProvider';
 
 export default function PaymentModalScreen() {
   const { i18n, theme } = useSupabase();
-  const { eventBackgroundColor, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion, cardNumber, expiryDate } = useEventScreens();
+  const { eventBackgroundColor, formUrl, Ds_MerchantParameters, Ds_Signature, Ds_SignatureVersion, cardNumber, expiryDate, event } = useEventScreens();
 
   const parsedFormUrl = formUrl.replace(/%2F/g, '/');
   const parsedDs_MerchantParameters = Ds_MerchantParameters.replace(/%2F/g, '/');
@@ -20,8 +20,8 @@ export default function PaymentModalScreen() {
   const savedCard = !!cardNumber || !!expiryDate;
 
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data === 'close') {
+    const handleMessage = (messageEvent: MessageEvent) => {
+      if (messageEvent.data === 'close') {
         router.back();
       }
     };
@@ -38,7 +38,7 @@ export default function PaymentModalScreen() {
             <GoBackArrow />
           </View>
         </View>
-        <Pressable onPress={() => router.back()} style={styles.closeBttnWeb}>
+        <Pressable onPress={() => router.navigate(`/event/${event.id}`)} style={styles.closeBttnWeb}>
           <FeatherIcon name="x" size={30} color={Colors[theme].text} />
         </Pressable>
         <iframe

@@ -23,21 +23,34 @@ type CartItem = { eventTicket: EventTicket, quantity: number, associatedTicketFo
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user, session, i18n, followingEvents, storeFollowingEventsUserData, storeFollowingEventsCookie, theme } = useSupabase();
-  const { cart, setCart, eventBackgroundColor, setEventBackgroundColor, setFormUrl, setDs_MerchantParameters, setDs_Signature, setDs_SignatureVersion, cardNumber, setCardNumber, expiryDate, setExpiryDate } = useEventScreens();
+  const { cart,
+    setCart,
+    eventBackgroundColor,
+    setEventBackgroundColor,
+    cardNumber,
+    setCardNumber,
+    expiryDate,
+    setExpiryDate,
+    eventTicketsWithLimit,
+    setEventTicketsWithLimit,
+    event,
+    setEvent,
+    loading,
+    storeCreditCardChecked,
+    setStoreCreditCardChecked,
+    orderConfirmed,
+    setOrderConfirmed,
+    buyCartProcess
+  } = useEventScreens();
 
   const [userIsMinor, setUserIsMinor] = useState<boolean>(undefined);
-  const [event, setEvent] = useState<Event>();
   const [eventTickets, setEventTickets] = useState<EventTicket[]>();
   const [accessEventTickets, setAccessEventTickets] = useState<EventTicket[]>();
   const [accessEventTicketsExpanded, setAccessEventTicketsExpanded] = useState<boolean>(false);
   const [moreInfoExpanded, setMoreInfoExpanded] = useState<boolean>(false);
   const [cartTotalPrice, setCartTotalPrice] = useState<number>(0);
   const [cartTotalQuantity, setCartTotalQuantity] = useState<number>(0);
-  const [eventTicketsWithLimit, setEventTicketsWithLimit] = useState<EventTicket[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string>('misc');
-  const [storeCreditCardChecked, setStoreCreditCardChecked] = useState(false);
   const [previousFollowingEvents, setPreviousFollowingEvents] = useState<number[]>(undefined);
 
   useEffect(() => {
@@ -205,83 +218,8 @@ export default function EventDetailScreen() {
       router.navigate('/event/authModal');
       return;
     }
-    if (loading) {
-      return;
-    }
-    setLoading(true);
-
-    if (eventTicketsWithLimit?.length) {
-      checkForLimitedTickets();
-    } else {
-      getPaymentFormInfo();
-    }
+    buyCartProcess();
   };
-
-  const checkForLimitedTickets = async () => {
-    try {
-      const results = await Promise.all(eventTicketsWithLimit.map(async (ticket) => {
-        const cartItem = cart.find((item) => item.eventTicket.id === ticket.id);
-        const { data: count, error } = await supabase.rpc('count_wallet_tickets_by_event_tickets_id', { p_event_tickets_id: ticket.id });
-        
-        return !(error || count > ticket.wallet_tickets_limit || count + cartItem.quantity > ticket.wallet_tickets_limit);
-      }));
-  
-      if (results.every(Boolean)) {
-        getPaymentFormInfo();
-      } else {
-        setLoading(false);
-      }
-    } catch (error) {
-      setLoading(false);
-    }
-  };
-
-  const getPaymentFormInfo = () => {
-    const finalAmount = cartTotalPrice + ((event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0));
-
-    fetch(process.env.EXPO_PUBLIC_FIREBASE_FUNC_GET_FORM_INFO_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + session.access_token
-      },
-      body: JSON.stringify({
-        eventId: event.id,
-        requestToken: storeCreditCardChecked,
-        cart: cart
-      })
-    })
-    .then((response) => response.json())
-    .then((data) => {
-      if (!data) {
-        return;
-      }
-      if (data.zeroAmount) {
-        setTimeout(() => {
-          setLoading(false);
-          setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
-          setCart(null);
-        }, 700);
-        return;
-      }
-
-      setFormUrl(data.formUrl.replace(/\//g, '%2F'));
-      setDs_MerchantParameters(data.Ds_MerchantParameters.replace(/\//g, '%2F'));
-      setDs_Signature(data.Ds_Signature.replace(/\//g, '%2F'));
-      setDs_SignatureVersion(data.Ds_SignatureVersion.replace(/\//g, '%2F'));
-
-      setTimeout(() => {
-        setLoading(false);
-        setOrderConfirmed(true); //TODO PAU ideally this should be set to true after payment is confirmed. this will require listening for new redsys_orders docs with the orderId and checking the status field
-        setCart(null);
-      }, 3000);
-
-      router.navigate('/event/paymentModal');
-    })
-    .catch(() => {
-      setLoading(false);
-    });
-  }
 
   const onGoToWallet = () => {
     router.navigate('/(tabs)/wallet');
