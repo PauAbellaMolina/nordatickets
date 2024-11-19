@@ -1,14 +1,15 @@
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList, Pressable, StyleSheet } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import WalletEventCardComponent from '../../components/WalletEventCardComponent';
 import { useCallback, useRef, useState } from 'react';
 import { supabase } from "../../supabase";
 import { useSupabase } from '../../context/SupabaseProvider';
 import { WalletTicket } from '../../types/supabaseplain';
-import { router, useFocusEffect } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
+import AuthCta from '../../components/auth/AuthCta';
 
 export default function TabTwoScreen() {
-  const { user, i18n } = useSupabase();
+  const { user, i18n, theme } = useSupabase();
   const [eventGroupedWalletTickets, setEventGroupedWalletTickets] = useState<WalletTicket[][]>([]);
 
   let triggerNextFocus = useRef<boolean>(true);
@@ -71,13 +72,12 @@ export default function TabTwoScreen() {
         </View>
       </View>
       <View style={styles.ticketsContainer}>
-        <Text style={styles.ticketsTitle}>Tickets</Text>
         { !user ?
           <View style={styles.loginToSeeContainer}>
-            <Text style={styles.loginToSee}>TODO Log in to see your wallet</Text>
-            <Text style={styles.loginToSee} onPress={() => router.push('/welcome')}>Log in</Text>
+            <AuthCta text={i18n?.t('logInToSeeTickets')} />
           </View>
         : <>
+          <Text style={styles.ticketsTitle}>Tickets</Text>
           { eventGroupedWalletTickets?.length ?
             <FlatList
               style={styles.walletTicketList}
@@ -97,7 +97,6 @@ export default function TabTwoScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingTop: 10,
-    paddingBottom: 95,
     paddingHorizontal: 15,
     flex: 1,
     overflow: 'scroll'
@@ -118,6 +117,7 @@ const styles = StyleSheet.create({
     color: '#8C90A3'
   },
   ticketsContainer: {
+    flex: 1,
     marginTop: 20,
     marginHorizontal: 5
   },
@@ -135,12 +135,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic'
   },
   loginToSeeContainer: {
-    marginTop: 70,
-    gap: 20
-  },
-  loginToSee: {
-    textAlign: 'center',
-    color: 'grey',
-    fontStyle: 'italic'
+    flex: 1,
+    paddingBottom: 100
   }
 });

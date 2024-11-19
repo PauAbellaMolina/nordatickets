@@ -209,7 +209,7 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
     //TODO PAU this seems to work, but test deeply and make sure theres no security issues
     // const cleanParamsId = params.id && typeof params.id === "string" ? params.id : null;
     // const cleanParamsEventId = params.event && typeof params.event === "string" ? params.event : null;
-
+    //TODO PAU INFO: old way of enforcing auth wall always if not signed in (and keeping the params so user was redirected to the scanned event page after auth)
     // if (!session && segments[0] !== "(auth)") {
     //   router.replace("/welcome");
     //   if (segments[0] === "(screens)" && segments[1] === "event" && segments[2] === "[id]") {

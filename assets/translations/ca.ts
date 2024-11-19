@@ -116,5 +116,7 @@ export const ca: { [key: string]: string } = {
   selectAnOption: 'Selecciona una opció',
   fullname: 'Nom i cognoms',
   registrations: 'Inscripcions',
-  loginRequired: 'Requereix iniciar sessió'
+  loginRequired: 'Requereix iniciar sessió',
+  logInToSeeTickets: 'Inicia sessió per veure el teus tickets',
+  logInToSeeReceipts: 'Inicia sessió per veure el teus rebuts'
 };

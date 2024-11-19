@@ -20,8 +20,8 @@ export default function PaymentModalScreen() {
   const savedCard = !!cardNumber || !!expiryDate;
 
   useEffect(() => {
-    const handleMessage = (messageEvent: MessageEvent) => {
-      if (messageEvent.data === 'close') {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data === 'close') {
         router.back();
       }
     };

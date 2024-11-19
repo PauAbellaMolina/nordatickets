@@ -7,6 +7,7 @@ import { WalletTicket } from '../../../../types/supabaseplain';
 import { supabase } from '../../../../supabase';
 import ReceiptsOrderComponent from '../../../../components/ReceiptsOrderComponent';
 import { router } from 'expo-router';
+import AuthCta from '../../../../components/auth/AuthCta';
 
 export default function ReceiptsScreen() {
   const { user, i18n, theme } = useSupabase();
@@ -76,8 +77,7 @@ export default function ReceiptsScreen() {
       <View style={styles.wrapper}>
         { !user ?
           <View style={styles.loginToSeeContainer}>
-            <Text style={styles.loginToSee}>TODO Log in to see your receipts</Text>
-            <Text style={styles.loginToSee} onPress={() => router.push('/welcome')}>Log in</Text>
+            <AuthCta text={i18n?.t('logInToSeeReceipts')} />
           </View>
         :
           <FlatList
@@ -105,15 +105,11 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     marginTop: 30,
-    marginHorizontal: 2
+    marginHorizontal: 2,
+    flex: 1
   },
   loginToSeeContainer: {
-    marginTop: 30,
-    gap: 20
-  },
-  loginToSee: {
-    textAlign: 'center',
-    color: 'grey',
-    fontStyle: 'italic'
+    flex: 1,
+    paddingBottom: 225
   }
 });

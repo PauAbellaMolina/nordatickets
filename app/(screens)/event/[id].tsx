@@ -98,7 +98,7 @@ export default function EventDetailScreen() {
 
     if (!followingEvents.includes(+event.id)) {
       storeFollowingEventsCookie([...followingEvents, +event.id], false, !user);
-      if (user) { //TODO PAU this is for when we support not signed in users
+      if (user) {
         storeFollowingEventsUserData([...followingEvents, +event.id], false, true);
       }
     }
@@ -228,7 +228,7 @@ export default function EventDetailScreen() {
   const onStopFollowingEvent = () => {
     setSelectedOption('misc');
     storeFollowingEventsCookie(followingEvents.filter((eventId) => eventId !== +id), true, !user);
-    if (user) { //TODO PAU this is for when we support not signed in users
+    if (user) {
       storeFollowingEventsUserData(followingEvents.filter((eventId) => eventId !== +id), true, true);
     }
   };
