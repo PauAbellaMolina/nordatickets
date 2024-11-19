@@ -128,7 +128,12 @@ export const EventScreensProvider = ({ children }: EventScreensProviderProps) =>
         cart: cart
       })
     })
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw response;
+      }
+      return response.json();
+    })
     .then((data) => {
       if (!data) {
         return;
@@ -155,7 +160,7 @@ export const EventScreensProvider = ({ children }: EventScreensProviderProps) =>
 
       router.navigate('/event/paymentModal');
     })
-    .catch(() => { //TODO PAU handle 403 forbidden response case (user is minor and trying to buy a minor restricted ticket)
+    .catch(() => {
       setLoading(false);
     });
   }

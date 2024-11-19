@@ -116,5 +116,7 @@ export const en: { [key: string]: string } = {
   selectAnOption: 'Select an option',
   fullname: 'Name and surnames',
   registrations: 'Registrations',
-  loginRequired: 'Requires login'
+  loginRequired: 'Requires login',
+  logInToSeeTickets: 'Log in to see your tickets',
+  logInToSeeReceipts: 'Log in to see your receipts'
 };

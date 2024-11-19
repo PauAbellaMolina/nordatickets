@@ -10,7 +10,7 @@ import Colors from '../../../../constants/Colors';
 
 export default function ReceiptDetailScreen() {
   const { user, i18n, theme } = useSupabase();
-  const { id } = useLocalSearchParams<{ id: string }>(); //TODO PAU make sure that the user will only be able to retrieve their own receipts. With the correct fetch and also RLS config!!!!
+  const { id } = useLocalSearchParams<{ id: string }>();
   const { width, height } = Dimensions.get('window');
 
   const [vwpDimension, setVwpDimension] = useState<number>(width < height/1.414 ? width : height/1.414);

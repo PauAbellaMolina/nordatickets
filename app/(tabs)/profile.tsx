@@ -8,6 +8,7 @@ import { useSupabase } from '../../context/SupabaseProvider';
 import { router, useFocusEffect } from 'expo-router';
 import { AvailableLocales } from '../../assets/translations/translation';
 import { Picker } from '@react-native-picker/picker';
+import AuthCta from '../../components/auth/AuthCta';
 
 export default function TabThreeScreen() {
   const { user, signOut, i18n, setLanguage, theme } = useSupabase();
@@ -71,7 +72,7 @@ export default function TabThreeScreen() {
     });
   };
 
-  const onSelectedLanguage = (language: AvailableLocales) => { //TODO PAU ideally we should update user's metadata email translations so we can send emails in the selected language, but we can assume the user will understand the email in the language they signed up
+  const onSelectedLanguage = (language: AvailableLocales) => {
     if (!i18n) return;
     setSelectedLanguage(language);
     setLanguage(language);
@@ -86,11 +87,10 @@ export default function TabThreeScreen() {
         </View>
       </View>
       <View style={styles.profileContainer}>
-        <Text style={styles.infoTitle}>{ i18n?.t('emailAndPaymentMethods') }</Text>
         { !user ? <>
-          {/* <Text style={styles.loginToSee}>TODO Log in to see your profile</Text> */}
-          <Text style={styles.loginToSee} onPress={() => router.push('/welcome')}>Log in</Text>
+          <AuthCta horizontalButtons />
         </> : <>
+          <Text style={styles.infoTitle}>{ i18n?.t('emailAndPaymentMethods') }</Text>
           <View style={styles.userInfo}>
             { user?.user_metadata?.fullname ?
               <View style={styles.singleLineContainer}>
@@ -218,11 +218,5 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     opacity: 0
-  },
-  loginToSee: {
-    textAlign: 'center',
-    color: 'grey',
-    marginTop: 10,
-    fontStyle: 'italic'
   }
 });
