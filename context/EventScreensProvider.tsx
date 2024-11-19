@@ -162,6 +162,8 @@ export const EventScreensProvider = ({ children }: EventScreensProviderProps) =>
     })
     .catch(() => {
       setLoading(false);
+      setCart(null);
+      router.navigate(`/event/${event.id}`);
     });
   }
 
