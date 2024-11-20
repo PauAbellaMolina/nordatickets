@@ -190,8 +190,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   wrapper: {
-    paddingVertical: 30,
-    paddingBottom: 35,
+    paddingVertical: 20,
+    paddingBottom: 25,
     paddingHorizontal: 20,
     borderRadius: 50,
     alignItems: 'center',
@@ -313,15 +313,17 @@ const styles = StyleSheet.create({
   },
   bottomActionContainer: {
     position: 'absolute',
-    bottom: 35
+    bottom: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5
   },
   bottomActionTitle: {
     fontSize: 16
   },
   bottomActionLink: {
-    fontSize: 14,
+    fontSize: 16,
     textDecorationLine: 'underline',
-    textAlign: 'center',
-    marginTop: 6
+    textAlign: 'center'
   }
 });
