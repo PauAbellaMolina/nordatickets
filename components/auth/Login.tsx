@@ -152,8 +152,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   wrapper: {
-    paddingVertical: 30,
-    paddingBottom: 35,
+    paddingVertical: 25,
+    paddingBottom: 30,
     paddingHorizontal: 20,
     borderRadius: 50,
     alignItems: 'center',

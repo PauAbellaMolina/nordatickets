@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session, SignInWithPasswordlessCredentials, User } from "@supabase/supabase-js";
-import { useGlobalSearchParams, useRouter, useSegments } from "expo-router";
+import { useRouter, useSegments } from "expo-router";
 import { supabase } from "../supabase";
 import { I18n } from 'i18n-js';
 import { AvailableLocales, dict } from "../assets/translations/translation";
@@ -53,7 +53,6 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
   const [i18n, setI18n] = useState<I18n | null>(null);
   const [followingEvents, setFollowingEvents] = useState<number[]>(undefined);
 
-  // const params = useGlobalSearchParams();
   const segments = useSegments();
   const router = useRouter();
 

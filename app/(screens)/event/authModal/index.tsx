@@ -45,7 +45,7 @@ export default function AuthModalScreen() {
         <Pressable onPress={() => router.back()} style={styles.closeBttnWeb}>
           <FeatherIcon name="x" size={30} color={Colors[theme].text} />
         </Pressable>
-        <View style={[styles.welcomeContainer, {backgroundColor: Colors[theme].background}]}>
+        <View style={[styles.welcomeContainer, {backgroundColor: Colors[theme].background, borderColor: Colors[theme].oppositeBackgroundHalfOpacity}]}>
           {renderAuthComponent()}
         </View>
       </>:<> {/* Implement when adding support to ios and android */} </>}
@@ -59,11 +59,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start'
   },
-  containerStyle: {
-    width: '100%',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25
-  },
   closeBttnWeb: {
     marginBottom: 5,
     display: 'flex',
@@ -73,11 +68,12 @@ const styles = StyleSheet.create({
     gap: 5
   },
   welcomeContainer: {
+    overflow: 'hidden',
     width: '100%',
     height: 'auto',
     flex: 1,
     borderRadius: 25,
-    borderWidth: 0
+    borderWidth: StyleSheet.hairlineWidth
   },
   fakeBackground: {
     width: '100%',

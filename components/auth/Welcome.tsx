@@ -71,12 +71,11 @@ export default function Welcome({ showLocaleSelector = true }: { showLocaleSelec
 const styles = StyleSheet.create({
   container: {
     height: '100%',
-    overflow: 'hidden',
-    paddingBottom: 50,
-    paddingHorizontal: 15,
+    paddingBottom: 40,
+    paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 100
+    gap: '10%'
   },
   blob: {
     position: 'absolute',
