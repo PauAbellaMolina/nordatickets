@@ -17,7 +17,7 @@ export default function AuthModalScreen() {
   const { theme, user } = useSupabase();
   const { eventBackgroundColor, buyCartProcess } = useEventScreens();
 
-  useEffect(() => {
+  useEffect(() => { //TODO PAU looks like supabase can take a bit to respond with the user so we need to add a spinner when user clicks login/signup (i know it's not done here but yeah)
     if (user) {
       buyCartProcess();
     }
@@ -30,7 +30,7 @@ export default function AuthModalScreen() {
       case 'login':
         return <Login />;
       default:
-        return <Welcome showLocaleSelector={false} />;
+        return <Welcome showLocaleSelector={false} />; //TODO PAU might want to pass some sort of instructions to be shown on the welcome screen so users know their purchase is being carried out if they sign in!
     }
   };
   
