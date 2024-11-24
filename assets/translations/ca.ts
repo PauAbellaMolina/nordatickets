@@ -118,5 +118,6 @@ export const ca: { [key: string]: string } = {
   registrations: 'Inscripcions',
   loginRequired: 'Requereix iniciar sessió',
   logInToSeeTickets: 'Inicia sessió per veure el teus tickets',
-  logInToSeeReceipts: 'Inicia sessió per veure el teus rebuts'
+  logInToSeeReceipts: 'Inicia sessió per veure el teus rebuts',
+  logInToProceedPurchase: 'Inicia sessió per continuar amb la compra'
 };

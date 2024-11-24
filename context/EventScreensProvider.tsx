@@ -23,6 +23,7 @@ type EventScreensContextProps = {
   event: Event;
   storeCreditCardChecked: boolean;
   orderConfirmed: boolean;
+  authModalAdditionalInfoText: string;
   setCart: (cart: Cart) => void;
   setEventBackgroundColor: (eventBackgroundColor: string) => void;
   setCardNumber: (cardNumber: string) => void;
@@ -32,6 +33,7 @@ type EventScreensContextProps = {
   setEvent: (event: Event) => void;
   setStoreCreditCardChecked: (storeCreditCardChecked: boolean) => void;
   setOrderConfirmed: (orderConfirmed: boolean) => void;
+  setAuthModalAdditionalInfoText: (authModalAdditionalInfoText: string) => void;
 };
 
 type EventScreensProviderProps = {
@@ -52,6 +54,7 @@ export const EventScreensContext = createContext<EventScreensContextProps>({
   event: null,
   storeCreditCardChecked: false,
   orderConfirmed: false,
+  authModalAdditionalInfoText: null,
   setCart: () => {},
   setEventBackgroundColor: () => {},
   setCardNumber: () => {},
@@ -60,7 +63,8 @@ export const EventScreensContext = createContext<EventScreensContextProps>({
   buyCartProcess: () => {},
   setEvent: () => {},
   setStoreCreditCardChecked: () => {},
-  setOrderConfirmed: () => {}
+  setOrderConfirmed: () => {},
+  setAuthModalAdditionalInfoText: () => {}
 });
 
 export const useEventScreens = () => useContext(EventScreensContext);
@@ -80,6 +84,7 @@ export const EventScreensProvider = ({ children }: EventScreensProviderProps) =>
   const [event, setEvent] = useState<Event>();
   const [storeCreditCardChecked, setStoreCreditCardChecked] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
+  const [authModalAdditionalInfoText, setAuthModalAdditionalInfoText] = useState<string>(null);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -163,7 +168,7 @@ export const EventScreensProvider = ({ children }: EventScreensProviderProps) =>
     .catch(() => {
       setLoading(false);
       setCart(null);
-      router.navigate(`/event/${event.id}`);
+      router.navigate(`/event/${event.slug}`);
     });
   }
 
@@ -191,6 +196,8 @@ export const EventScreensProvider = ({ children }: EventScreensProviderProps) =>
         setStoreCreditCardChecked,
         orderConfirmed,
         setOrderConfirmed,
+        authModalAdditionalInfoText,
+        setAuthModalAdditionalInfoText,
         buyCartProcess
       }}
     >
