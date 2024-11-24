@@ -8,7 +8,7 @@ export default function EventLayout() {
   return (
     <EventScreensProvider>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="[id]" options={{ title: i18n?.t('event') }} />
+        <Stack.Screen name="[slug]" options={{ title: i18n?.t('event') }} />
         <Stack.Screen 
           name="paymentModal/index"
           options={{ 

@@ -61,8 +61,6 @@ export default function Login() {
     verifyOTP(email, oneTimeCode.toString())
     .catch(() => {
       setEmailErrorMessage(i18n?.t('tryAgain'));
-    })
-    .finally(() => {
       setLoading(false);
     });
   };

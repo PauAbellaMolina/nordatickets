@@ -52,7 +52,7 @@ export default function OneTimeCodeInput({ value, onChange, theme, errorState }:
           onFocus={() => setFocusedIndex(index)}
           onBlur={() => setFocusedIndex(-1)}
           maxLength={1}
-          keyboardType="numeric"
+          inputMode="numeric"
           textContentType="oneTimeCode"
         />
       ))}

@@ -12,7 +12,7 @@ import { AvailableLocales } from "../../assets/translations/translation";
 import Animated, { Easing, FadeIn, ReduceMotion } from "react-native-reanimated";
 import PurpleBlob from '../../assets/svgs/blobs/purple.svg';
 
-export default function Welcome({ showLocaleSelector = true }: { showLocaleSelector?: boolean }) {
+export default function Welcome({ showLocaleSelector = true, additionalInfoText }: { showLocaleSelector?: boolean, additionalInfoText?: string }) {
   const { i18n, setLanguage, theme } = useSupabase();
 
   const [selectedLanguage, setSelectedLanguage] = useState<AvailableLocales>();
@@ -50,9 +50,15 @@ export default function Welcome({ showLocaleSelector = true }: { showLocaleSelec
           <Text style={[styles.buttonText, {color: Colors[theme].text}]}>{ i18n?.t('logIn') }</Text>
         </Pressable>
       </Animated.View>
+      { additionalInfoText ?
+        <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.additionalInfoContainer, {bottom: showLocaleSelector ? '14%' : '12%'}]}>
+          <FeatherIcon name="info" size={18} color='#8C90A3' />
+          <Text style={styles.additionalInfoText}>{ additionalInfoText }</Text>
+        </Animated.View>
+      : null }
       { showLocaleSelector ?
-          <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.bottomActionContainer}>
-            <Pressable style={styles.languageButton}><FeatherIcon name="globe" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('changeLanguage') }</Text></Pressable>
+        <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.bottomActionContainer, {bottom: additionalInfoText ? 30 : 50}]}>
+          <Pressable style={styles.languageButton}><FeatherIcon name="globe" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('changeLanguage') }</Text></Pressable>
           <Picker
             style={styles.languagePicker}
             selectedValue={selectedLanguage}
@@ -107,8 +113,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   bottomActionContainer: {
-    position: 'absolute',
-    bottom: 50
+    position: 'absolute'
   },
   languageButton: {
     display: 'flex',
@@ -118,6 +123,18 @@ const styles = StyleSheet.create({
   },
   entryText: {
     fontSize: 16
+  },
+  additionalInfoContainer: {
+    position: 'absolute',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    maxWidth: 265
+  },
+  additionalInfoText: {
+    fontSize: 16,
+    color: '#8C90A3'
   },
   languagePicker: {
     position: 'absolute',

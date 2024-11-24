@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Text, View } from './Themed';
 import { TicketFormSubmit, TicketFormTemplate } from '../types/supabaseplain';
 import { supabase } from '../supabase';
-import { TextInput, StyleSheet, Pressable } from 'react-native';
+import { TextInput, StyleSheet, Pressable, InputModeOptions } from 'react-native';
 import { useSupabase } from '../context/SupabaseProvider';
 import Colors from '../constants/Colors';
 import { formatDateInput, isValidDate, isValidEmail, isValidNumber } from '../utils/formValidationUtils';
@@ -101,18 +101,18 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
     const isRequired = required ? ' *' : '';
     const maxValue = ticketFormTemplate[`${key}_max_value`] as number | undefined;
 
-    const getKeyboardType = () => {
+    const getKeyboardType = (): InputModeOptions => {
       switch (type) {
         case 'TEXT':
-          return 'default';
+          return 'text';
         case 'NUMBER':
           return 'numeric';
         case 'EMAIL':
-          return 'email-address';
+          return 'email';
         case 'DATE':
           return 'numeric';
         default:
-          return 'default';
+          return 'text';
       }
     };
 
@@ -154,7 +154,7 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
           editable={!formSubmitted}
           placeholder={type === 'DATE' ? new Date().toLocaleDateString('es-ES') : i18n?.t('enterYourAnswer')}
           placeholderTextColor={Colors[theme].text+'99'}
-          keyboardType={getKeyboardType()}
+          inputMode={getKeyboardType()}
           value={formData[key] || ''}
           onChangeText={handleInputChange}
           maxLength={type === 'DATE' ? 10 : type === 'NUMBER' ? 25 : maxValue}

@@ -62,8 +62,6 @@ export default function Signup() {
     verifyOTP(email, oneTimeCode.toString())
     .catch(() => {
       setEmailErrorMessage(i18n?.t('tryAgain'));
-    })
-    .finally(() => {
       setLoading(false);
     });
   };

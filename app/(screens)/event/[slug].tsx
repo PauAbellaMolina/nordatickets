@@ -21,8 +21,8 @@ import { useEventScreens } from '../../../context/EventScreensProvider';
 type CartItem = { eventTicket: EventTicket, quantity: number, associatedTicketFormSubmit?: Partial<TicketFormSubmit> }; //TODO PAU can be imported from EventScreensProvider?
 
 export default function EventDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const { user, session, i18n, followingEvents, storeFollowingEventsUserData, storeFollowingEventsCookie, theme } = useSupabase();
+  const { slug } = useLocalSearchParams<{ slug: string }>();
+  const { user, i18n, followingEvents, storeFollowingEventsUserData, storeFollowingEventsCookie, theme } = useSupabase();
   const { cart,
     setCart,
     eventBackgroundColor,
@@ -40,6 +40,7 @@ export default function EventDetailScreen() {
     setStoreCreditCardChecked,
     orderConfirmed,
     setOrderConfirmed,
+    setAuthModalAdditionalInfoText,
     buyCartProcess
   } = useEventScreens();
 
@@ -56,7 +57,7 @@ export default function EventDetailScreen() {
   useEffect(() => {
     let unmounted = false;
 
-    supabase.from('events').select().eq('id', id as string).single()
+    supabase.from('events').select().eq('slug', slug).single()
     .then(({ data: event, error }) => {
       if (unmounted || error || !event) return;
       setEvent(event);
@@ -120,14 +121,14 @@ export default function EventDetailScreen() {
     if (userIsMinor === undefined || !event) return;
     let unmounted = false;
 
-    supabase.from('event_tickets').select().eq('event_id', id).eq('type', 'ACCESS').order('price')
+    supabase.from('event_tickets').select().eq('event_id', event.id).eq('type', 'ACCESS').order('price')
     .then(({ data: event_tickets, error }) => {
       if (unmounted || error || !event_tickets.length) return;
       setAccessEventTickets(event_tickets);
     });
 
     const queryAllTickets = () => {
-      supabase.from('event_tickets').select().eq('event_id', id).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).order('type', { ascending: true }).order('price', { ascending: false })
+      supabase.from('event_tickets').select().eq('event_id', event.id).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).order('type', { ascending: true }).order('price', { ascending: false })
       .then(({ data: event_tickets, error }) => {
         if (unmounted || error || !event_tickets.length) return;
         const typeOrder = ['ADDON_REFUNDABLE', 'ADDON'];
@@ -144,7 +145,7 @@ export default function EventDetailScreen() {
     if (!user || (user && !userIsMinor)) {
       queryAllTickets();
     } else {
-      supabase.from('event_tickets').select().eq('event_id', id).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).is('minor_restricted', false).order('type', { ascending: true }).order('price', { ascending: false })
+      supabase.from('event_tickets').select().eq('event_id', event.id).in('type', ['CONSUMABLE', 'ADDON', 'ADDON_REFUNDABLE']).is('minor_restricted', false).order('type', { ascending: true }).order('price', { ascending: false })
       .then(({ data: event_tickets, error }) => {
         if (unmounted || error || !event_tickets.length) return;
         const typeOrder = ['ADDON_REFUNDABLE', 'ADDON'];
@@ -215,6 +216,7 @@ export default function EventDetailScreen() {
   
   const onBuyCart = () => {
     if (!user) {
+      setAuthModalAdditionalInfoText(i18n?.t('logInToProceedPurchase'));
       router.navigate('/event/authModal');
       return;
     }
@@ -227,9 +229,9 @@ export default function EventDetailScreen() {
 
   const onStopFollowingEvent = () => {
     setSelectedOption('misc');
-    storeFollowingEventsCookie(followingEvents.filter((eventId) => eventId !== +id), true, !user);
+    storeFollowingEventsCookie(followingEvents.filter((eventId) => eventId !== +event.id), true, !user);
     if (user) {
-      storeFollowingEventsUserData(followingEvents.filter((eventId) => eventId !== +id), true, true);
+      storeFollowingEventsUserData(followingEvents.filter((eventId) => eventId !== +event.id), true, true);
     }
   };
 
