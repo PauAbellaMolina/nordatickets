@@ -300,7 +300,7 @@ export default function EventDetailScreen() {
             </CollapsableComponent>
           </> }
         </Animated.View>
-        { eventTickets ? <>
+        { eventTickets || accessEventTickets ? <>
           <Animated.View entering={FadeIn.duration(220).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.ticketsContainer, {marginTop: event.more_info_content ? 167 : 177}]}>
             { accessEventTickets ? <>
               <View style={styles.accessTickets}>
@@ -323,18 +323,20 @@ export default function EventDetailScreen() {
                 </CollapsableComponent>
               </View>
             </> : null }
-            <View>
-              <View style={styles.sellingStatusContainer}>
-                <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
-                <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{ i18n?.t(event.selling ? 'selling': 'notSelling') }</Text>
+            { eventTickets ? <>
+              <View>
+                <View style={styles.sellingStatusContainer}>
+                  <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
+                  <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{ i18n?.t(event.selling ? 'selling': 'notSelling') }</Text>
+                </View>
+                <Text style={styles.subtitle}>Tickets:</Text>
+                <FlatList
+                  style={styles.ticketsList}
+                  data={eventTickets}
+                  renderItem={renderItemTickets}
+                />
               </View>
-              <Text style={styles.subtitle}>Tickets:</Text>
-              <FlatList
-                style={styles.ticketsList}
-                data={eventTickets}
-                renderItem={renderItemTickets}
-              />
-            </View>
+            </> : null }
           </Animated.View>
           { orderConfirmed ?
             <Pressable style={[styles.orderConfirmedContainer, {backgroundColor: Colors[theme].cartContainerBackground}]} onPress={onGoToWallet}>
