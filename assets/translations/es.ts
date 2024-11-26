@@ -120,5 +120,8 @@ export const es: { [key: string]: string } = {
   loginRequired: 'Requiere iniciar sesión',
   logInToSeeTickets: 'Inicia sesión para ver tus tickets',
   logInToSeeReceipts: 'Inicia sesión para ver tus recibos',
-  logInToProceedPurchase: 'Inicia sesión para continuar con la compra'
+  logInToProceedPurchase: 'Inicia sesión para continuar con la compra',
+  tickets: 'Tickets',
+  tastings: 'Degustaciones',
+  drinks: 'Bebidas'
 };
