@@ -144,6 +144,8 @@ export type Database = {
           access_tickets_section_title: string | null
           color_code_dark: string | null
           color_code_light: string | null
+          consumable_tickets_section_expanded: boolean
+          consumable_tickets_section_title: string | null
           created_at: string
           description: string | null
           id: number
@@ -161,6 +163,8 @@ export type Database = {
           access_tickets_section_title?: string | null
           color_code_dark?: string | null
           color_code_light?: string | null
+          consumable_tickets_section_expanded?: boolean
+          consumable_tickets_section_title?: string | null
           created_at?: string
           description?: string | null
           id?: number
@@ -178,6 +182,8 @@ export type Database = {
           access_tickets_section_title?: string | null
           color_code_dark?: string | null
           color_code_light?: string | null
+          consumable_tickets_section_expanded?: boolean
+          consumable_tickets_section_title?: string | null
           created_at?: string
           description?: string | null
           id?: number

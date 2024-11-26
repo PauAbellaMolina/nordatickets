@@ -48,6 +48,7 @@ export default function EventDetailScreen() {
   const [eventTickets, setEventTickets] = useState<EventTicket[]>();
   const [accessEventTickets, setAccessEventTickets] = useState<EventTicket[]>();
   const [accessEventTicketsExpanded, setAccessEventTicketsExpanded] = useState<boolean>(false);
+  const [eventTicketsExpanded, setEventTicketsExpanded] = useState<boolean>(false);
   const [moreInfoExpanded, setMoreInfoExpanded] = useState<boolean>(false);
   const [cartTotalPrice, setCartTotalPrice] = useState<number>(0);
   const [cartTotalQuantity, setCartTotalQuantity] = useState<number>(0);
@@ -62,6 +63,7 @@ export default function EventDetailScreen() {
       if (unmounted || error || !event) return;
       setEvent(event);
       setAccessEventTicketsExpanded(event.access_tickets_section_expanded);
+      setEventTicketsExpanded(event.consumable_tickets_section_expanded);
     });
 
     if (user) {
@@ -243,6 +245,10 @@ export default function EventDetailScreen() {
     setAccessEventTicketsExpanded(!accessEventTicketsExpanded);
   };
 
+  const onEventTicketsExpand = () => {
+    setEventTicketsExpanded(!eventTicketsExpanded);
+  };
+
   const onDismissAddedToWallet = () => {
     setOrderConfirmed(false);
   };
@@ -325,16 +331,23 @@ export default function EventDetailScreen() {
             </> : null }
             { eventTickets ? <>
               <View>
-                <View style={styles.sellingStatusContainer}>
-                  <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
-                  <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{ i18n?.t(event.selling ? 'selling': 'notSelling') }</Text>
-                </View>
-                <Text style={styles.subtitle}>Tickets:</Text>
-                <FlatList
-                  style={styles.ticketsList}
-                  data={eventTickets}
-                  renderItem={renderItemTickets}
-                />
+                { eventTicketsExpanded ?
+                  <View style={styles.sellingStatusContainer}>
+                    <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
+                    <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{ i18n?.t(event.selling ? 'selling': 'notSelling') }</Text>
+                  </View>
+                : null }
+                <Pressable style={styles.accessTicketsExpand} onPress={onEventTicketsExpand}>
+                  <Text style={styles.subtitle}>{ !event.consumable_tickets_section_title ? 'Tickets' : i18n?.t(event.consumable_tickets_section_title) }</Text>
+                  <FeatherIcon name={eventTicketsExpanded ? 'chevron-down' : 'chevron-right'} size={24} color={Colors[theme].text} />
+                </Pressable>
+                <CollapsableComponent expanded={eventTicketsExpanded} maxHeight={300}>
+                  <FlatList
+                    style={styles.ticketsList}
+                    data={eventTickets}
+                    renderItem={renderItemTickets}
+                  />
+                </CollapsableComponent>
               </View>
             </> : null }
           </Animated.View>
