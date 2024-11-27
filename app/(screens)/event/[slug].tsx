@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { ActivityIndicator, Dimensions, FlatList, Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Text, View } from '../../../components/Themed';
 import EventTicketCardComponent from '../../../components/EventTicketCardComponent';
@@ -22,6 +22,7 @@ type CartItem = { eventTicket: EventTicket, quantity: number, associatedTicketFo
 
 export default function EventDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
+  const { height: windowHeight } = Dimensions.get('window');
   const { user, i18n, followingEvents, storeFollowingEventsUserData, storeFollowingEventsCookie, theme } = useSupabase();
   const { cart,
     setCart,
@@ -288,26 +289,51 @@ export default function EventDetailScreen() {
               <Picker.Item label={ i18n?.t('stopFollowingEventConfirmation') } value="unfollow" />
             </Picker>
           </View>
-          <ScrollView horizontal>
-            <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
-          </ScrollView>
-          { !event.more_info_content ?
-            <ScrollView horizontal>
-              <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
-            </ScrollView>
-          : <>
+          <View style={styles.eventInfoHeader}>
+            <View style={styles.eventInfoHeaderLeft}>
+              <View style={styles.eventImageFrame}>
+                {/* TODO PAU implement the no image case */}
+                <View style={{backgroundColor: '#9c9c9c', aspectRatio: 1/1.414, justifyContent: 'center', alignItems: 'center', borderRadius: 5}}><Text style={{textAlign: 'center'}}>Event cartel image</Text></View>
+              </View>
+            </View>
+            <View style={styles.eventInfoHeaderRight}>
+              <View style={styles.eventInfoHeaderRightHeader}>
+                <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
+                <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
+              </View>
+              <View style={styles.eventInfoHeaderRightDetails}>
+                <View style={styles.detailRow}>
+                  <FeatherIcon name="calendar" size={16} color={Colors['light'].text} />
+                  <Text style={[styles.detailValue, {color: Colors['light'].text}]}>25 Nov, 23:59h</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <FeatherIcon name="map-pin" size={16} color={Colors['light'].text} />
+                  <Text style={[styles.detailValue, {color: Colors['light'].text}]}>Parc de la Festa, Reus</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <FeatherIcon name="plus" size={16} color={Colors['light'].text} />
+                  <Text style={[styles.detailValue, {color: Colors['light'].text}]}>16</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+          { event.more_info_content ? <>
             <Pressable style={styles.moreEventInfo} onPress={onMoreInfo}>
               <FeatherIcon name={moreInfoExpanded ? 'chevron-up' : 'chevron-down'} size={21} color={Colors['light'].text} />
               <Text style={[styles.moreEventInfoActionable, {color: Colors['light'].text}]}>{ i18n?.t('moreInfo') }</Text>
             </Pressable>
-            <CollapsableComponent expanded={moreInfoExpanded}>
-              <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
+            <CollapsableComponent expanded={moreInfoExpanded} maxHeight={windowHeight - 350}>
+              {/* <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text> */}
               <Text style={[styles.moreEventInfoText, {color: Colors['light'].text}]}>{event.more_info_content}</Text>
             </CollapsableComponent>
-          </> }
+          </> : null }
+          {/* <ScrollView horizontal>
+            <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
+          </ScrollView> */}
         </Animated.View>
         { eventTickets || accessEventTickets ? <>
-          <Animated.View entering={FadeIn.duration(220).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.ticketsContainer, {marginTop: event.more_info_content ? 167 : 177}]}>
+          {/* <Animated.View entering={FadeIn.duration(220).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.ticketsContainer, {marginTop: event.more_info_content ? 167 : 177}]}> */}
+          <Animated.View entering={FadeIn.duration(220).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.ticketsContainer}>
             { accessEventTickets ? <>
               <View style={styles.accessTickets}>
                 { accessEventTicketsExpanded ?
@@ -331,23 +357,35 @@ export default function EventDetailScreen() {
             </> : null }
             { eventTickets ? <>
               <View>
-                { eventTicketsExpanded ?
+                { !accessEventTickets || (accessEventTickets && eventTicketsExpanded) ?
                   <View style={styles.sellingStatusContainer}>
                     <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
                     <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{ i18n?.t(event.selling ? 'selling': 'notSelling') }</Text>
                   </View>
                 : null }
-                <Pressable style={styles.accessTicketsExpand} onPress={onEventTicketsExpand}>
+                { accessEventTickets ?
+                  <Pressable style={styles.accessTicketsExpand} onPress={onEventTicketsExpand}>
+                    <Text style={styles.subtitle}>{ !event.consumable_tickets_section_title ? 'Tickets' : i18n?.t(event.consumable_tickets_section_title) }</Text>
+                    <FeatherIcon name={eventTicketsExpanded ? 'chevron-down' : 'chevron-right'} size={24} color={Colors[theme].text} />
+                  </Pressable>
+                :
                   <Text style={styles.subtitle}>{ !event.consumable_tickets_section_title ? 'Tickets' : i18n?.t(event.consumable_tickets_section_title) }</Text>
-                  <FeatherIcon name={eventTicketsExpanded ? 'chevron-down' : 'chevron-right'} size={24} color={Colors[theme].text} />
-                </Pressable>
-                <CollapsableComponent expanded={eventTicketsExpanded} maxHeight={300}>
+                }
+                { accessEventTickets ?
+                  <CollapsableComponent expanded={eventTicketsExpanded} maxHeight={windowHeight - 35}>
+                    <FlatList
+                      style={styles.ticketsList}
+                      data={eventTickets}
+                      renderItem={renderItemTickets}
+                    />
+                  </CollapsableComponent>
+                :
                   <FlatList
                     style={styles.ticketsList}
                     data={eventTickets}
                     renderItem={renderItemTickets}
                   />
-                </CollapsableComponent>
+                }
               </View>
             </> : null }
           </Animated.View>
@@ -465,10 +503,11 @@ const styles = StyleSheet.create({
     display: 'flex',
     height: '100%',
     gap: 5,
-    overflow: 'hidden'
+    overflow: 'scroll',
+    overflowX:'hidden'
   },
   eventInfoContainer: {
-    position: 'absolute',
+    // position: 'absolute',
     left: 0,
     right: 0,
     paddingTop: 71,
@@ -484,6 +523,41 @@ const styles = StyleSheet.create({
       ios: {...eventInfoContainerMobileShadow},
       android: {...eventInfoContainerMobileShadow, elevation: 4}
     })
+  },
+  eventInfoHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12
+  },
+  eventInfoHeaderLeft: {
+    flex: 1
+  },
+  eventInfoHeaderRight: {
+    flex: 2,
+    flexDirection: 'column',
+    gap: 12
+  },
+  eventImageFrame: {
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    padding: 5
+  },
+  eventInfoHeaderRightHeader: {
+    flexDirection: 'column',
+    gap: 2
+  },
+  eventInfoHeaderRightDetails: {
+    flexDirection: 'column',
+    gap: 8
+  },
+  detailRow: {
+    flexDirection: 'row',
+    gap: 5
+  },
+  detailValue: {
+    fontSize: 14
   },
   stopFollowingButton: {
     display: 'flex',
@@ -501,16 +575,15 @@ const styles = StyleSheet.create({
     opacity: 0
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold'
+    fontSize: 24,
+    fontWeight: '900'
   },
   subtitle: {
     fontSize: 25,
     fontWeight: '800'
   },
   eventDescription: {
-    fontSize: 16,
-    marginVertical: 10
+    fontSize: 14
   },
   moreEventInfo: {
     flexDirection: 'row',
@@ -530,9 +603,10 @@ const styles = StyleSheet.create({
     marginTop: 5
   },
   ticketsContainer: {
+    height: '100%',
     flex: 1,
+    marginTop: 20,
     marginHorizontal: 20,
-    overflow: 'scroll',
     borderRadius: 5
   },
   accessTickets: {
