@@ -1,18 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { LayoutChangeEvent, View, Dimensions, ScrollView } from "react-native";
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 export const CollapsableComponent = ({ children, expanded, maxHeight }: { children: React.ReactNode; expanded: boolean; maxHeight?: number }) => {
   const animatedHeight = useSharedValue(0);
   const contentHeight = useSharedValue(0);
+  const isFirstRender = useRef(true);
   const { height: windowHeight } = Dimensions.get('window');
   
   const config = {
-    duration: 500,
+    duration: isFirstRender.current ? 0 : 500,
     easing: Easing.bezier(0.35, 1, 0.25, 1)
   };
 
-  const getMaxHeight = () => maxHeight ? maxHeight : windowHeight - 215;
+  const getMaxHeight = () => maxHeight ? maxHeight : windowHeight - 100;
 
   const updateHeight = (newHeight: number) => {
     const maxAllowedHeight = getMaxHeight();
@@ -25,6 +26,10 @@ export const CollapsableComponent = ({ children, expanded, maxHeight }: { childr
   const onLayout = (event: LayoutChangeEvent) => {
     const newHeight = event.nativeEvent.layout.height;
     runOnJS(updateHeight)(newHeight);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
   };
 
   useEffect(() => {
