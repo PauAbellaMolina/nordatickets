@@ -60,11 +60,7 @@ export default function EventDetailScreen() {
 
   useEffect(() => {
     if (!event) return;
-    supabase.storage
-    .from('event_posters')
-    .list('', {
-      search: event.slug
-    })
+    supabase.storage.from('event_posters').list('', { search: event.slug })
     .then(({ data, error }) => {
       if (error || !data.length) {
         setEventPosterImageUrl(null);
