@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Dimensions, FlatList, Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { Image } from 'expo-image';
 import { Text, View } from '../../../components/Themed';
 import EventTicketCardComponent from '../../../components/EventTicketCardComponent';
 import Colors from '../../../constants/Colors';
@@ -55,6 +56,24 @@ export default function EventDetailScreen() {
   const [cartTotalQuantity, setCartTotalQuantity] = useState<number>(0);
   const [selectedOption, setSelectedOption] = useState<string>('misc');
   const [previousFollowingEvents, setPreviousFollowingEvents] = useState<number[]>(undefined);
+  const [eventPosterImageUrl, setEventPosterImageUrl] = useState<string>(undefined);
+
+  useEffect(() => {
+    if (!event) return;
+    supabase.storage
+    .from('event_posters')
+    .list('', {
+      search: event.slug
+    })
+    .then(({ data, error }) => {
+      if (error || !data.length) {
+        setEventPosterImageUrl(null);
+        return;
+      };
+      const { data: publicUrl } = supabase.storage.from('event_posters').getPublicUrl(data[0].name);
+      setEventPosterImageUrl(publicUrl.publicUrl);
+    });
+  }, [event]);
 
   useEffect(() => {
     let unmounted = false;
@@ -271,6 +290,9 @@ export default function EventDetailScreen() {
     <Text style={styles.cartItemsList}>{ (item.eventTicket.type === "ADDON" || item.eventTicket.type === "ADDON_REFUNDABLE") ? null : item.quantity + '  -  ' }{item.eventTicket.name} · {item.eventTicket.price/100}€</Text>
   ), []);
 
+  //TODO PAU find a better blurhash
+  const blurhash = '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
+
   return (
     <View style={[styles.container, !event || userIsMinor === undefined ? { justifyContent: 'center' } : null]}>
       { !event || userIsMinor === undefined ? <>
@@ -290,12 +312,20 @@ export default function EventDetailScreen() {
             </Picker>
           </View>
           <View style={styles.eventInfoHeader}>
-            <View style={styles.eventInfoHeaderLeft}>
-              <View style={styles.eventImageFrame}>
-                {/* TODO PAU implement the no image case */}
-                <View style={{backgroundColor: '#9c9c9c', aspectRatio: 1/1.414, justifyContent: 'center', alignItems: 'center', borderRadius: 5}}><Text style={{textAlign: 'center'}}>Event cartel image</Text></View>
+            { eventPosterImageUrl !== null ?
+              <View style={styles.eventInfoHeaderLeft}>
+                <View style={styles.eventImageFrame}>
+                  {/* TODO PAU implement the no image case */}
+                  <Image
+                    style={styles.image}
+                    source={eventPosterImageUrl}
+                    placeholder={{ blurhash }}
+                    contentFit="cover"
+                    transition={100}
+                  />
+                </View>
               </View>
-            </View>
+            : null }
             <View style={styles.eventInfoHeaderRight}>
               <View style={styles.eventInfoHeaderRightHeader}>
                 <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
@@ -538,11 +568,19 @@ const styles = StyleSheet.create({
     gap: 12
   },
   eventImageFrame: {
+    flex: 1,
     backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    padding: 5
+    padding: 5,
+    aspectRatio: 1/1.414
+  },
+  image: {
+    borderRadius: 5,
+    flex: 1,
+    width: '100%',
+    backgroundColor: '#0553',
   },
   eventInfoHeaderRightHeader: {
     flexDirection: 'column',
