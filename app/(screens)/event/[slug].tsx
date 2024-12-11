@@ -8,7 +8,7 @@ import Colors from '../../../constants/Colors';
 import { FeatherIcon } from '../../../components/CustomIcons';
 import GoBackArrow from '../../../components/GoBackArrow';
 import { supabase } from "../../../supabase";
-import { Event, EventTicket, TicketFormSubmit } from '../../../types/supabaseplain';
+import { EventTicket, TicketFormSubmit } from '../../../types/supabaseplain';
 import { useSupabase } from '../../../context/SupabaseProvider';
 import { Picker } from '@react-native-picker/picker';
 import { getThemeRandomColor } from '../../../utils/chooseRandomColor';
@@ -553,7 +553,11 @@ const styles = StyleSheet.create({
     gap: 12
   },
   eventInfoHeaderLeft: {
-    flex: 1
+    flex: 1,
+    minWidth: 115,
+    maxWidth: 175,
+    aspectRatio: 1/1.414,
+    alignSelf: 'flex-start'
   },
   eventInfoHeaderRight: {
     flex: 2,
@@ -562,18 +566,20 @@ const styles = StyleSheet.create({
   },
   eventImageFrame: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#ffffff40',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    padding: 5,
-    aspectRatio: 1/1.414
+    padding: 3,
+    width: '100%',
+    height: '100%'
   },
   image: {
-    borderRadius: 5,
+    borderRadius: 7,
     flex: 1,
     width: '100%',
-    backgroundColor: '#0553',
+    height: '100%',
+    backgroundColor: '#0553'
   },
   eventInfoHeaderRightHeader: {
     flexDirection: 'column',
