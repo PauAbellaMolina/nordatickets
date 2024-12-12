@@ -16,7 +16,7 @@ import { CollapsableComponent } from '../../../components/CollapsableComponent';
 import EventAddonTicketCardComponent from '../../../components/EventAddonTicketCardComponent';
 import EventAccessTicketCardComponent from '../../../components/EventAccessTicketCardComponent';
 import Checkbox from 'expo-checkbox';
-import Animated, { Easing, FadeIn, FadeInDown, FadeInUp, FadeOutDown, ReduceMotion } from 'react-native-reanimated';
+import Animated, { Easing, FadeIn, FadeInDown, FadeInUp, FadeOut, FadeOutDown, ReduceMotion } from 'react-native-reanimated';
 import { useEventScreens } from '../../../context/EventScreensProvider';
 
 type CartItem = { eventTicket: EventTicket, quantity: number, associatedTicketFormSubmit?: Partial<TicketFormSubmit> }; //TODO PAU can be imported from EventScreensProvider?
@@ -434,11 +434,20 @@ export default function EventDetailScreen() {
             <Animated.View
               entering={FadeInDown.duration(200).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)}
               exiting={FadeOutDown.duration(150).easing(Easing.out(Easing.exp)).reduceMotion(ReduceMotion.Never)}
-              style={[styles.cartContainer, {backgroundColor: Colors[theme].cartContainerBackground}]}
+              style={[styles.cartContainer, moreInfoExpanded ? styles.cartContainerCollapsedMode : {}, {backgroundColor: Colors[theme].cartContainerBackground}]}
             >
-              <View style={styles.cartTitleRowContainer}><Text style={styles.subtitle}>{ i18n?.t('cart') }</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
-              {/* Uncomment below if we want to show the cart even if it's empty */}
-              {/* { cart?.length ? <> */}
+              { moreInfoExpanded ?
+                <Animated.View
+                  entering={FadeIn.duration(200).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)}
+                  exiting={FadeOut.duration(150).easing(Easing.out(Easing.exp)).reduceMotion(ReduceMotion.Never)}
+                >
+                  <Pressable style={[styles.cartTitleRowContainer, {width: '100%', height: '100%'}]} onPress={onMoreInfo}>
+                    <Text style={styles.collapsedCartSubtitle}>{ i18n?.t('continueWithCart') }</Text>
+                    <FeatherIcon name="arrow-right" size={16} color={Colors[theme].text} />
+                  </Pressable>
+                </Animated.View>
+              : <>
+                <View style={styles.cartTitleRowContainer}><Text style={styles.subtitle}>{ i18n?.t('cart') }</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
                 <FlatList
                   style={styles.cartList}
                   data={cart}
@@ -484,9 +493,7 @@ export default function EventDetailScreen() {
                   </View>
                 }
                 </Pressable>
-              {/* </> :
-                <Text style={[styles.emptyCard, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('noTicketsInCart') }</Text>
-              } */}
+              </> }
             </Animated.View>
           : null }
         </> }
@@ -619,6 +626,10 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: '800'
   },
+  collapsedCartSubtitle: {
+    fontSize: 16,
+    fontWeight: '800'
+  },
   eventDescription: {
     fontSize: 14
   },
@@ -726,6 +737,15 @@ const styles = StyleSheet.create({
       ios: {...cartContainerMobileShadow},
       android: {...cartContainerMobileShadow, elevation: 3}
     })
+  },
+  cartContainerCollapsedMode: {
+    position: 'absolute',
+    justifyContent: 'center',
+    bottom: 15,
+    height: 35,
+    width: '75%',
+    margin: 0,
+    padding: 0
   },
   cartTitleRowContainer: {
     flexDirection: 'row',

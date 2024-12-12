@@ -75,9 +75,11 @@ export interface Database {
       }
       event_tickets: {
         Row: {
+          additional_info: string | null
           buy_includes_event_tickets_ids: number[] | null
           color_code_dark: string | null
           color_code_light: string | null
+          conditions_notice: string | null
           created_at: string
           description: string | null
           event_id: number | null
@@ -87,15 +89,19 @@ export interface Database {
           minor_restricted: boolean
           name: string | null
           price: number | null
+          purchased_additional_info: string | null
+          purchased_conditions_notice: string | null
           selling: boolean
           ticket_form_templates_id: number | null
           type: Database["public"]["Enums"]["event_ticket_type"]
           wallet_tickets_limit: number | null
         }
         Insert: {
+          additional_info?: string | null
           buy_includes_event_tickets_ids?: number[] | null
           color_code_dark?: string | null
           color_code_light?: string | null
+          conditions_notice?: string | null
           created_at?: string
           description?: string | null
           event_id?: number | null
@@ -105,15 +111,19 @@ export interface Database {
           minor_restricted?: boolean
           name?: string | null
           price?: number | null
+          purchased_additional_info?: string | null
+          purchased_conditions_notice?: string | null
           selling?: boolean
           ticket_form_templates_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
           wallet_tickets_limit?: number | null
         }
         Update: {
+          additional_info?: string | null
           buy_includes_event_tickets_ids?: number[] | null
           color_code_dark?: string | null
           color_code_light?: string | null
+          conditions_notice?: string | null
           created_at?: string
           description?: string | null
           event_id?: number | null
@@ -123,6 +133,8 @@ export interface Database {
           minor_restricted?: boolean
           name?: string | null
           price?: number | null
+          purchased_additional_info?: string | null
+          purchased_conditions_notice?: string | null
           selling?: boolean
           ticket_form_templates_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
@@ -149,7 +161,6 @@ export interface Database {
           consumable_tickets_section_title: string | null
           created_at: string
           description: string | null
-          end_date: string | null
           id: number
           location: string | null
           more_info_content: string | null
@@ -172,7 +183,6 @@ export interface Database {
           consumable_tickets_section_title?: string | null
           created_at?: string
           description?: string | null
-          end_date?: string | null
           id?: number
           location?: string | null
           more_info_content?: string | null
@@ -195,7 +205,6 @@ export interface Database {
           consumable_tickets_section_title?: string | null
           created_at?: string
           description?: string | null
-          end_date?: string | null
           id?: number
           location?: string | null
           more_info_content?: string | null
@@ -436,6 +445,8 @@ export interface Database {
           event_id: number | null
           event_tickets_id: number | null
           event_tickets_name: string | null
+          event_tickets_purchased_additional_info: string | null
+          event_tickets_purchased_conditions_notice: string | null
           id: number
           iva: number
           order_id: string
@@ -453,6 +464,8 @@ export interface Database {
           event_id?: number | null
           event_tickets_id?: number | null
           event_tickets_name?: string | null
+          event_tickets_purchased_additional_info?: string | null
+          event_tickets_purchased_conditions_notice?: string | null
           id?: number
           iva?: number
           order_id: string
@@ -470,6 +483,8 @@ export interface Database {
           event_id?: number | null
           event_tickets_id?: number | null
           event_tickets_name?: string | null
+          event_tickets_purchased_additional_info?: string | null
+          event_tickets_purchased_conditions_notice?: string | null
           id?: number
           iva?: number
           order_id?: string
