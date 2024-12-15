@@ -68,7 +68,8 @@ export default function EventAddonTicketCardComponent({ticket, eventSelling, qua
         <View style={styles.ticketInfo}>
           <EntypoIcon name="cup" size={23} color={Colors[theme].text} />
           <View style={styles.ticketInfoText}>
-            <Text style={styles.ticketName}>{ticket.name} · {ticket.price/100 * priceMultiplier}€</Text>
+            <Text style={styles.ticketName}>{ticket.name}</Text>
+            <Text style={styles.ticketPrice}>{ticket.price/100 * priceMultiplier}€</Text>
             { ticket?.description ?
               <Text style={styles.ticketDescription}>{ i18n?.t(ticket.description) }</Text>
             : null}
@@ -113,7 +114,8 @@ const eventCardMobileShadow = {
 
 const styles = StyleSheet.create({
   ticketCard: {
-    padding: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     marginBottom: 10,
     borderRadius: 10,
     ...Platform.select({
@@ -128,7 +130,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 25
+    gap: 15
   },
   ticketActions: {
     flexDirection: 'row',
@@ -153,18 +155,19 @@ const styles = StyleSheet.create({
   ticketInfoText: {
     flexDirection: 'column',
     maxWidth: '90%',
+    width: '100%',
     gap: 3
   },
   ticketName: {
     fontSize: 20,
     fontWeight: 'bold'
   },
+  ticketPrice: {
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
   ticketDescription: {
     fontSize: 14,
     color: '#606175'
-  },
-  ticketPrice: {
-    fontSize: 20,
-    fontWeight: 'bold'
   }
 });
