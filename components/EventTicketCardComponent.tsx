@@ -35,7 +35,8 @@ export default function EventTicketCardComponent({ticket, eventSelling, quantity
         <View style={styles.ticketInfo}>
           <FontAwesomeIcon name="ticket" size={23} color={Colors[theme].text} />
           <View style={styles.ticketInfoText}>
-            <Text style={styles.ticketName}>{ticket.name} · {ticket.price/100}€</Text>
+            <Text style={styles.ticketName}>{ticket.name}</Text>
+            <Text style={styles.ticketPrice}>{ticket.price/100}€</Text>
             { ticket?.description ?
               <Text style={styles.ticketDescription}>{ i18n?.t(ticket.description) }</Text>
             : null}
@@ -73,7 +74,8 @@ const eventCardMobileShadow = {
 
 const styles = StyleSheet.create({
   ticketCard: {
-    padding: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     marginBottom: 10,
     borderRadius: 10,
     ...Platform.select({
@@ -87,7 +89,8 @@ const styles = StyleSheet.create({
   ticketContents: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
+    gap: 15
   },
   ticketActions: {
     flexDirection: 'row',
@@ -95,7 +98,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   quantityInCart: {
-    width: 45,
+    width: 40,
     fontSize: 18,
     textAlign: 'center'
   },
@@ -112,19 +115,20 @@ const styles = StyleSheet.create({
   },
   ticketInfoText: {
     flexDirection: 'column',
-    maxWidth: '80%',
+    maxWidth: '85%',
+    width: '100%',
     gap: 3
   },
   ticketName: {
     fontSize: 20,
     fontWeight: 'bold'
   },
+  ticketPrice: {
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
   ticketDescription: {
     fontSize: 14,
     color: '#606175'
-  },
-  ticketPrice: {
-    fontSize: 20,
-    fontWeight: 'bold'
   }
 });

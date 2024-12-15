@@ -232,6 +232,35 @@ export default function EventDetailScreen() {
     }
   };
   
+  const onAddTicketQuantityHandler = (ticket: EventTicket, quantity: number, associatedTicketFormSubmit?: Partial<TicketFormSubmit>) => {
+    if (quantity > 0 && ticket.wallet_tickets_limit) {
+      if (!eventTicketsWithLimit.some(t => t.id === ticket.id)) {
+        setEventTicketsWithLimit([...eventTicketsWithLimit, ticket]);
+      }
+    }
+    if (quantity > 0 && !cart) {
+      setCart([{eventTicket: ticket, quantity: quantity, associatedTicketFormSubmit}]);
+      return;
+    }
+    const existingCartItem = cart.find((cartItem) => cartItem.eventTicket.id === ticket.id);
+    if (quantity == 0) {
+      if (existingCartItem) {
+        if (eventTicketsWithLimit.some((t) => t.id === ticket.id)) {
+          setEventTicketsWithLimit(eventTicketsWithLimit.filter((t) => t.id !== ticket.id));
+        }
+        const newCart = cart.filter((cartTicket) => cartTicket.eventTicket.id !== ticket.id);
+        setCart(newCart);
+      }
+      return;
+    }
+    if (existingCartItem) {
+      existingCartItem.quantity = quantity;
+      setCart([...cart]);
+    } else {
+      setCart([...cart, {eventTicket: ticket, quantity: quantity, associatedTicketFormSubmit}]);
+    }
+  };
+  
   const onBuyCart = () => {
     if (!user) {
       setAuthModalAdditionalInfoText(i18n?.t('logInToProceedPurchase'));
@@ -271,7 +300,7 @@ export default function EventDetailScreen() {
 
   const renderItemAccessTickets = useCallback(({item}: {item: EventTicket}) => {
     if (item.hide_from_event_page) return;
-    return <EventAccessTicketCardComponent ticket={item} eventSelling={event?.selling_access} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} />;
+    return <EventAccessTicketCardComponent ticket={item} eventSelling={event?.selling_access} quantityInCart={cart?.find((cartItem) => cartItem.eventTicket.id === item.id)?.quantity ?? 0} onRemoveTicket={onRemoveTicketHandler} onAddTicket={onAddTicketHandler} onAddTicketQuantity={onAddTicketQuantityHandler} />;
   }, [cart, event]);
 
   const renderItemTickets = useCallback(({item}: {item: EventTicket}) => {
@@ -375,7 +404,7 @@ export default function EventDetailScreen() {
                     <Text style={styles.subtitle}>{ !event.access_tickets_section_title ? i18n?.t('accessControlTickets') : i18n?.t(event.access_tickets_section_title) }</Text>
                     <FeatherIcon name={accessEventTicketsExpanded ? 'chevron-down' : 'chevron-right'} size={24} color={Colors[theme].text} />
                   </Pressable>
-                  <CollapsableComponent expanded={accessEventTicketsExpanded} maxHeight={300}>
+                  <CollapsableComponent expanded={accessEventTicketsExpanded} maxHeight={windowHeight - 35}>
                     <FlatList
                       style={styles.ticketsList}
                       data={accessEventTickets}

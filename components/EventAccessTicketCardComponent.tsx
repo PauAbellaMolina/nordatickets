@@ -7,16 +7,18 @@ import { useSupabase } from '../context/SupabaseProvider';
 import EventTicketCardFormComponent from './EventTicketCardFormComponent';
 import { CollapsableComponent } from './CollapsableComponent';
 import { useState } from 'react';
+import { Picker } from '@react-native-picker/picker';
 
 export interface TicketCardComponentProps {
+  ticket: EventTicket,
   eventSelling: boolean,
   quantityInCart: number,
   onRemoveTicket: (ticket: EventTicket) => void,
   onAddTicket: (ticket: EventTicket, associatedTicketFormSubmit?: Partial<TicketFormSubmit>) => void,
-  ticket: EventTicket
+  onAddTicketQuantity: (ticket: EventTicket, quantity: number, associatedTicketFormSubmit?: Partial<TicketFormSubmit>) => void
 }
 
-export default function EventAccessTicketCardComponent({ticket, eventSelling, quantityInCart, onRemoveTicket, onAddTicket}: TicketCardComponentProps) {
+export default function EventAccessTicketCardComponent({ticket, eventSelling, quantityInCart, onRemoveTicket, onAddTicket, onAddTicketQuantity}: TicketCardComponentProps) {
   const { i18n, theme } = useSupabase();
 
   const [formExpanded, setFormExpanded] = useState<boolean>(false);
@@ -46,6 +48,17 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
     onAddTicket(newTicket);
   };
 
+  const onSelectedQuantity = (quantity: number) => {
+    if (quantityInCart === 100) {
+      return;
+    }
+    const newTicket = {...ticket};
+    if (priceMultiplier > 1) {
+      newTicket.price = newTicket.price * priceMultiplier;
+    }
+    onAddTicketQuantity(newTicket, quantity);
+  };
+
   const handlePriceMultiplierChange = (priceMultiplier: number) => {
     setPriceMultiplier(priceMultiplier);
   };
@@ -61,20 +74,23 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
     }
     onAddTicket(newTicket, ticketFormSubmit);
   };
+
+  const style = styles(theme);
   
   return (
-    <View style={[styles.ticketCard, {backgroundColor: Colors[theme].backgroundContrast}]}>
-      <View style={styles.ticketContents}>
-        <View style={styles.ticketInfo}>
-          <FontAwesome6Icon name="person-walking-arrow-right" size={20} color={Colors[theme].text} />
-          <View style={styles.ticketInfoText}>
-            <Text style={styles.ticketName}>{ticket.name} · {ticket.price/100 * priceMultiplier}€</Text>
+    <View style={style.ticketCard}>
+      <View style={style.ticketContents}>
+        <View style={style.ticketInfo}>
+          {/* <FontAwesome6Icon name="person-walking-arrow-right" size={20} color={Colors[theme].text} /> */}
+          <View style={style.ticketInfoText}>
+            <Text style={style.ticketName}>{ticket.name}</Text>
+            <Text style={style.ticketPrice}>{ticket.price/100 * priceMultiplier}€</Text>
             { ticket?.description ?
-              <Text style={styles.ticketDescription}>{ i18n?.t(ticket.description) }</Text>
+              <Text style={style.ticketDescription}>{ i18n?.t(ticket.description) }</Text>
             : null}
           </View>
         </View>
-        <View style={styles.ticketActions}>
+        <View style={style.ticketActions}>
           { eventSelling ? <>
             { ticket.selling ? <>
               { ticket.ticket_form_templates_id ?
@@ -82,12 +98,29 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
                   <FeatherIcon name={formSubmitted ? 'x-circle' : formExpanded ? 'chevron-up' : 'chevron-down'} size={28} color={Colors[theme].text} />
                 </Pressable>
               :
-                <Pressable onPress={quantityInCart === 1 ? onRemove : onAdd}>
-                  <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={28} color={quantityInCart === 100 ? Colors[theme].text+'60' : Colors[theme].text} />
-                </Pressable>
+                // <Pressable onPress={quantityInCart === 1 ? onRemove : onAdd}>
+                //   <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={28} color={quantityInCart === 100 ? Colors[theme].text+'60' : Colors[theme].text} />
+                // </Pressable>
+                <Picker
+                  style={style.quantityPicker}
+                  selectedValue={quantityInCart}
+                  onValueChange={(itemValue) => onSelectedQuantity(itemValue)}
+                >
+                  <Picker.Item label="0" value="0" />
+                  <Picker.Item label="1" value="1" />
+                  <Picker.Item label="2" value="2" />
+                  <Picker.Item label="3" value="3" />
+                  <Picker.Item label="4" value="4" />
+                  <Picker.Item label="5" value="5" />
+                  <Picker.Item label="6" value="6" />
+                  <Picker.Item label="7" value="7" />
+                  <Picker.Item label="8" value="8" />
+                  <Picker.Item label="9" value="9" />
+                  <Picker.Item label="10" value="10" />
+                </Picker>
               }
             </> :
-              <Text style={styles.notAvailable}>{ i18n?.t('notAvailable') }</Text>
+              <Text style={style.notAvailable}>{ i18n?.t('notAvailable') }</Text>
             }
           </> : null }
         </View>
@@ -111,11 +144,13 @@ const eventCardMobileShadow = {
   shadowRadius: 1
 };
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   ticketCard: {
-    padding: 15,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     marginBottom: 10,
     borderRadius: 10,
+    backgroundColor: Colors[theme].backgroundContrast,
     ...Platform.select({
       web: {
         boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.08)'
@@ -128,7 +163,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 25
+    gap: 15
   },
   ticketActions: {
     flexDirection: 'row',
@@ -152,19 +187,31 @@ const styles = StyleSheet.create({
   },
   ticketInfoText: {
     flexDirection: 'column',
-    maxWidth: '90%',
+    width: '100%',
     gap: 3
   },
   ticketName: {
     fontSize: 20,
     fontWeight: 'bold'
   },
+  ticketPrice: {
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
   ticketDescription: {
     fontSize: 14,
     color: '#606175'
   },
-  ticketPrice: {
-    fontSize: 20,
-    fontWeight: 'bold'
+  quantityPicker: {
+    textAlign: 'center',
+    width: 50,
+    height: 40,
+    backgroundColor: Colors[theme].inputBackgroundColor,
+    borderColor: Colors[theme].inputBorderColor,
+    color: Colors[theme].text,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 12,
+    padding: 6,
+    fontSize: 15
   }
 });
