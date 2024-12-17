@@ -57,6 +57,7 @@ export default function EventDetailScreen() {
   const [selectedOption, setSelectedOption] = useState<string>('misc');
   const [previousFollowingEvents, setPreviousFollowingEvents] = useState<number[]>(undefined);
   const [eventPosterImageUrl, setEventPosterImageUrl] = useState<string>(undefined);
+  const [posterImageExpanded, setPosterImageExpanded] = useState<boolean>(false);
 
   useEffect(() => {
     if (!event) return;
@@ -282,6 +283,10 @@ export default function EventDetailScreen() {
     }
   };
 
+  const onPosterImagePress = () => {
+    setPosterImageExpanded(!posterImageExpanded);
+  };
+
   const onMoreInfo = () => {
     setMoreInfoExpanded(!moreInfoExpanded);
   };
@@ -340,16 +345,16 @@ export default function EventDetailScreen() {
             <View style={styles.eventInfoHeader}>
               { eventPosterImageUrl !== null ?
                 <View style={styles.eventInfoHeaderLeft}>
-                  <View style={styles.eventImageFrame}>
+                  <Pressable onPress={onPosterImagePress} style={styles.eventImageFrame}>
                     {/* TODO PAU implement the no image case */}
                     <Image
-                      style={styles.image}
+                      style={posterImageExpanded ? styles.imageExpanded : styles.image}
                       source={eventPosterImageUrl}
                       placeholder={{ blurhash }}
                       contentFit="cover"
                       transition={100}
                     />
-                  </View>
+                  </Pressable>
                 </View>
               : null }
               <View style={styles.eventInfoHeaderRight}>
@@ -616,6 +621,15 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     backgroundColor: '#0553'
+  },
+  imageExpanded: {
+    borderRadius: 7,
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#0553',
+    position: 'absolute',
+    top: 0
   },
   eventInfoHeaderRightHeader: {
     flexDirection: 'column',
