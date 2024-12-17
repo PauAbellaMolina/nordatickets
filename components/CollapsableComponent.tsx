@@ -52,7 +52,9 @@ export const CollapsableComponent = ({ children, expanded, maxHeight }: { childr
         contentContainerStyle={{ flexGrow: 1 }}
       >
         <View onLayout={onLayout}>
-          {children}
+          <ScrollView>
+            {children}
+          </ScrollView>
         </View>
       </ScrollView>
     </Animated.View>

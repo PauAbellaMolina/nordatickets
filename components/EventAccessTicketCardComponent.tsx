@@ -21,12 +21,17 @@ export interface TicketCardComponentProps {
 export default function EventAccessTicketCardComponent({ticket, eventSelling, quantityInCart, onRemoveTicket, onAddTicket, onAddTicketQuantity}: TicketCardComponentProps) {
   const { i18n, theme } = useSupabase();
 
+  const [moreInfoExpanded, setMoreInfoExpanded] = useState<boolean>(false);
   const [formExpanded, setFormExpanded] = useState<boolean>(false);
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [priceMultiplier, setPriceMultiplier] = useState<number>(1);
 
   const onExpandForm = () => {
     setFormExpanded(!formExpanded);
+  };
+
+  const onExpandAdditionalInfo = () => {
+    setMoreInfoExpanded(!moreInfoExpanded);
   };
 
   const onRemove = () => {
@@ -130,6 +135,31 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
           <EventTicketCardFormComponent event_id={ticket.event_id} ticket_form_templates_id={ticket.ticket_form_templates_id} formSubmitted={formSubmitted} onPriceMultiplierChange={handlePriceMultiplierChange} onSubmit={onFormSubmit} />
         </CollapsableComponent>
       : null }
+      {/* TODO PAU when totally refined, implement on all other ticket type components */}
+      { ticket?.additional_info || ticket?.conditions_notice ? <>
+        <View>
+          <Pressable style={style.additionalInfoToggle} onPress={onExpandAdditionalInfo}>
+            <Text style={style.additionalInfoToggleText}>Informació adicional i condicions</Text>
+            <FeatherIcon name={moreInfoExpanded ? 'chevron-down' : 'chevron-right'} size={18} color='#606175' />
+          </Pressable>
+          <CollapsableComponent expanded={moreInfoExpanded} maxHeight={200}>
+            <View style={{flexDirection: 'column', gap: 10, marginTop: 5}}>
+              { ticket?.additional_info ? 
+                <View style={{flexDirection: 'column', gap: 2}}>
+                  <Text style={[style.ticketDescription, {fontWeight: 'bold'}]}>Informació adicional:</Text>
+                  <Text style={style.ticketDescription}>{ ticket.additional_info }</Text>
+                </View>
+              : null}
+              { ticket?.conditions_notice ?
+                <View style={{flexDirection: 'column', gap: 2}}>
+                  <Text style={[style.ticketDescription, {fontWeight: 'bold'}]}>Condicions:</Text>
+                  <Text style={style.ticketDescription}>{ ticket.conditions_notice }</Text>
+                </View>
+              : null}
+            </View>
+          </CollapsableComponent>
+        </View>
+      </> : null}
     </View>
   );
 }
@@ -213,5 +243,16 @@ const styles = (theme: string) => StyleSheet.create({
     borderRadius: 12,
     padding: 6,
     fontSize: 15
+  },
+  additionalInfoToggle: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 3,
+    gap: 2
+  },
+  additionalInfoToggleText: {
+    lineHeight: 18,
+    fontSize: 14,
+    color: '#606175'
   }
 });
