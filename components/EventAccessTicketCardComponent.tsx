@@ -130,29 +130,23 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
           </> : null }
         </View>
       </View>
-      { ticket.ticket_form_templates_id ?
-        <CollapsableComponent expanded={formExpanded} maxHeight={200}>
-          <EventTicketCardFormComponent event_id={ticket.event_id} ticket_form_templates_id={ticket.ticket_form_templates_id} formSubmitted={formSubmitted} onPriceMultiplierChange={handlePriceMultiplierChange} onSubmit={onFormSubmit} />
-        </CollapsableComponent>
-      : null }
-      {/* TODO PAU when totally refined, implement on all other ticket type components */}
       { ticket?.additional_info || ticket?.conditions_notice ? <>
         <View>
           <Pressable style={style.additionalInfoToggle} onPress={onExpandAdditionalInfo}>
-            <Text style={style.additionalInfoToggleText}>Informació adicional i condicions</Text>
+            <Text style={style.additionalInfoToggleText}>{ i18n?.t('additionalInfoAndConditions') }</Text>
             <FeatherIcon name={moreInfoExpanded ? 'chevron-down' : 'chevron-right'} size={18} color='#606175' />
           </Pressable>
           <CollapsableComponent expanded={moreInfoExpanded} maxHeight={200}>
-            <View style={{flexDirection: 'column', gap: 10, marginTop: 5}}>
+            <View style={style.additionalInfoContentContainer}>
               { ticket?.additional_info ? 
-                <View style={{flexDirection: 'column', gap: 2}}>
-                  <Text style={[style.ticketDescription, {fontWeight: 'bold'}]}>Informació adicional:</Text>
+                <View style={style.additionalInfoContentSection}>
+                  <Text style={[style.ticketDescription, {fontWeight: 'bold'}]}>{ i18n?.t('additionalInfo') }:</Text>
                   <Text style={style.ticketDescription}>{ ticket.additional_info }</Text>
                 </View>
               : null}
               { ticket?.conditions_notice ?
-                <View style={{flexDirection: 'column', gap: 2}}>
-                  <Text style={[style.ticketDescription, {fontWeight: 'bold'}]}>Condicions:</Text>
+                <View style={style.additionalInfoContentSection}>
+                  <Text style={[style.ticketDescription, {fontWeight: 'bold'}]}>{ i18n?.t('conditions') }:</Text>
                   <Text style={style.ticketDescription}>{ ticket.conditions_notice }</Text>
                 </View>
               : null}
@@ -160,6 +154,11 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
           </CollapsableComponent>
         </View>
       </> : null}
+      { ticket.ticket_form_templates_id ?
+        <CollapsableComponent expanded={formExpanded} maxHeight={200}>
+          <EventTicketCardFormComponent event_id={ticket.event_id} ticket_form_templates_id={ticket.ticket_form_templates_id} formSubmitted={formSubmitted} onPriceMultiplierChange={handlePriceMultiplierChange} onSubmit={onFormSubmit} />
+        </CollapsableComponent>
+      : null }
     </View>
   );
 }
@@ -174,7 +173,7 @@ const eventCardMobileShadow = {
   shadowRadius: 1
 };
 
-const styles = (theme: string) => StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({ //TODO PAU implement passing theme param everywhere else
   ticketCard: {
     paddingHorizontal: 15,
     paddingVertical: 10,
@@ -254,5 +253,14 @@ const styles = (theme: string) => StyleSheet.create({
     lineHeight: 18,
     fontSize: 14,
     color: '#606175'
+  },
+  additionalInfoContentContainer: {
+    flexDirection: 'column',
+    gap: 10,
+    marginTop: 5
+  },
+  additionalInfoContentSection: {
+    flexDirection: 'column',
+    gap: 2
   }
 });

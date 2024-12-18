@@ -123,5 +123,8 @@ export const es: { [key: string]: string } = {
   logInToProceedPurchase: 'Inicia sesión para continuar con la compra',
   tickets: 'Tickets',
   tastings: 'Degustaciones',
-  drinks: 'Bebidas'
+  drinks: 'Bebidas',
+  additionalInfo: 'Información adicional',
+  conditions: 'Condiciones',
+  additionalInfoAndConditions: 'Información adicional y condiciones'
 };
