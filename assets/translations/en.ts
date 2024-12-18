@@ -123,5 +123,8 @@ export const en: { [key: string]: string } = {
   logInToProceedPurchase: 'Log in to continue with the purchase',
   tickets: 'Tickets',
   tastings: 'Tastings',
-  drinks: 'Drinks'
+  drinks: 'Drinks',
+  additionalInfo: 'Additional info',
+  conditions: 'Conditions',
+  additionalInfoAndConditions: 'Additional info and conditions'
 };
