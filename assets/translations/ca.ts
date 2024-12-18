@@ -122,5 +122,8 @@ export const ca: { [key: string]: string } = {
   logInToProceedPurchase: 'Inicia sessió per continuar amb la compra',
   tickets: 'Tiquets',
   tastings: 'Degustacions',
-  drinks: 'Begudes'
+  drinks: 'Begudes',
+  additionalInfo: 'Informació addicional',
+  conditions: 'Condicions',
+  additionalInfoAndConditions: 'Informació addicional i condicions'
 };

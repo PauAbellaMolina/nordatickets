@@ -18,6 +18,7 @@ import EventAccessTicketCardComponent from '../../../components/EventAccessTicke
 import Checkbox from 'expo-checkbox';
 import Animated, { Easing, FadeIn, FadeInDown, FadeInUp, FadeOut, FadeOutDown, ReduceMotion } from 'react-native-reanimated';
 import { useEventScreens } from '../../../context/EventScreensProvider';
+import ImageFullscreen from '../../../components/ImageFullscreen';
 
 type CartItem = { eventTicket: EventTicket, quantity: number, associatedTicketFormSubmit?: Partial<TicketFormSubmit> }; //TODO PAU can be imported from EventScreensProvider?
 
@@ -325,10 +326,17 @@ export default function EventDetailScreen() {
 
   return (
     <View style={[styles.container, !event || userIsMinor === undefined ? { justifyContent: 'center' } : null]}>
+      { posterImageExpanded ?
+        <ImageFullscreen
+          image={eventPosterImageUrl}
+          onClose={onPosterImagePress}
+        />
+      : null }
+      
       { !event || userIsMinor === undefined ? <>
         <ActivityIndicator size="large" />
       </> : <>
-        <ScrollView>
+        <ScrollView scrollEnabled={!posterImageExpanded} style={posterImageExpanded ? styles.posterImageExpandedBlur : null}>
           <Animated.View entering={FadeInUp.duration(205).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor, paddingBottom: event.more_info_content ? 40 : 10}]}>
             <GoBackArrow />
             <View style={styles.stopFollowingButton}>
@@ -348,7 +356,7 @@ export default function EventDetailScreen() {
                   <Pressable onPress={onPosterImagePress} style={styles.eventImageFrame}>
                     {/* TODO PAU implement the no image case */}
                     <Image
-                      style={posterImageExpanded ? styles.imageExpanded : styles.image}
+                      style={styles.image}
                       source={eventPosterImageUrl}
                       placeholder={{ blurhash }}
                       contentFit="cover"
@@ -571,6 +579,14 @@ const styles = StyleSheet.create({
     gap: 5,
     flex: 1
   },
+  posterImageExpandedBlur: {
+    position: 'relative',
+    ...Platform.select({
+      web: {
+        filter: 'blur(3px)'
+      }
+    })
+  },
   eventInfoContainer: {
     left: 0,
     right: 0,
@@ -621,15 +637,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     backgroundColor: '#0553'
-  },
-  imageExpanded: {
-    borderRadius: 7,
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#0553',
-    position: 'absolute',
-    top: 0
   },
   eventInfoHeaderRightHeader: {
     flexDirection: 'column',
