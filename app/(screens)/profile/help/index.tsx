@@ -42,7 +42,7 @@ export default function HelpAndTermsScreen() {
       <Text style={styles.title}>{ i18n?.t('helpAndFaqs') }</Text>
       <View style={styles.wrapper}>
         <Text>{ i18n?.t('getInContactExplanation') }</Text>
-        <View style={{display: 'flex', flexDirection: 'row'}}><Text>{ i18n?.t('sendAnEmailTo') } </Text><Text style={{textDecorationLine: 'underline'}}>help@elteutikt.com</Text></View>
+        <View style={{display: 'flex', flexDirection: 'row'}}><Text>{ i18n?.t('sendAnEmailTo') } </Text><Text style={{textDecorationLine: 'underline'}}>help@nordatickets.com</Text></View>
         <View style={[styles.separator, {backgroundColor: Colors[theme].separatorBackgroundColor}]} />
         <Text style={styles.subtitle}>FAQs:</Text>
         { !faqs ? 

@@ -59,7 +59,7 @@ function RootLayoutNav() {
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="(auth)/welcome" options={{ title: 'ElTeuTikt' }} />
+          <Stack.Screen name="(auth)/welcome" options={{ title: 'Norda Tickets' }} />
           <Stack.Screen name="(auth)/terms" options={{ title: i18n?.t('termsAndPrivacy') }} />
           <Stack.Screen name="(screens)" />
         </Stack>

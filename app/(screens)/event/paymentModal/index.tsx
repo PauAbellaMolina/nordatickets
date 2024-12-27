@@ -59,7 +59,7 @@ export default function PaymentModalScreen() {
               <script>
                 document.forms[0].addEventListener('submit', () => {
                   setTimeout(() => {
-                    window.parent.postMessage('close', 'https://elteutikt.com');
+                    window.parent.postMessage('close', 'https://nordatickets.com');
                   }, 1000);
                 });
               </script>

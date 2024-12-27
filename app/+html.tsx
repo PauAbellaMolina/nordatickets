@@ -30,29 +30,29 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
         {/* Add any additional <head> elements that you want globally available on web... */}
         {/* SEO Meta Tags */}
-        <title>ElTeuTikt</title>
-        <meta name="description" content="Digitaliza el proceso de venta y gestión de bebidas y consumiciones de tus eventos y fiestas con ElTeuTikt. La mejor experiencia de compra desde el móvil para el organizador y el asistente." />
-        <meta name="keywords" content="event tickets, ticketing, event management, ElTeuTikt, mobile ticketing, event drinks, consumable ticketing" />
-        <meta name="author" content="ElTeuTikt" />
+        <title>Norda Tickets</title>
+        <meta name="description" content="Digitize the sales process and management of tickets, drinks and consumables for your events and parties with Norda Tickets. The best mobile purchase experience for both the organizer and attendee." />
+        <meta name="keywords" content="event tickets, ticketing, event management, Norda Tickets, mobile ticketing, event drinks, consumable ticketing" />
+        <meta name="author" content="Norda Tickets" />
         
         {/* Open Graph Meta Tags */}
-        <meta property="og:title" content="ElTeuTikt" />
-        <meta property="og:description" content="Digitaliza el proceso de venta y gestión de bebidas y consumiciones de tus eventos y fiestas con ElTeuTikt. La mejor experiencia de compra desde el móvil para el organizador y el asistente." />
+        <meta property="og:title" content="Norda Tickets" />
+        <meta property="og:description" content="Digitize the sales process and management of tickets, drinks and consumables for your events and parties with Norda Tickets. The best mobile purchase experience for both the organizer and attendee." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.elteutikt.com" />
+        <meta property="og:url" content="https://www.nordatickets.com" />
         <meta property="og:image" content="https://waniuunkeiqwqatzunof.supabase.co/storage/v1/object/public/assets/og-image.png" />
         
         {/* iOS Meta Tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="ElTeuTikt" />
+        <meta name="apple-mobile-web-app-title" content="Norda Tickets" />
         
         {/* Social Media Links */}
-        <link rel="instagram" href="https://www.instagram.com/elteutikt" />
-        <link rel="linkedin" href="https://linkedin.com/company/elteutikt" />
+        <link rel="instagram" href="https://www.instagram.com/nordatickets" />
+        <link rel="linkedin" href="https://linkedin.com/company/nordatickets" />
         
         {/* Canonical URL */}
-        <link rel="canonical" href="https://www.elteutikt.com" />
+        <link rel="canonical" href="https://www.nordatickets.com" />
       </head>
       <body>{children}</body>
     </html>

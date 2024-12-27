@@ -2,8 +2,8 @@ import { StyleSheet, Pressable, Platform } from "react-native";
 import { router } from "expo-router";
 import Colors from "../../constants/Colors";
 import { View, Text} from "../../components/Themed";
-import TiktDark from '../../assets/svgs/tiktdark.svg';
-import TiktLight from '../../assets/svgs/tiktlight.svg';
+import NordaDark from '../../assets/svgs/nordadark.svg';
+import NordaLight from '../../assets/svgs/nordalight.svg';
 import { useSupabase } from "../../context/SupabaseProvider";
 import { FeatherIcon } from "../../components/CustomIcons";
 import { Picker } from "@react-native-picker/picker";
@@ -39,7 +39,7 @@ export default function Welcome({ showLocaleSelector = true, additionalInfoText 
       <View style={{ alignItems: 'center', justifyContent: 'center' }}>
         <View style={[styles.blob, { opacity: theme === 'dark' ? .25 : .45 }]}><PurpleBlob width={280} height={280} /></View>
         <Animated.View style={{ alignItems: 'center', justifyContent: 'center' }} entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)}>
-          { theme === 'dark' ? <TiktDark width={165} height={165} /> : <TiktLight width={165} height={165} /> }
+          { theme === 'dark' ? <NordaDark width={165} height={165} /> : <NordaLight width={165} height={165} /> }
         </Animated.View>
       </View>
       <Animated.View entering={FadeIn.duration(350).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.buttonsContainer}>

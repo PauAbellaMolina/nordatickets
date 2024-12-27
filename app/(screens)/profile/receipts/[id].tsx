@@ -2,7 +2,7 @@ import { FlatList, StyleSheet, Dimensions, ActivityIndicator, Platform, Pressabl
 import { View, Text } from '../../../../components/Themed';
 import { WalletTicket } from "../../../../types/supabaseplain";
 import { useLocalSearchParams } from 'expo-router';
-import TiktLight from '../../../../assets/svgs/tiktlight.svg';
+import NordaLight from '../../../../assets/svgs/nordalight.svg';
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../../../supabase';
 import { useSupabase } from '../../../../context/SupabaseProvider';
@@ -109,7 +109,7 @@ export default function ReceiptDetailScreen() {
     <View style={[styles.folio, {width: vwpDimension}]}>
       { pageIndex === 0 ? <>
         <View style={styles.titleRow}>
-          <TiktLight width={vwpDimension/6} height={vwpDimension/12} />
+          <NordaLight width={vwpDimension/6} height={vwpDimension/12} />
           <Text style={[styles.receiptText, {fontSize: vwpDimension/24}]}>{ i18n?.t('simplifiedInvoice') }</Text>
         </View>
         <View style={styles.generalInfoRow}>

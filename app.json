@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "elteutikt",
-    "slug": "elteutikt",
+    "name": "nordatickets",
+    "slug": "nordatickets",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -17,7 +17,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.pauabella.elteutikt"
+      "bundleIdentifier": "com.pauabella.nordatickets"
     },
     "android": {
       "adaptiveIcon": {
@@ -52,6 +52,6 @@
         "projectId": "21bc3f3f-6e92-479b-bad6-10228e20b990"
       }
     },
-    "owner": "elteutikt"
+    "owner": "nordatickets"
   }
 }
