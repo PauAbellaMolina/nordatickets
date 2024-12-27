@@ -31,13 +31,13 @@ export default function Root({ children }: { children: React.ReactNode }) {
         {/* Add any additional <head> elements that you want globally available on web... */}
         {/* SEO Meta Tags */}
         <title>Norda Tickets</title>
-        <meta name="description" content="Digitize the sales process and management of tickets, drinks and consumables for your events and parties with Norda Tickets. The best mobile purchase experience for both the organizer and attendee." />
+        <meta name="description" content="Digitise the sales process and management of tickets, drinks and consumables for your events and parties with Norda Tickets. The best mobile purchase experience for both the organizer and attendee." />
         <meta name="keywords" content="event tickets, ticketing, event management, Norda Tickets, mobile ticketing, event drinks, consumable ticketing" />
         <meta name="author" content="Norda Tickets" />
         
         {/* Open Graph Meta Tags */}
         <meta property="og:title" content="Norda Tickets" />
-        <meta property="og:description" content="Digitize the sales process and management of tickets, drinks and consumables for your events and parties with Norda Tickets. The best mobile purchase experience for both the organizer and attendee." />
+        <meta property="og:description" content="Digitise the sales process and management of tickets, drinks and consumables for your events and parties with Norda Tickets. The best mobile purchase experience for both the organizer and attendee." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.nordatickets.com" />
         <meta property="og:image" content="https://waniuunkeiqwqatzunof.supabase.co/storage/v1/object/public/assets/og-image.png" />
