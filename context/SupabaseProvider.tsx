@@ -140,14 +140,14 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
         i18n.locale = value as AvailableLocales;
         setI18n(i18n);
       } else {
-        i18n.locale = AvailableLocales.CA;
+        i18n.locale = AvailableLocales.EN;
         try {
-          await AsyncStorage.setItem('locale', AvailableLocales.CA);
+          await AsyncStorage.setItem('locale', AvailableLocales.EN);
         } catch (e) { }
         setI18n(i18n);
       }
     } catch (e) {
-      i18n.locale = AvailableLocales.CA;
+      i18n.locale = AvailableLocales.EN;
       setI18n(i18n);
     }
   };
