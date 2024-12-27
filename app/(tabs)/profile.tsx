@@ -37,9 +37,8 @@ export default function TabThreeScreen() {
   );
 
   useEffect(() => {
-    if (!user) return;
     setSelectedLanguage(i18n?.locale as AvailableLocales);
-  }, [user, i18n]);
+  }, [i18n]);
 
   const fetchUser = (unmounted: boolean) => {
     if (!user) return;
