@@ -82,6 +82,7 @@ export interface Database {
           conditions_notice: string | null
           created_at: string
           description: string | null
+          email_qr_pdf: boolean
           event_id: number | null
           hide_from_event_page: boolean
           id: number
@@ -92,6 +93,7 @@ export interface Database {
           purchased_additional_info: string | null
           purchased_conditions_notice: string | null
           selling: boolean
+          strikethrough_price: number | null
           ticket_form_templates_id: number | null
           type: Database["public"]["Enums"]["event_ticket_type"]
           wallet_tickets_limit: number | null
@@ -104,6 +106,7 @@ export interface Database {
           conditions_notice?: string | null
           created_at?: string
           description?: string | null
+          email_qr_pdf?: boolean
           event_id?: number | null
           hide_from_event_page?: boolean
           id?: number
@@ -114,6 +117,7 @@ export interface Database {
           purchased_additional_info?: string | null
           purchased_conditions_notice?: string | null
           selling?: boolean
+          strikethrough_price?: number | null
           ticket_form_templates_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
           wallet_tickets_limit?: number | null
@@ -126,6 +130,7 @@ export interface Database {
           conditions_notice?: string | null
           created_at?: string
           description?: string | null
+          email_qr_pdf?: boolean
           event_id?: number | null
           hide_from_event_page?: boolean
           id?: number
@@ -136,6 +141,7 @@ export interface Database {
           purchased_additional_info?: string | null
           purchased_conditions_notice?: string | null
           selling?: boolean
+          strikethrough_price?: number | null
           ticket_form_templates_id?: number | null
           type?: Database["public"]["Enums"]["event_ticket_type"]
           wallet_tickets_limit?: number | null
@@ -442,6 +448,7 @@ export interface Database {
       wallet_tickets: {
         Row: {
           created_at: string
+          email_qr_pdf: boolean
           event_id: number | null
           event_tickets_id: number | null
           event_tickets_name: string | null
@@ -461,6 +468,7 @@ export interface Database {
         }
         Insert: {
           created_at?: string
+          email_qr_pdf?: boolean
           event_id?: number | null
           event_tickets_id?: number | null
           event_tickets_name?: string | null
@@ -480,6 +488,7 @@ export interface Database {
         }
         Update: {
           created_at?: string
+          email_qr_pdf?: boolean
           event_id?: number | null
           event_tickets_id?: number | null
           event_tickets_name?: string | null

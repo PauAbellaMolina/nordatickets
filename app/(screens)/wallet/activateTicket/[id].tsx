@@ -28,8 +28,11 @@ export default function ActivateTicketScreen() {
   const [ticketUsedTimeAgo, setTicketUsedTimeAgo] = useState<string>();
   const [ticketType, setTicketType] = useState<string>();
   const [addonTicket, setAddonTicket] = useState<WalletTicket>(undefined);
+  const [purchasedAdditionalInfo, setPurchasedAdditionalInfo] = useState<string>();
+  const [purchasedConditionsNotice, setPurchasedConditionsNotice] = useState<string>();
   const [ticketFormSubmit, setTicketFormSubmit] = useState<TicketFormSubmit>();
   const [formSubmitExpanded, setFormSubmitExpanded] = useState<boolean>(false);
+  const [purchasedAdditionalInfoExpanded, setPurchasedAdditionalInfoExpanded] = useState<boolean>(false);
 
   const { id } = useLocalSearchParams<{ id: string }>();
 
@@ -109,6 +112,13 @@ export default function ActivateTicketScreen() {
         });
       }
 
+      if (wallet_ticket.event_tickets_purchased_additional_info) {
+        setPurchasedAdditionalInfo(wallet_ticket.event_tickets_purchased_additional_info);
+      }
+      if (wallet_ticket.event_tickets_purchased_conditions_notice) {
+        setPurchasedConditionsNotice(wallet_ticket.event_tickets_purchased_conditions_notice);
+      }
+
       if (wallet_ticket.order_id === 'free') {
         proceedWalletTickets(wallet_ticket, unmounted);
         return;
@@ -138,23 +148,23 @@ export default function ActivateTicketScreen() {
     setTicketRefundedAt(wallet_ticket.refunded_at);
     setTicketType(wallet_ticket.type);
 
-    supabase.from('event_tickets').select().eq('id', wallet_ticket.event_tickets_id)
-    .then(({ data: event_tickets, error }) => {
-      if (unmounted || error || !event_tickets.length) return;
-      if ((theme === 'dark' && !event_tickets[0]?.color_code_dark) || (theme === 'light' && !event_tickets[0]?.color_code_light)) {
+    supabase.from('event_tickets').select().eq('id', wallet_ticket.event_tickets_id).single()
+    .then(({ data: event_ticket, error }) => {
+      if (unmounted || error || !event_ticket) return;
+      if ((theme === 'dark' && !event_ticket?.color_code_dark) || (theme === 'light' && !event_ticket?.color_code_light)) {
         setTicketThemeColor(getThemeRandomColor(theme));
         setDarkTicketThemeColor(getThemeRandomColor('dark'));
         setLightTicketThemeColor(getThemeRandomColor('light'));
         return;
       };
 
-      setDarkTicketThemeColor(event_tickets[0]?.color_code_dark ? event_tickets[0].color_code_dark : getThemeRandomColor('dark'));
-      setLightTicketThemeColor(event_tickets[0]?.color_code_light ? event_tickets[0].color_code_light : getThemeRandomColor('light'));
+      setDarkTicketThemeColor(event_ticket?.color_code_dark ? event_ticket.color_code_dark : getThemeRandomColor('dark'));
+      setLightTicketThemeColor(event_ticket?.color_code_light ? event_ticket.color_code_light : getThemeRandomColor('light'));
 
       if (theme === 'dark') {
-        setTicketThemeColor(event_tickets[0].color_code_dark);
+        setTicketThemeColor(event_ticket.color_code_dark);
       } else {
-        setTicketThemeColor(event_tickets[0].color_code_light);
+        setTicketThemeColor(event_ticket.color_code_light);
       }
     });
     
@@ -326,6 +336,24 @@ export default function ActivateTicketScreen() {
                     { ticketFormSubmit.entries.map((entry, index) => {
                       return <View key={index} style={{flexBasis: '48%', minWidth: 125, flexWrap: 'wrap', alignItems: index % 2 === 0 ? 'flex-end' : 'flex-start'}}><Text key={index} style={index % 2 === 0 ? styles.formSubmitQuestion : styles.formSubmitAnswer}>{ entry + (index % 2 === 0 ? ':' : '') }</Text></View>
                     })}
+                  </View>
+                </CollapsableComponent>
+              </View>
+            : null }
+            { purchasedAdditionalInfo ?
+              <View style={styles.additionalInfoContainer}>
+                <Pressable onPress={() => setPurchasedAdditionalInfoExpanded(!purchasedAdditionalInfoExpanded)}>
+                  <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 3, opacity: .8}}>
+                    <FeatherIcon name={purchasedAdditionalInfoExpanded ? 'chevron-up' : 'chevron-down'} size={20} color={Colors[theme].text} />
+                    <Text style={styles.additionalInfoTitle}>{ i18n?.t('additionalInfoAndConditions') }</Text>
+                  </View>
+                </Pressable>
+                <CollapsableComponent expanded={purchasedAdditionalInfoExpanded} maxHeight={125}>
+                  <View style={[styles.additionalInfoContent, {backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
+                    <Text style={styles.additionalInfoTitle}>{ i18n?.t('additionalInfo') }:</Text>
+                    <Text style={styles.additionalInfoText}>{ purchasedAdditionalInfo }</Text>
+                    <Text style={styles.additionalInfoTitle}>{ i18n?.t('conditions') }:</Text>
+                    <Text style={styles.additionalInfoText}>{ purchasedConditionsNotice }</Text>
                   </View>
                 </CollapsableComponent>
               </View>
@@ -520,6 +548,28 @@ const styles = StyleSheet.create({
   formSubmitAnswer: {
     fontSize: 16,
     fontWeight: 'bold'
+  },
+  additionalInfoContainer: {
+    marginBottom: 10
+  },
+  additionalInfoContent: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    columnGap: 5,
+    rowGap: 3,
+    marginHorizontal: 15,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    borderRadius: 16
+  },
+  additionalInfoTitle: {
+    fontSize: 14,
+    fontWeight: 'bold'
+  },
+  additionalInfoText: {
+    fontSize: 14,
+    marginLeft: 3
   },
   ticketDecorContainer: {
     flexDirection: 'row',
