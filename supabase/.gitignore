@@ -4,3 +4,4 @@
 .env
 migrations
 *.sql
+local_db_backups/

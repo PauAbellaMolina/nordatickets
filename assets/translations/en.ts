@@ -42,6 +42,7 @@ export const en: { [key: string]: string } = {
   selling: 'Selling',
   notSelling: 'Not selling',
   ticketsAddedToWallet: 'Tickets added to wallet',
+  ticketsSentToEmail: 'Tickets sent to email',
   cart: 'Cart',
   continueWithCart: 'Continue with the cart',
   serviceFee: 'Service fee',

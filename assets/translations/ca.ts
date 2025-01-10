@@ -42,6 +42,7 @@ export const ca: { [key: string]: string } = {
   selling: 'Venent',
   notSelling: 'No venent',
   ticketsAddedToWallet: 'Tickets afegits a la wallet',
+  ticketsSentToEmail: 'Tickets enviats al correu electrònic',
   cart: 'Carretó',
   continueWithCart: 'Continuar amb el carretó',
   serviceFee: 'Comissió de servei',
