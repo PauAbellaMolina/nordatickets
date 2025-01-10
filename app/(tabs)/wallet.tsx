@@ -9,7 +9,7 @@ import { useFocusEffect } from 'expo-router';
 import AuthCta from '../../components/auth/AuthCta';
 
 export default function TabTwoScreen() {
-  const { user, i18n, theme } = useSupabase();
+  const { user, i18n } = useSupabase();
   const [eventGroupedWalletTickets, setEventGroupedWalletTickets] = useState<WalletTicket[][]>([]);
 
   let triggerNextFocus = useRef<boolean>(true);
@@ -33,7 +33,7 @@ export default function TabTwoScreen() {
   );
 
   const fetchWalletTickets = (unmounted: boolean) => {
-    supabase.from('wallet_tickets').select().eq('user_id', user.id).is('used_at', null).is('refunded_at', null).order('type', { ascending: true })
+    supabase.from('wallet_tickets').select().eq('user_id', user.id).eq('email_qr_pdf', false).is('used_at', null).is('refunded_at', null).order('type', { ascending: true })
     .then(({ data: wallet_tickets, error }) => {
       if (unmounted || error) return;
       const typeOrder = ['ADDON_REFUNDABLE', 'ADDON', 'ACCESS'];

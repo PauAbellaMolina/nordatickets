@@ -89,10 +89,18 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
           {/* <FontAwesome6Icon name="person-walking-arrow-right" size={20} color={Colors[theme].text} /> */}
           <View style={style.ticketInfoText}>
             <Text style={style.ticketName}>{ticket.name}</Text>
-            <Text style={style.ticketPrice}>{ticket.price/100 * priceMultiplier}€</Text>
+            <View style={style.ticketPricesContainer}>
+              { ticket.strikethrough_price != null ? 
+                <View style={style.strikethroughTicketPriceContainer}>
+                  <Text style={style.strikethroughTicketPrice}>{ticket.strikethrough_price/100 * priceMultiplier}€</Text>
+                  <FeatherIcon name="arrow-right" size={12} color='#606175' />
+                </View>
+              : null }
+              <Text style={style.ticketPrice}>{ticket.price/100 * priceMultiplier}€</Text>
+            </View>
             { ticket?.description ?
               <Text style={style.ticketDescription}>{ i18n?.t(ticket.description) }</Text>
-            : null}
+            : null }
           </View>
         </View>
         <View style={style.ticketActions}>
@@ -223,9 +231,22 @@ const styles = (theme: string) => StyleSheet.create({ //TODO PAU implement passi
     fontSize: 20,
     fontWeight: 'bold'
   },
+  ticketPricesContainer: {
+    flexDirection: 'row',
+    gap: 4
+  },
+  strikethroughTicketPriceContainer: {
+    flexDirection: 'row',
+    gap: 3
+  },
   ticketPrice: {
     fontSize: 18,
     fontWeight: 'bold'
+  },
+  strikethroughTicketPrice: {
+    fontSize: 18,
+    textDecorationLine: 'line-through',
+    color: '#606175'
   },
   ticketDescription: {
     fontSize: 14,

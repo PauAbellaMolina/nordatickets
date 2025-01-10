@@ -59,6 +59,7 @@ export default function EventDetailScreen() {
   const [previousFollowingEvents, setPreviousFollowingEvents] = useState<number[]>(undefined);
   const [eventPosterImageUrl, setEventPosterImageUrl] = useState<string>(undefined);
   const [posterImageExpanded, setPosterImageExpanded] = useState<boolean>(false);
+  const [showSentToEmail, setShowSentToEmail] = useState<boolean>(false);
 
   useEffect(() => {
     if (!event) return;
@@ -269,6 +270,9 @@ export default function EventDetailScreen() {
       router.navigate('/event/authModal');
       return;
     }
+    if (!cart.some((cartItem) => !cartItem.eventTicket.email_qr_pdf)) {
+      setShowSentToEmail(true);
+    }
     buyCartProcess();
   };
 
@@ -302,6 +306,7 @@ export default function EventDetailScreen() {
 
   const onDismissAddedToWallet = () => {
     setOrderConfirmed(false);
+    setShowSentToEmail(false);
   };
 
   const renderItemAccessTickets = useCallback(({item}: {item: EventTicket}) => {
@@ -464,12 +469,19 @@ export default function EventDetailScreen() {
           </> : null }
         </ScrollView>
         { (eventTickets || accessEventTickets) && orderConfirmed ?
-          <Pressable style={[styles.orderConfirmedContainer, {backgroundColor: Colors[theme].cartContainerBackground}]} onPress={onGoToWallet}>
+          <Pressable style={[styles.orderConfirmedContainer, {backgroundColor: Colors[theme].cartContainerBackground}]} onPress={showSentToEmail ? onDismissAddedToWallet : onGoToWallet}>
             <Pressable onPress={onDismissAddedToWallet} style={styles.dismissAddedToWallet}>
               <FeatherIcon name="x" size={25} color={Colors[theme].text} />
             </Pressable>
             <FeatherIcon name="check-circle" size={40} color={Colors[theme].text} />
-            <View style={styles.orderConfirmedTextContainer}><Text style={styles.orderConfirmedSubtitle}>{ i18n?.t('ticketsAddedToWallet') }</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
+            { showSentToEmail ?
+              <View style={styles.orderConfirmedTextContainerEmail}>
+                <Text style={styles.orderConfirmedSubtitle}>{ i18n?.t('ticketsSentToEmail')}</Text>
+                <Text style={[styles.orderConfirmedSubtitle, {fontSize: 18}]}>{ user.email }</Text>
+              </View>
+              :
+              <View style={styles.orderConfirmedTextContainer}><Text style={styles.orderConfirmedSubtitle}>{ i18n?.t('ticketsAddedToWallet') }</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
+            }
           </Pressable>
         : <>
           { cart?.length ?
@@ -766,6 +778,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5
+  },
+  orderConfirmedTextContainerEmail: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 3
   },
   orderConfirmedSubtitle: {
     fontSize: 20,

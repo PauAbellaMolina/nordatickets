@@ -10,5 +10,5 @@ export const supabase = createClient<Database>(process.env.EXPO_PUBLIC_SUPABASE_
     ...(Platform.OS !== 'web' ? { storage: AsyncStorage } : {}),
     autoRefreshToken: true,
     persistSession: true
-  },
+  }
 });

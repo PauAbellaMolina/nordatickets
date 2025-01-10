@@ -42,6 +42,7 @@ export const es: { [key: string]: string } = {
   selling: 'Vendiendo',
   notSelling: 'No vendiendo',
   ticketsAddedToWallet: 'Tickets añadidos a la wallet',
+  ticketsSentToEmail: 'Tickets enviados al correo electrónico',
   cart: 'Carrito',
   continueWithCart: 'Continuar con el carrito',
   serviceFee: 'Comisión de servicio',
