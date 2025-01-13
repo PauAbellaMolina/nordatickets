@@ -48,6 +48,7 @@ export const es: { [key: string]: string } = {
   usingCardWithExpiryDate: 'Utilizando la tarjeta con fecha de caducidad',
   noTicketsInCart: 'No hay tickets en el carrito',
   saveCardForFuturePurchases: 'Guardar tarjeta para futuras compras',
+  saveCardForFuturePurchasesSubtext: '(Excepto Apple Pay y Google Pay)',
   notAvailable: 'No disponible',
   buy: 'Comprar',
   total: 'Total',

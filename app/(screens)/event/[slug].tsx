@@ -386,7 +386,10 @@ export default function EventDetailScreen() {
                           value={storeCreditCardChecked}
                           onValueChange={setStoreCreditCardChecked}
                         />
-                        <Text style={[styles.creditCardText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('saveCardForFuturePurchases') }</Text>
+                        <View>
+                          <Text style={[styles.creditCardText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('saveCardForFuturePurchases') }</Text>
+                          <Text style={[styles.creditCardSubtext, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('saveCardForFuturePurchasesSubtext') }</Text>
+                        </View>
                       </View>
                     }
                   <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground, marginTop: !cardNumber ? 5 : 3, paddingTop: !user ? 5 : 10, paddingBottom: !user ? 7 : 10}]} onPress={onBuyCart}>
@@ -634,6 +637,9 @@ const styles = StyleSheet.create({
   },
   creditCardText: {
     fontSize: 14
+  },
+  creditCardSubtext: {
+    fontSize: 11
   },
   buyButton: {
     width: '100%',

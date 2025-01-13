@@ -48,6 +48,7 @@ export const ca: { [key: string]: string } = {
   usingCardWithExpiryDate: 'Utilitzant la targeta amb data de caducitat',
   noTicketsInCart: 'No hi ha tickets al carretó',
   saveCardForFuturePurchases: 'Guardar targeta per futures compres',
+  saveCardForFuturePurchasesSubtext: '(Excepte Apple Pay i Google Pay)',
   notAvailable: 'No disponible',
   buy: 'Comprar',
   total: 'Total',
