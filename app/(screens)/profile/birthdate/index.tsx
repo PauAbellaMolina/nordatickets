@@ -35,34 +35,36 @@ export default function BirthdateScreen() {
     });
   };
 
+  const style = styles(theme);
+
   return (
-    <View style={[styles.container, {paddingTop: userBirthdate ? 75 : 10}]}>
+    <View style={[style.container, {paddingTop: userBirthdate ? 75 : 10}]}>
       { userBirthdate === undefined ?
         <ActivityIndicator size="large" style={{marginTop: 50}} />
       : <>
         { userBirthdate ? 
           <GoBackArrow light={theme === 'dark'} />
         : null }
-        <Text style={styles.title}>{ i18n?.t('needYourBirthdateTitle') }</Text>
-        <View style={styles.wrapper}>
+        <Text style={style.title}>{ i18n?.t('needYourBirthdateTitle') }</Text>
+        <View style={style.wrapper}>
           { !userBirthdate ? <>
             { Platform.OS === 'web' ?
-              <View style={styles.datepickerWrapper}>
-                <Text style={styles.datepickerTitle}>{ i18n?.t('birthdate') }:</Text>
-                <input style={theme === 'light' ? styles.datepickerLight : styles.datepickerDark} type="date" id="birthdate" name="birthdate" value={birthdate || ''} onChange={(e) => setBirthdate(e.target.value)} />
+              <View style={style.datepickerWrapper}>
+                <Text style={style.datepickerTitle}>{ i18n?.t('birthdate') }:</Text>
+                <input style={theme === 'light' ? style.datepickerLight : style.datepickerDark} type="date" id="birthdate" name="birthdate" value={birthdate || ''} onChange={(e) => setBirthdate(e.target.value)} />
               </View>
             : null }
             <Pressable
               disabled={!birthdate}
               onPress={onSaveBirthdate}
-              style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !birthdate ? 0.5 : 1}]}
+              style={[style.button, {opacity: !birthdate ? 0.5 : 1}]}
             >
-              <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('save') }</Text>
+              <Text style={style.buttonText}>{ i18n?.t('save') }</Text>
             </Pressable>
           </> : <>
-            <Text style={styles.text}>{ i18n?.t('alreadyHaveSetBirthdateTitle') }:</Text>
-            <Text style={styles.text}>{new Date(userBirthdate).toLocaleDateString()}</Text>
-            <Text style={styles.text}>{ i18n?.t('ifIncorrectGetInContactWithHelp') }</Text>
+            <Text style={style.text}>{ i18n?.t('alreadyHaveSetBirthdateTitle') }:</Text>
+            <Text style={style.text}>{new Date(userBirthdate).toLocaleDateString()}</Text>
+            <Text style={style.text}>{ i18n?.t('ifIncorrectGetInContactWithHelp') }</Text>
           </> }
         </View>
       </> }
@@ -70,7 +72,7 @@ export default function BirthdateScreen() {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   container: {
     paddingBottom: 25,
     paddingHorizontal: 15,
@@ -127,11 +129,13 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     paddingHorizontal: 25,
     width: '100%',
-    maxWidth: 300
+    maxWidth: 300,
+    backgroundColor: Colors[theme].text
   },
   buttonText: {
     fontWeight: '500',
     fontSize: 18,
-    textAlign: 'center'
+    textAlign: 'center',
+    color: Colors[theme].oppositeThemeText
   }
 });

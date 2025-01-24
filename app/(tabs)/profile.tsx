@@ -77,34 +77,36 @@ export default function TabThreeScreen() {
     setLanguage(language);
   };
 
+  const style = styles(theme);
+
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={style.container}>
+      <View style={style.header}>
         <View>
-          <Text style={styles.title}>{ i18n?.t('profile') }</Text>
-          <Text style={styles.infoLabel}>{ i18n?.t('infoAboutYou') }</Text>
+          <Text style={style.title}>{ i18n?.t('profile') }</Text>
+          <Text style={style.infoLabel}>{ i18n?.t('infoAboutYou') }</Text>
         </View>
       </View>
-      <View style={styles.profileContainer}>
+      <View style={style.profileContainer}>
         { !user ? <>
           <AuthCta horizontalButtons />
         </> : <>
-          <Text style={styles.infoTitle}>{ i18n?.t('emailAndPaymentMethods') }</Text>
-          <View style={styles.userInfo}>
+          <Text style={style.infoTitle}>{ i18n?.t('emailAndPaymentMethods') }</Text>
+          <View style={style.userInfo}>
             { user?.user_metadata?.fullname ?
-              <View style={styles.singleLineContainer}>
+              <View style={style.singleLineContainer}>
                 <FeatherIcon name="user" size={18} color={Colors[theme].text} />
                 <Text>{user?.user_metadata?.fullname}</Text>
               </View>
             : null }
-            <View style={styles.singleLineContainer}>
+            <View style={style.singleLineContainer}>
               <FeatherIcon name="at-sign" size={18} color={Colors[theme].text} />
               <Text>{user?.email}</Text>
             </View>
             { card ?
-              <View style={styles.singleLineContainer}>
+              <View style={style.singleLineContainer}>
                 <FeatherIcon name="credit-card" size={18} color={Colors[theme].text} />
-                <View style={styles.cardLineContainer}>
+                <View style={style.cardLineContainer}>
                   <Text>{card}  ·  </Text>
                   <Pressable onPress={onDeleteUserCard}>
                     <Text style={{color: '#ff3737'}}>{ i18n?.t('delete') }</Text>
@@ -112,9 +114,9 @@ export default function TabThreeScreen() {
                 </View>
               </View>
             : expiryDate ?
-              <View style={styles.singleLineContainer}>
+              <View style={style.singleLineContainer}>
                 <FeatherIcon name="credit-card" size={18} color={Colors[theme].text} />
-                <View style={styles.cardLineContainer}>
+                <View style={style.cardLineContainer}>
                   <Text>{ i18n?.t('cardWithExpiryDate') }: {expiryDate}  ·  </Text>
                   <Pressable onPress={onDeleteUserCard}>
                     <Text style={{color: '#ff3737'}}>{ i18n?.t('delete') }</Text>
@@ -124,15 +126,15 @@ export default function TabThreeScreen() {
             : null }
           </View>
         </> }
-        <View style={[styles.separator, {backgroundColor: Colors[theme].separatorBackgroundColor}]} />
-        <View style={styles.entriesContainer}>
-          <Pressable style={styles.entryButton} onPress={() => router.navigate('/profile/receipts')}><FeatherIcon name="file-text" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('purchaseReceipts') }</Text></Pressable>
-          <Pressable style={styles.entryButton} onPress={() => router.navigate('/profile/help')}><FeatherIcon name="help-circle" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('helpAndFaqs') }</Text></Pressable>
-          <Pressable style={styles.entryButton} onPress={() => router.navigate('/profile/terms')}><FeatherIcon name="info" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('termsAndPrivacy') }</Text></Pressable>
+        <View style={style.separator} />
+        <View style={style.entriesContainer}>
+          <Pressable style={style.entryButton} onPress={() => router.navigate('/profile/receipts')}><FeatherIcon name="file-text" size={18} color={Colors[theme].text} /><Text style={style.entryText}>{ i18n?.t('purchaseReceipts') }</Text></Pressable>
+          <Pressable style={style.entryButton} onPress={() => router.navigate('/profile/help')}><FeatherIcon name="help-circle" size={18} color={Colors[theme].text} /><Text style={style.entryText}>{ i18n?.t('helpAndFaqs') }</Text></Pressable>
+          <Pressable style={style.entryButton} onPress={() => router.navigate('/profile/terms')}><FeatherIcon name="info" size={18} color={Colors[theme].text} /><Text style={style.entryText}>{ i18n?.t('termsAndPrivacy') }</Text></Pressable>
           <View>
-            <Pressable style={styles.entryButton}><FeatherIcon name="globe" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('changeLanguage') }</Text></Pressable>
+            <Pressable style={style.entryButton}><FeatherIcon name="globe" size={18} color={Colors[theme].text} /><Text style={style.entryText}>{ i18n?.t('changeLanguage') }</Text></Pressable>
             <Picker
-              style={styles.languagePicker}
+              style={style.languagePicker}
               selectedValue={selectedLanguage}
               onValueChange={(itemValue) => onSelectedLanguage(itemValue)}
             >
@@ -142,7 +144,7 @@ export default function TabThreeScreen() {
             </Picker>
           </View>
           { user ?
-            <Pressable style={styles.entryButton} onPress={() => signOut()}><FeatherIcon name="log-out" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('logOut') }</Text></Pressable>
+            <Pressable style={style.entryButton} onPress={() => signOut()}><FeatherIcon name="log-out" size={18} color={Colors[theme].text} /><Text style={style.entryText}>{ i18n?.t('logOut') }</Text></Pressable>
           : null }
         </View>
       </View>
@@ -150,7 +152,7 @@ export default function TabThreeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   container: {
     paddingTop: 10,
     paddingBottom: 95,
@@ -192,7 +194,8 @@ const styles = StyleSheet.create({
     marginTop: 22,
     marginBottom: 25,
     height: 1,
-    width: '80%'
+    width: '80%',
+    backgroundColor: Colors[theme].separatorBackgroundColor
   },
   singleLineContainer: {
     flexDirection: 'row',
