@@ -32,35 +32,37 @@ export default function Welcome({ showLocaleSelector = true, additionalInfoText 
     if (!i18n) return;
     setSelectedLanguage(language);
     setLanguage(language);
-  }
+  };
+
+  const style = styles(theme);
 
   return (
-    <View style={styles.container}>
+    <View style={style.container}>
       <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-        <View style={[styles.blob, { opacity: theme === 'dark' ? .25 : .45 }]}><PurpleBlob width={280} height={280} /></View>
+        <View style={[style.blob, { opacity: theme === 'dark' ? .25 : .45 }]}><PurpleBlob width={280} height={280} /></View>
         <Animated.View style={{ alignItems: 'center', justifyContent: 'center' }} entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)}>
           { theme === 'dark' ? <NordaDark width={165} height={165} /> : <NordaLight width={165} height={165} /> }
         </Animated.View>
       </View>
-      <Animated.View entering={FadeIn.duration(350).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.buttonsContainer}>
-        <Pressable onPress={onGoToSignUp} style={[styles.button, {backgroundColor: Colors[theme].text}]}>
-          <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('createAccount') }</Text>
+      <Animated.View entering={FadeIn.duration(350).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={style.buttonsContainer}>
+        <Pressable onPress={onGoToSignUp} style={style.button}>
+          <Text style={style.buttonText}>{ i18n?.t('createAccount') }</Text>
         </Pressable>
-        <Pressable onPress={onGoToLogIn} style={[styles.button, {borderWidth: StyleSheet.hairlineWidth, borderColor: Colors[theme].text}]}>
-          <Text style={[styles.buttonText, {color: Colors[theme].text}]}>{ i18n?.t('logIn') }</Text>
+        <Pressable onPress={onGoToLogIn} style={style.buttonGhost}>
+          <Text style={style.buttonTextGhost}>{ i18n?.t('logIn') }</Text>
         </Pressable>
       </Animated.View>
       { additionalInfoText ?
-        <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.additionalInfoContainer, {bottom: showLocaleSelector ? '14%' : '12%'}]}>
+        <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[style.additionalInfoContainer, {bottom: showLocaleSelector ? '14%' : '12%'}]}>
           <FeatherIcon name="info" size={18} color='#8C90A3' />
-          <Text style={styles.additionalInfoText}>{ additionalInfoText }</Text>
+          <Text style={style.additionalInfoText}>{ additionalInfoText }</Text>
         </Animated.View>
       : null }
       { showLocaleSelector ?
-        <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.bottomActionContainer, {bottom: additionalInfoText ? 30 : 50}]}>
-          <Pressable style={styles.languageButton}><FeatherIcon name="globe" size={18} color={Colors[theme].text} /><Text style={styles.entryText}>{ i18n?.t('changeLanguage') }</Text></Pressable>
+        <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[style.bottomActionContainer, {bottom: additionalInfoText ? 30 : 50}]}>
+          <Pressable style={style.languageButton}><FeatherIcon name="globe" size={18} color={Colors[theme].text} /><Text style={style.entryText}>{ i18n?.t('changeLanguage') }</Text></Pressable>
           <Picker
-            style={styles.languagePicker}
+            style={style.languagePicker}
             selectedValue={selectedLanguage}
             onValueChange={(itemValue) => onSelectedLanguage(itemValue)}
           >
@@ -74,7 +76,7 @@ export default function Welcome({ showLocaleSelector = true, additionalInfoText 
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   container: {
     height: '100%',
     paddingBottom: 40,
@@ -105,12 +107,29 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     paddingHorizontal: 25,
     width: '100%',
-    maxWidth: 300
+    maxWidth: 300,
+    backgroundColor: Colors[theme].text
   },
   buttonText: {
     fontWeight: '500',
     fontSize: 18,
-    textAlign: 'center'
+    textAlign: 'center',
+    color: Colors[theme].oppositeThemeText
+  },
+  buttonGhost: {
+    borderRadius: 15,
+    paddingVertical: 11,
+    paddingHorizontal: 25,
+    width: '100%',
+    maxWidth: 300,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: Colors[theme].text
+  },
+  buttonTextGhost: {
+    fontWeight: '500',
+    fontSize: 18,
+    textAlign: 'center',
+    color: Colors[theme].text
   },
   bottomActionContainer: {
     position: 'absolute'

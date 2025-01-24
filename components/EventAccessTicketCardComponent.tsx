@@ -181,7 +181,7 @@ const eventCardMobileShadow = {
   shadowRadius: 1
 };
 
-const styles = (theme: string) => StyleSheet.create({ //TODO PAU implement passing theme param everywhere else
+const styles = (theme: string) => StyleSheet.create({
   ticketCard: {
     paddingHorizontal: 15,
     paddingVertical: 10,

@@ -34,18 +34,20 @@ export default function AuthModalScreen() {
     }
   };
   
+  const style = styles(theme);
+
   return (
-    <View style={[styles.container, Platform.OS !== 'web' ? {marginTop: 50} : {paddingHorizontal: 10, paddingVertical: 11}]}>
+    <View style={[style.container, Platform.OS !== 'web' ? {marginTop: 50} : {paddingHorizontal: 10, paddingVertical: 11}]}>
       { Platform.OS === 'web' ? <>
-        <View style={styles.fakeBackground}>
-          <View style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor}]}>
+        <View style={style.fakeBackground}>
+          <View style={[style.eventInfoContainer, {backgroundColor: eventBackgroundColor}]}>
             <GoBackArrow />
           </View>
         </View>
-        <Pressable onPress={() => router.back()} style={styles.closeBttnWeb}>
+        <Pressable onPress={() => router.back()} style={style.closeBttnWeb}>
           <FeatherIcon name="x" size={30} color={Colors[theme].text} />
         </Pressable>
-        <View style={[styles.welcomeContainer, {backgroundColor: Colors[theme].background, borderColor: Colors[theme].oppositeBackgroundHalfOpacity}]}>
+        <View style={style.welcomeContainer}>
           {renderAuthComponent()}
         </View>
       </>:<> {/* Implement when adding support to ios and android */} </>}
@@ -53,7 +55,7 @@ export default function AuthModalScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
@@ -73,7 +75,9 @@ const styles = StyleSheet.create({
     height: 'auto',
     flex: 1,
     borderRadius: 25,
-    borderWidth: StyleSheet.hairlineWidth
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: Colors[theme].oppositeBackgroundHalfOpacity,
+    backgroundColor: Colors[theme].background
   },
   fakeBackground: {
     width: '100%',

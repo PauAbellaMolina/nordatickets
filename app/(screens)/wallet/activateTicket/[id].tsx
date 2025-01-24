@@ -293,38 +293,40 @@ export default function ActivateTicketScreen() {
       ])
     ).start();
   }, []);
+
+  const style = styles(theme);
   
   return (
-    <View style={styles.container}>
-      { Platform.OS !== 'web' ? <View style={styles.expanderNotch}></View> : <></> }
+    <View style={style.container}>
+      { Platform.OS !== 'web' ? <View style={style.expanderNotch}></View> : <></> }
       { !ticketThemeColor || !eventName || !ticketName || addonTicket === undefined ? <>
         <ActivityIndicator size="large" />
       </> : <>
-        <Animated.View entering={FadeInDown.duration(300).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.ticketContainer, {backgroundColor: ticketThemeColor}]}>
-          <View style={[styles.ticketInfoContainer, { gap: ticketFormSubmit ? 20 : 8 }]}>
-            <RNAnimated.View style={[styles.pulseContainer, {transform: [{ scale: scale.current }], opacity: opacity.current }]}>
-              <View style={[styles.pulseDot, {backgroundColor: ticketUsedAt === undefined || ticketRefundedAt === undefined ? 'transparent' : ticketUsedAt != null || ticketRefundedAt != null ? '#ff3737' : '#3fde7a'}]} />
+        <Animated.View entering={FadeInDown.duration(300).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[style.ticketContainer, {backgroundColor: ticketThemeColor}]}>
+          <View style={[style.ticketInfoContainer, { gap: ticketFormSubmit ? 20 : 8 }]}>
+            <RNAnimated.View style={[style.pulseContainer, {transform: [{ scale: scale.current }], opacity: opacity.current }]}>
+              <View style={[style.pulseDot, {backgroundColor: ticketUsedAt === undefined || ticketRefundedAt === undefined ? 'transparent' : ticketUsedAt != null || ticketRefundedAt != null ? '#ff3737' : '#3fde7a'}]} />
             </RNAnimated.View>
-            <View style={[styles.ticketInfoTextsContainer, addonTicket || ticketFormSubmit ? {justifyContent: 'flex-end'} : {justifyContent: 'center'}]}>
-              <Text style={styles.ticketName} numberOfLines={4}>{ ticketName }</Text>
-              <Text style={styles.eventName}>{ eventName }</Text>
+            <View style={[style.ticketInfoTextsContainer, addonTicket || ticketFormSubmit ? {justifyContent: 'flex-end'} : {justifyContent: 'center'}]}>
+              <Text style={style.ticketName} numberOfLines={4}>{ ticketName }</Text>
+              <Text style={style.eventName}>{ eventName }</Text>
             </View>
             { addonTicket ?
-              <View style={styles.plusAddonTicketContainer}>
+              <View style={style.plusAddonTicketContainer}>
                 <FeatherIcon name="plus" size={26} color={Colors['light'].text} />
-                <View style={[styles.addonTicketContainer, {backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
-                  <View style={styles.addonTicketIconWrapper}>
+                <View style={style.addonTicketContainer}>
+                  <View style={style.addonTicketIconWrapper}>
                     <EntypoIcon name="cup" size={30} color={Colors['light'].text} />
                   </View>
-                  <View style={styles.addonTicketNameWrapper}>
-                    <Text style={[styles.addonTicketName, {color: Colors['light'].text}]} numberOfLines={1}>{addonTicket.event_tickets_name}</Text>
-                    <Text style={[styles.addonTicketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ addonTicket.type === 'ADDON_REFUNDABLE' ? i18n?.t('activateTicketRefundableAddonExplanation') : i18n?.t('activateTicketNonRefundableAddonExplanation') }</Text>
+                  <View style={style.addonTicketNameWrapper}>
+                    <Text style={[style.addonTicketName, {color: Colors['light'].text}]} numberOfLines={1}>{addonTicket.event_tickets_name}</Text>
+                    <Text style={[style.addonTicketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ addonTicket.type === 'ADDON_REFUNDABLE' ? i18n?.t('activateTicketRefundableAddonExplanation') : i18n?.t('activateTicketNonRefundableAddonExplanation') }</Text>
                   </View>
                 </View>
               </View>
             : null }
             { ticketFormSubmit ? 
-              <View style={styles.formSubmitContainer}>
+              <View style={style.formSubmitContainer}>
                 <Pressable onPress={() => setFormSubmitExpanded(!formSubmitExpanded)}>
                   <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 3, opacity: .8}}>
                     <FeatherIcon name={formSubmitExpanded ? 'chevron-up' : 'chevron-down'} size={20} color={Colors[theme].text} />
@@ -332,58 +334,58 @@ export default function ActivateTicketScreen() {
                   </View>
                 </Pressable>
                 <CollapsableComponent expanded={formSubmitExpanded} maxHeight={125}>
-                  <View style={[styles.formSubmitContent, {backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
+                  <View style={style.formSubmitContent}>
                     { ticketFormSubmit.entries.map((entry, index) => {
-                      return <View key={index} style={{flexBasis: '48%', minWidth: 125, flexWrap: 'wrap', alignItems: index % 2 === 0 ? 'flex-end' : 'flex-start'}}><Text key={index} style={index % 2 === 0 ? styles.formSubmitQuestion : styles.formSubmitAnswer}>{ entry + (index % 2 === 0 ? ':' : '') }</Text></View>
+                      return <View key={index} style={{flexBasis: '48%', minWidth: 125, flexWrap: 'wrap', alignItems: index % 2 === 0 ? 'flex-end' : 'flex-start'}}><Text key={index} style={index % 2 === 0 ? style.formSubmitQuestion : style.formSubmitAnswer}>{ entry + (index % 2 === 0 ? ':' : '') }</Text></View>
                     })}
                   </View>
                 </CollapsableComponent>
               </View>
             : null }
             { purchasedAdditionalInfo ?
-              <View style={styles.additionalInfoContainer}>
+              <View style={style.additionalInfoContainer}>
                 <Pressable onPress={() => setPurchasedAdditionalInfoExpanded(!purchasedAdditionalInfoExpanded)}>
-                  <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 3, opacity: .8}}>
+                  <View style={style.additionalInfoCollapsableContainer}>
                     <FeatherIcon name={purchasedAdditionalInfoExpanded ? 'chevron-up' : 'chevron-down'} size={20} color={Colors[theme].text} />
-                    <Text style={styles.additionalInfoTitle}>{ i18n?.t('additionalInfoAndConditions') }</Text>
+                    <Text style={style.additionalInfoTitle}>{ i18n?.t('additionalInfoAndConditions') }</Text>
                   </View>
                 </Pressable>
                 <CollapsableComponent expanded={purchasedAdditionalInfoExpanded} maxHeight={125}>
-                  <View style={[styles.additionalInfoContent, {backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
-                    <Text style={styles.additionalInfoTitle}>{ i18n?.t('additionalInfo') }:</Text>
-                    <Text style={styles.additionalInfoText}>{ purchasedAdditionalInfo }</Text>
-                    <Text style={styles.additionalInfoTitle}>{ i18n?.t('conditions') }:</Text>
-                    <Text style={styles.additionalInfoText}>{ purchasedConditionsNotice }</Text>
+                  <View style={style.additionalInfoContent}>
+                    <Text style={style.additionalInfoTitle}>{ i18n?.t('additionalInfo') }:</Text>
+                    <Text style={style.additionalInfoText}>{ purchasedAdditionalInfo }</Text>
+                    <Text style={style.additionalInfoTitle}>{ i18n?.t('conditions') }:</Text>
+                    <Text style={style.additionalInfoText}>{ purchasedConditionsNotice }</Text>
                   </View>
                 </CollapsableComponent>
               </View>
             : null }
           </View>
-          <View style={styles.ticketDecorContainer}>
-            <View style={[styles.ticketLeftCutout, {backgroundColor: Colors[theme].background}]}></View>
-            <View style={[styles.ticketDivider, {backgroundColor: Colors[theme].background}]}></View>
-            <View style={[styles.ticketRightCutout, {backgroundColor: Colors[theme].background}]}></View>
+          <View style={style.ticketDecorContainer}>
+            <View style={style.ticketLeftCutout}></View>
+            <View style={style.ticketDivider}></View>
+            <View style={style.ticketRightCutout}></View>
           </View>
-          <View style={[styles.ticketStatusContainer, {backgroundColor: ticketUsedAt === undefined || ticketRefundedAt === undefined ? 'transparent' : ticketUsedAt != null || ticketRefundedAt != null ? '#ff3737' : '#3fde7a', paddingVertical: ticketUsedAt === undefined || ticketRefundedAt === undefined || !ticketUsedTimeAgo ? 30 : 21.25}]}>
+          <View style={[style.ticketStatusContainer, {backgroundColor: ticketUsedAt === undefined || ticketRefundedAt === undefined ? 'transparent' : ticketUsedAt != null || ticketRefundedAt != null ? '#ff3737' : '#3fde7a', paddingVertical: ticketUsedAt === undefined || ticketRefundedAt === undefined || !ticketUsedTimeAgo ? 30 : 21.25}]}>
             { ticketUsedAt === undefined || ticketRefundedAt === undefined ? <>
-              <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('loading') } ticket...</Text>
-              <Text style={styles.statusInfoText}> </Text>
+              <Text style={[style.statusText, {color: Colors['light'].text}]}>{ i18n?.t('loading') } ticket...</Text>
+              <Text style={style.statusInfoText}> </Text>
             </> : <>{ ticketUsedAt === null && ticketRefundedAt === null ? <>
-                <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketActive') }</Text>
-                <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ ticketType === 'CONSUMABLE' ? i18n?.t('deactivateTicketOnDrinkExplanation') : i18n?.t('deactivateTicketOnAccessExplanation') }</Text>
+                <Text style={[style.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketActive') }</Text>
+                <Text style={[style.statusInfoText, {color: Colors['light'].text}]}>{ ticketType === 'CONSUMABLE' ? i18n?.t('deactivateTicketOnDrinkExplanation') : i18n?.t('deactivateTicketOnAccessExplanation') }</Text>
               </> : <>
-                <Text style={[styles.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUnactive') }</Text>
+                <Text style={[style.statusText, {color: Colors['light'].text}]}>{ i18n?.t('ticketUnactive') }</Text>
                 <View style={{ alignItems: 'center' }}>
                   { ticketRefundedAt != null ? <>
-                    <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketRefundedExplanation') }</Text>
+                    <Text style={[style.statusInfoText, {color: Colors['light'].text}]}>{ i18n?.t('ticketRefundedExplanation') }</Text>
                     { ticketUsedAt != null ? <>
-                      <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ !ticketUsedTimeAgo ? i18n?.t('ticketAlreadyUsedExplanation') : i18n?.t('ticketUsedTimeAgoExplanation') }</Text>
-                      <Text style={[styles.statusInfoTextTime, {color: Colors['light'].text}]}>{ ticketUsedTimeAgo }</Text>
+                      <Text style={[style.statusInfoText, {color: Colors['light'].text}]}>{ !ticketUsedTimeAgo ? i18n?.t('ticketAlreadyUsedExplanation') : i18n?.t('ticketUsedTimeAgoExplanation') }</Text>
+                      <Text style={[style.statusInfoTextTime, {color: Colors['light'].text}]}>{ ticketUsedTimeAgo }</Text>
                     </> : null }
                   </> : <>
                     { ticketUsedAt != null ? <>
-                      <Text style={[styles.statusInfoText, {color: Colors['light'].text}]}>{ !ticketUsedTimeAgo ? i18n?.t('ticketAlreadyUsedExplanation') : i18n?.t('ticketUsedTimeAgoExplanation') }</Text>
-                      <Text style={[styles.statusInfoTextTime, {color: Colors['light'].text}]}>{ ticketUsedTimeAgo }</Text>
+                      <Text style={[style.statusInfoText, {color: Colors['light'].text}]}>{ !ticketUsedTimeAgo ? i18n?.t('ticketAlreadyUsedExplanation') : i18n?.t('ticketUsedTimeAgoExplanation') }</Text>
+                      <Text style={[style.statusInfoTextTime, {color: Colors['light'].text}]}>{ ticketUsedTimeAgo }</Text>
                     </> : null }
                   </> }
                 </View>
@@ -392,27 +394,27 @@ export default function ActivateTicketScreen() {
           </View>
         </Animated.View>
         { !showConfirm ? <>
-          <Animated.View entering={FadeIn.delay(255).duration(200).easing(Easing.inOut(Easing.quad)).withInitialValues({opacity: 0}).reduceMotion(ReduceMotion.Never)} style={[styles.actionsButtonsContainer, {opacity: 1}]} >
-            <Pressable disabled={loading} onPress={() => router.navigate('/(tabs)/wallet')} style={[styles.button, loading ? {opacity: .7} : {}, {height: '100%', flex: 1, justifyContent: 'center'}, {borderColor: buttonTicketBorderColor, backgroundColor: buttonTicketBackgroundColor}]}>
+          <Animated.View entering={FadeIn.delay(255).duration(200).easing(Easing.inOut(Easing.quad)).withInitialValues({opacity: 0}).reduceMotion(ReduceMotion.Never)} style={[style.actionsButtonsContainer, {opacity: 1}]} >
+            <Pressable disabled={loading} onPress={() => router.navigate('/(tabs)/wallet')} style={[style.button, loading ? {opacity: .7} : {}, {height: '100%', flex: 1, justifyContent: 'center'}, {borderColor: buttonTicketBorderColor, backgroundColor: buttonTicketBackgroundColor}]}>
               <FeatherIcon name="arrow-left" size={28} color={Colors[theme].text} />
             </Pressable>
-            <Pressable disabled={!ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null || ticketRefundedAt === undefined || ticketRefundedAt != null} onPress={onDeactivateTicket} style={[styles.button, !ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null || ticketRefundedAt === undefined || ticketRefundedAt != null || loading ? {opacity: .7} : {}, {borderColor: buttonTicketBorderColor, backgroundColor: buttonTicketBackgroundColor}]}>
+            <Pressable disabled={!ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null || ticketRefundedAt === undefined || ticketRefundedAt != null} onPress={onDeactivateTicket} style={[style.button, !ticketDeactivable || ticketUsedAt === undefined || ticketUsedAt != null || ticketRefundedAt === undefined || ticketRefundedAt != null || loading ? {opacity: .7} : {}, {borderColor: buttonTicketBorderColor, backgroundColor: buttonTicketBackgroundColor}]}>
               {loading ?
-                <ActivityIndicator style={styles.buttonLoading} size="small" />
+                <ActivityIndicator style={style.buttonLoading} size="small" />
               :
-                <Text style={styles.buttonText}>{ i18n?.t('deactivateTicket') }</Text>
+                <Text style={style.buttonText}>{ i18n?.t('deactivateTicket') }</Text>
               }
             </Pressable>
           </Animated.View>
         </> : <>
-          <View style={styles.actionsConfirmContainer}>
-            <Text style={styles.confirmPrompt}>{ i18n?.t('deactivateTicketConfirmationQuestion') }</Text>
-            <View style={styles.actionsConfirmButtonsContainer}>
-              <Pressable onPress={() => setShowConfirm(false)} style={[styles.button, styles.buttonConfirm, {flex: 1, borderWidth: 1.25, borderColor: '#E84F44', backgroundColor: buttonTicketBackgroundColor}]}>
-                <Text style={styles.buttonText}>No</Text>
+          <View style={style.actionsConfirmContainer}>
+            <Text style={style.confirmPrompt}>{ i18n?.t('deactivateTicketConfirmationQuestion') }</Text>
+            <View style={style.actionsConfirmButtonsContainer}>
+              <Pressable onPress={() => setShowConfirm(false)} style={[style.button, style.buttonConfirm, {flex: 1, borderWidth: 1.25, borderColor: '#E84F44', backgroundColor: buttonTicketBackgroundColor}]}>
+                <Text style={style.buttonText}>No</Text>
               </Pressable>
-              <Pressable onPress={onConfirmDeactivateTicket} style={[styles.button, styles.buttonConfirm, {flex: 1.5, borderColor: '#79D475', backgroundColor: buttonTicketBackgroundColor}]}>
-                <Text style={styles.buttonText}>{ i18n?.t('yesDeactivate') }</Text>
+              <Pressable onPress={onConfirmDeactivateTicket} style={[style.button, style.buttonConfirm, {flex: 1.5, borderColor: '#79D475', backgroundColor: buttonTicketBackgroundColor}]}>
+                <Text style={style.buttonText}>{ i18n?.t('yesDeactivate') }</Text>
               </Pressable>
             </View>
           </View>
@@ -446,7 +448,7 @@ const buttonMobileShadow = {
   shadowRadius: 5
 };
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   container: {
     borderTopLeftRadius: 75,
     borderTopRightRadius: 75,
@@ -501,7 +503,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 2,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: Colors[theme].backgroundHalfOpacity
   },
   addonTicketIconWrapper: {
     paddingVertical: 20,
@@ -540,7 +543,8 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     paddingHorizontal: 5,
     borderRadius: 16,
-    borderWidth: 2
+    borderWidth: 2,
+    backgroundColor: Colors[theme].backgroundHalfOpacity
   },
   formSubmitQuestion: {
     fontSize: 14
@@ -552,6 +556,13 @@ const styles = StyleSheet.create({
   additionalInfoContainer: {
     marginBottom: 10
   },
+  additionalInfoCollapsableContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 3,
+    opacity: .8
+  },
   additionalInfoContent: {
     display: 'flex',
     flexDirection: 'row',
@@ -561,7 +572,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     paddingVertical: 8,
     paddingHorizontal: 8,
-    borderRadius: 16
+    borderRadius: 16,
+    backgroundColor: Colors[theme].backgroundHalfOpacity
   },
   additionalInfoTitle: {
     fontSize: 14,
@@ -583,6 +595,7 @@ const styles = StyleSheet.create({
     marginLeft: -20,
     borderTopRightRadius: 50,
     borderBottomRightRadius: 50,
+    backgroundColor: Colors[theme].background,
     ...Platform.select({
       web: {
         boxShadow: 'inset -8px 0 15px -10px rgba(0, 0, 0, 0.12)'
@@ -593,7 +606,8 @@ const styles = StyleSheet.create({
   },
   ticketDivider: {
     height: 2,
-    width: '68%'
+    width: '68%',
+    backgroundColor: Colors[theme].background
   },
   ticketRightCutout: {
     height: 40,
@@ -601,6 +615,7 @@ const styles = StyleSheet.create({
     marginRight: -20,
     borderTopLeftRadius: 50,
     borderBottomLeftRadius: 50,
+    backgroundColor: Colors[theme].background,
     ...Platform.select({
       web: {
         boxShadow: 'inset 8px 0 15px -10px rgba(0, 0, 0, 0.12)'

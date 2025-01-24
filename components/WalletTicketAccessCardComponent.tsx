@@ -134,29 +134,31 @@ export default function WalletTicketAccessCardComponent({ walletTicket }: { wall
     router.navigate(`/wallet/activateTicket/${walletTicket.id}`);
   };
 
+  const style = styles(theme);
+
   return (
     <>{ walletTicket?.used_at == null && walletTicket?.refunded_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEEDED' || (eventTicketOrderStatus === 'PAYMENT_PENDING')) ?
       <>{ eventTicketOrderStatus === 'PAYMENT_PENDING' ?
-        <View style={styles.wrapperContainer}>
-          <View style={[styles.singleTicketContainer, {opacity: .6, backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
-            <View style={styles.ticketIconWrapper}>
+        <View style={style.wrapperContainer}>
+          <View style={style.singleTicketContainerPending}>
+            <View style={style.ticketIconWrapper}>
               <FontAwesome6Icon name="person-walking-arrow-right" size={20} color={Colors['light'].text} />
             </View>
-            <View style={styles.ticketNameWrapper}>
-              <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
-              <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ shouldDisplayPendingTicket ? i18n?.t('paymentProcessing')+'...' : i18n?.t('paymentFailed') }</Text>
+            <View style={style.ticketNameWrapper}>
+              <Text style={[style.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
+              <Text style={[style.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ shouldDisplayPendingTicket ? i18n?.t('paymentProcessing')+'...' : i18n?.t('paymentFailed') }</Text>
             </View>
           </View>
         </View>
       :
-        <View style={styles.wrapperContainer}>
-          <Pressable style={[styles.singleTicketContainer, {backgroundColor: Colors[theme].backgroundHalfOpacity}]} onPress={onActivateTicket}>
-            <View style={styles.ticketIconWrapper}>
+        <View style={style.wrapperContainer}>
+          <Pressable style={style.singleTicketContainer} onPress={onActivateTicket}>
+            <View style={style.ticketIconWrapper}>
               <FontAwesome6Icon name="person-walking-arrow-right" size={20} color={Colors['light'].text} />
             </View>
-            <View style={styles.ticketNameWrapper}>
-              <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
-              <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ i18n?.t('walletTicketAccessExplanation') }</Text>
+            <View style={style.ticketNameWrapper}>
+              <Text style={[style.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
+              <Text style={[style.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ i18n?.t('walletTicketAccessExplanation') }</Text>
             </View>
           </Pressable>
         </View>
@@ -165,7 +167,7 @@ export default function WalletTicketAccessCardComponent({ walletTicket }: { wall
   );
 };
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   wrapperContainer: {
     width: '100%',
     alignItems: 'center',
@@ -176,7 +178,18 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 2,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: Colors[theme].backgroundHalfOpacity
+  },
+  singleTicketContainerPending: {
+    width: '100%',
+    marginTop: 10,
+    borderRadius: 12,
+    borderWidth: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    opacity: .6,
+    backgroundColor: Colors[theme].backgroundHalfOpacity
   },
   ticketIconWrapper: {
     paddingVertical: 25.5,

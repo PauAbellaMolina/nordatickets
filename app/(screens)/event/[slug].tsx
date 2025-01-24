@@ -323,14 +323,16 @@ export default function EventDetailScreen() {
   }, [cart, event]);
 
   const renderItemCartTicket = useCallback(({item}: {item: CartItem}) => (
-    <Text style={styles.cartItemsList}>{ (item.eventTicket.type === "ADDON" || item.eventTicket.type === "ADDON_REFUNDABLE") ? null : item.quantity + '  -  ' }{item.eventTicket.name} · {item.eventTicket.price/100}€</Text>
+    <Text style={style.cartItemsList}>{ (item.eventTicket.type === "ADDON" || item.eventTicket.type === "ADDON_REFUNDABLE") ? null : item.quantity + '  -  ' }{item.eventTicket.name} · {item.eventTicket.price/100}€</Text>
   ), []);
 
   //TODO PAU find a better blurhash
   const blurhash = '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
+  const style = styles(theme);
+
   return (
-    <View style={[styles.container, !event || userIsMinor === undefined ? { justifyContent: 'center' } : null]}>
+    <View style={[style.container, !event || userIsMinor === undefined ? { justifyContent: 'center' } : null]}>
       { posterImageExpanded ?
         <ImageFullscreen
           image={eventPosterImageUrl}
@@ -341,13 +343,13 @@ export default function EventDetailScreen() {
       { !event || userIsMinor === undefined ? <>
         <ActivityIndicator size="large" />
       </> : <>
-        <ScrollView scrollEnabled={!posterImageExpanded} style={posterImageExpanded ? styles.posterImageExpandedBlur : null}>
-          <Animated.View entering={FadeInUp.duration(205).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.eventInfoContainer, {backgroundColor: eventBackgroundColor, paddingBottom: event.more_info_content ? 40 : 10}]}>
+        <ScrollView scrollEnabled={!posterImageExpanded} style={posterImageExpanded ? style.posterImageExpandedBlur : null}>
+          <Animated.View entering={FadeInUp.duration(205).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[style.eventInfoContainer, {backgroundColor: eventBackgroundColor, paddingBottom: event.more_info_content ? 40 : 10}]}>
             <GoBackArrow />
-            <View style={styles.stopFollowingButton}>
+            <View style={style.stopFollowingButton}>
               <FeatherIcon name="more-horizontal" size={35} color={Colors['light'].text} />
               <Picker
-                style={styles.optionsPicker}
+                style={style.optionsPicker}
                 selectedValue={selectedOption}
                 onValueChange={() => onStopFollowingEvent()}
               >
@@ -355,13 +357,13 @@ export default function EventDetailScreen() {
                 <Picker.Item label={ i18n?.t('stopFollowingEventConfirmation') } value="unfollow" />
               </Picker>
             </View>
-            <View style={styles.eventInfoHeader}>
+            <View style={style.eventInfoHeader}>
               { eventPosterImageUrl !== null ?
-                <View style={styles.eventInfoHeaderLeft}>
-                  <Pressable onPress={onPosterImagePress} style={styles.eventImageFrame}>
+                <View style={style.eventInfoHeaderLeft}>
+                  <Pressable onPress={onPosterImagePress} style={style.eventImageFrame}>
                     {/* TODO PAU implement the no image case */}
                     <Image
-                      style={styles.image}
+                      style={style.image}
                       source={eventPosterImageUrl}
                       placeholder={{ blurhash }}
                       contentFit="cover"
@@ -370,61 +372,61 @@ export default function EventDetailScreen() {
                   </Pressable>
                 </View>
               : null }
-              <View style={styles.eventInfoHeaderRight}>
-                <View style={styles.eventInfoHeaderRightHeader}>
-                  <Text style={[styles.title, {color: Colors['light'].text}]}>{ event?.name }</Text>
-                  <Text style={[styles.eventDescription, {color: Colors['light'].text}]}>{event.description}</Text>
+              <View style={style.eventInfoHeaderRight}>
+                <View style={style.eventInfoHeaderRightHeader}>
+                  <Text style={style.title}>{ event?.name }</Text>
+                  <Text style={style.eventDescription}>{event.description}</Text>
                 </View>
-                <View style={styles.eventInfoHeaderRightDetails}>
+                <View style={style.eventInfoHeaderRightDetails}>
                   { event.start_date ?
-                    <View style={styles.detailRow}>
+                    <View style={style.detailRow}>
                       <FeatherIcon name="calendar" size={16} color={Colors['light'].text} />
-                      <Text style={[styles.detailValue, {color: Colors['light'].text}]}>{new Date(event.start_date).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' })}, {new Date(event.start_date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}h</Text>
+                      <Text style={style.detailValue}>{new Date(event.start_date).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' })}, {new Date(event.start_date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}h</Text>
                     </View>
                   : null }
                   { event.location ?
-                    <View style={styles.detailRow}>
+                    <View style={style.detailRow}>
                       <FeatherIcon name="map-pin" size={16} color={Colors['light'].text} />
-                      <Text style={[styles.detailValue, {color: Colors['light'].text}]}>{event.location}</Text>
+                      <Text style={style.detailValue}>{event.location}</Text>
                     </View>
                   : null }
                   { event.age_required ?
-                    <View style={styles.detailRow}>
+                    <View style={style.detailRow}>
                       <FeatherIcon name="plus" size={16} color={Colors['light'].text} />
-                      <Text style={[styles.detailValue, {color: Colors['light'].text}]}>{event.age_required}</Text>
+                      <Text style={style.detailValue}>{event.age_required}</Text>
                     </View>
                   : null }
                 </View>
               </View>
             </View>
             { event.more_info_content ? <>
-              <Pressable style={styles.moreEventInfo} onPress={onMoreInfo}>
+              <Pressable style={style.moreEventInfo} onPress={onMoreInfo}>
                 <FeatherIcon name={moreInfoExpanded ? 'chevron-up' : 'chevron-down'} size={21} color={Colors['light'].text} />
-                <Text style={[styles.moreEventInfoActionable, {color: Colors['light'].text}]}>{ i18n?.t('moreInfo') }</Text>
+                <Text style={style.moreEventInfoActionable}>{ i18n?.t('moreInfo') }</Text>
               </Pressable>
               <CollapsableComponent expanded={moreInfoExpanded} maxHeight={windowHeight - 350}>
-                <Text style={[styles.moreEventInfoText, {color: Colors['light'].text}]}>{event.more_info_content}</Text>
+                <Text style={style.moreEventInfoText}>{event.more_info_content}</Text>
               </CollapsableComponent>
             </> : null }
           </Animated.View>
           { eventTickets || accessEventTickets ? <>
-            {/* <Animated.View entering={FadeIn.duration(220).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.ticketsContainer, {marginTop: event.more_info_content ? 167 : 177}]}> */}
-            <Animated.View entering={FadeIn.duration(220).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.ticketsContainer}>
+            {/* <Animated.View entering={FadeIn.duration(220).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[style.ticketsContainer, {marginTop: event.more_info_content ? 167 : 177}]}> */}
+            <Animated.View entering={FadeIn.duration(220).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={style.ticketsContainer}>
               { accessEventTickets ? <>
-                <View style={styles.accessTickets}>
+                <View style={style.accessTickets}>
                   { accessEventTicketsExpanded ?
-                    <View style={styles.sellingStatusContainer}>
-                      <View style={[styles.sellingStatusDot, {backgroundColor: event.selling_access ? 'green' : 'red'}]}></View>
-                      <Text style={[styles.sellingStatus, {color: event.selling_access ? 'green' : 'red'}]}>{ i18n?.t(event.selling_access ? 'selling': 'notSelling') }</Text>
+                    <View style={style.sellingStatusContainer}>
+                      <View style={[style.sellingStatusDot, {backgroundColor: event.selling_access ? 'green' : 'red'}]}></View>
+                      <Text style={[style.sellingStatus, {color: event.selling_access ? 'green' : 'red'}]}>{ i18n?.t(event.selling_access ? 'selling': 'notSelling') }</Text>
                     </View>
                   : null }
-                  <Pressable style={styles.accessTicketsExpand} onPress={onAccessTicketsExpand}>
-                    <Text style={styles.subtitle}>{ !event.access_tickets_section_title ? i18n?.t('accessControlTickets') : i18n?.t(event.access_tickets_section_title) }</Text>
+                  <Pressable style={style.accessTicketsExpand} onPress={onAccessTicketsExpand}>
+                    <Text style={style.subtitle}>{ !event.access_tickets_section_title ? i18n?.t('accessControlTickets') : i18n?.t(event.access_tickets_section_title) }</Text>
                     <FeatherIcon name={accessEventTicketsExpanded ? 'chevron-down' : 'chevron-right'} size={24} color={Colors[theme].text} />
                   </Pressable>
                   <CollapsableComponent expanded={accessEventTicketsExpanded} maxHeight={windowHeight - 35}>
                     <FlatList
-                      style={styles.ticketsList}
+                      style={style.ticketsList}
                       data={accessEventTickets}
                       renderItem={renderItemAccessTickets}
                     />
@@ -434,30 +436,30 @@ export default function EventDetailScreen() {
               { eventTickets ? <>
                 <View>
                   { !accessEventTickets || (accessEventTickets && eventTicketsExpanded) ?
-                    <View style={styles.sellingStatusContainer}>
-                      <View style={[styles.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
-                      <Text style={[styles.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{ i18n?.t(event.selling ? 'selling': 'notSelling') }</Text>
+                    <View style={style.sellingStatusContainer}>
+                      <View style={[style.sellingStatusDot, {backgroundColor: event.selling ? 'green' : 'red'}]}></View>
+                      <Text style={[style.sellingStatus, {color: event.selling ? 'green' : 'red'}]}>{ i18n?.t(event.selling ? 'selling': 'notSelling') }</Text>
                     </View>
                   : null }
                   { accessEventTickets ?
-                    <Pressable style={styles.accessTicketsExpand} onPress={onEventTicketsExpand}>
-                      <Text style={styles.subtitle}>{ !event.consumable_tickets_section_title ? 'Tickets' : i18n?.t(event.consumable_tickets_section_title) }</Text>
+                    <Pressable style={style.accessTicketsExpand} onPress={onEventTicketsExpand}>
+                      <Text style={style.subtitle}>{ !event.consumable_tickets_section_title ? 'Tickets' : i18n?.t(event.consumable_tickets_section_title) }</Text>
                       <FeatherIcon name={eventTicketsExpanded ? 'chevron-down' : 'chevron-right'} size={24} color={Colors[theme].text} />
                     </Pressable>
                   :
-                    <Text style={styles.subtitle}>{ !event.consumable_tickets_section_title ? 'Tickets' : i18n?.t(event.consumable_tickets_section_title) }</Text>
+                    <Text style={style.subtitle}>{ !event.consumable_tickets_section_title ? 'Tickets' : i18n?.t(event.consumable_tickets_section_title) }</Text>
                   }
                   { accessEventTickets ?
                     <CollapsableComponent expanded={eventTicketsExpanded} maxHeight={windowHeight - 35}>
                       <FlatList
-                        style={styles.ticketsList}
+                        style={style.ticketsList}
                         data={eventTickets}
                         renderItem={renderItemTickets}
                       />
                     </CollapsableComponent>
                   :
                     <FlatList
-                      style={styles.ticketsList}
+                      style={style.ticketsList}
                       data={eventTickets}
                       renderItem={renderItemTickets}
                     />
@@ -469,18 +471,18 @@ export default function EventDetailScreen() {
           </> : null }
         </ScrollView>
         { (eventTickets || accessEventTickets) && orderConfirmed ?
-          <Pressable style={[styles.orderConfirmedContainer, {backgroundColor: Colors[theme].cartContainerBackground}]} onPress={showSentToEmail ? onDismissAddedToWallet : onGoToWallet}>
-            <Pressable onPress={onDismissAddedToWallet} style={styles.dismissAddedToWallet}>
+          <Pressable style={style.orderConfirmedContainer} onPress={showSentToEmail ? onDismissAddedToWallet : onGoToWallet}>
+            <Pressable onPress={onDismissAddedToWallet} style={style.dismissAddedToWallet}>
               <FeatherIcon name="x" size={25} color={Colors[theme].text} />
             </Pressable>
             <FeatherIcon name="check-circle" size={40} color={Colors[theme].text} />
             { showSentToEmail ?
-              <View style={styles.orderConfirmedTextContainerEmail}>
-                <Text style={styles.orderConfirmedSubtitle}>{ i18n?.t('ticketsSentToEmail')}</Text>
-                <Text style={[styles.orderConfirmedSubtitle, {fontSize: 18}]}>{ user.email }</Text>
+              <View style={style.orderConfirmedTextContainerEmail}>
+                <Text style={style.orderConfirmedSubtitle}>{ i18n?.t('ticketsSentToEmail')}</Text>
+                <Text style={[style.orderConfirmedSubtitle, {fontSize: 18}]}>{ user.email }</Text>
               </View>
               :
-              <View style={styles.orderConfirmedTextContainer}><Text style={styles.orderConfirmedSubtitle}>{ i18n?.t('ticketsAddedToWallet') }</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
+              <View style={style.orderConfirmedTextContainer}><Text style={style.orderConfirmedSubtitle}>{ i18n?.t('ticketsAddedToWallet') }</Text><FeatherIcon name="arrow-up-right" size={25} color={Colors[theme].text} /></View>
             }
           </Pressable>
         : <>
@@ -488,62 +490,62 @@ export default function EventDetailScreen() {
             <Animated.View
               entering={FadeInDown.duration(200).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)}
               exiting={FadeOutDown.duration(150).easing(Easing.out(Easing.exp)).reduceMotion(ReduceMotion.Never)}
-              style={[styles.cartContainer, moreInfoExpanded ? styles.cartContainerCollapsedMode : {}, {backgroundColor: Colors[theme].cartContainerBackground}]}
+              style={[style.cartContainer, moreInfoExpanded ? style.cartContainerCollapsedMode : {}]}
             >
               { moreInfoExpanded ?
                 <Animated.View
                   entering={FadeIn.duration(200).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)}
                   exiting={FadeOut.duration(150).easing(Easing.out(Easing.exp)).reduceMotion(ReduceMotion.Never)}
                 >
-                  <Pressable style={[styles.cartTitleRowContainer, {width: '100%', height: '100%'}]} onPress={onMoreInfo}>
-                    <Text style={styles.collapsedCartSubtitle}>{ i18n?.t('continueWithCart') }</Text>
+                  <Pressable style={[style.cartTitleRowContainer, {width: '100%', height: '100%'}]} onPress={onMoreInfo}>
+                    <Text style={style.collapsedCartSubtitle}>{ i18n?.t('continueWithCart') }</Text>
                     <FeatherIcon name="arrow-right" size={16} color={Colors[theme].text} />
                   </Pressable>
                 </Animated.View>
               : <>
-                <View style={styles.cartTitleRowContainer}><Text style={styles.subtitle}>{ i18n?.t('cart') }</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
+                <View style={style.cartTitleRowContainer}><Text style={style.subtitle}>{ i18n?.t('cart') }</Text><FeatherIcon name="shopping-cart" size={22} color={Colors[theme].text} /></View>
                 <FlatList
-                  style={styles.cartList}
+                  style={style.cartList}
                   data={cart}
                   renderItem={renderItemCartTicket}
                   ItemSeparatorComponent={() => <View style={{height: 3}} />}
                 />
                 { event.ticket_fee ?
                   <View style={{marginHorizontal: 8, flexDirection: 'row', alignItems: 'flex-end'}}>
-                    <Text style={[styles.transactionFeePrice, {color: Colors[theme].cartContainerBackgroundContrast}]}>+ {event.ticket_fee * cartTotalQuantity / 100}€ </Text>
-                    <Text style={[styles.creditCardText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('serviceFee') }</Text>
+                    <Text style={style.transactionFeePrice}>+ {event.ticket_fee * cartTotalQuantity / 100}€ </Text>
+                    <Text style={style.creditCardText}>{ i18n?.t('serviceFee') }</Text>
                   </View>
                 : null }
                   { cardNumber ?
-                    <View style={styles.usingCreditCardContainer}>
+                    <View style={style.usingCreditCardContainer}>
                       <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
-                      <Text style={[styles.creditCardText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCreditCard') } {cardNumber.slice(-7)}</Text>
+                      <Text style={style.creditCardText}>{ i18n?.t('usingCreditCard') } {cardNumber.slice(-7)}</Text>
                     </View>
                   : expiryDate ?
-                    <View style={styles.usingCreditCardContainer}>
+                    <View style={style.usingCreditCardContainer}>
                       <FeatherIcon name="info" size={15} color={Colors[theme].cartContainerBackgroundContrast} />
-                      <Text style={[styles.creditCardText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('usingCardWithExpiryDate') } {expiryDate}</Text>
+                      <Text style={style.creditCardText}>{ i18n?.t('usingCardWithExpiryDate') } {expiryDate}</Text>
                     </View>
                   :
-                    <View style={styles.storeCreditCardContainer}>
+                    <View style={style.storeCreditCardContainer}>
                       <Checkbox
-                        style={styles.storeCreditCardCheckboxInput}
+                        style={style.storeCreditCardCheckboxInput}
                         color={Colors[theme].cartContainerButtonBackground}
                         value={storeCreditCardChecked}
                         onValueChange={setStoreCreditCardChecked}
                       />
-                      <Text style={[styles.creditCardText, {color: Colors[theme].cartContainerBackgroundContrast}]}>{ i18n?.t('saveCardForFuturePurchases') }</Text>
+                      <Text style={style.creditCardText}>{ i18n?.t('saveCardForFuturePurchases') }</Text>
                     </View>
                   }
-                <Pressable style={[styles.buyButton, {backgroundColor: Colors[theme].cartContainerButtonBackground, marginTop: !cardNumber ? 5 : 3, paddingTop: !user ? 5 : 10, paddingBottom: !user ? 7 : 10}]} onPress={onBuyCart}>
+                <Pressable style={[style.buyButton, {marginTop: !cardNumber ? 5 : 3, paddingTop: !user ? 5 : 10, paddingBottom: !user ? 7 : 10}]} onPress={onBuyCart}>
                 { loading ?
                   <ActivityIndicator style={{marginVertical: 1.75}} size="small" />
                 :
                   <View style={{flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
                     { !user ?
-                      <Text style={styles.buyButtonTextLoginRequired}>{ i18n?.t('loginRequired') }</Text>
+                      <Text style={style.buyButtonTextLoginRequired}>{ i18n?.t('loginRequired') }</Text>
                     : null }
-                    <Text style={styles.buyButtonText}>{(cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)) / 100 + '€  ·  '}{ i18n?.t('buy') }</Text>
+                    <Text style={style.buyButtonText}>{(cartTotalPrice + (event?.ticket_fee ? event.ticket_fee * cartTotalQuantity : 0)) / 100 + '€  ·  '}{ i18n?.t('buy') }</Text>
                   </View>
                 }
                 </Pressable>
@@ -586,7 +588,7 @@ const cartContainerMobileShadow = {
   shadowRadius: 3
 };
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   container: {
     gap: 5,
     flex: 1
@@ -663,7 +665,8 @@ const styles = StyleSheet.create({
     gap: 5
   },
   detailValue: {
-    fontSize: 14
+    fontSize: 14,
+    color: Colors['light'].text
   },
   stopFollowingButton: {
     display: 'flex',
@@ -682,7 +685,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: '900'
+    fontWeight: '900',
+    color: Colors['light'].text
   },
   subtitle: {
     fontSize: 25,
@@ -693,7 +697,8 @@ const styles = StyleSheet.create({
     fontWeight: '800'
   },
   eventDescription: {
-    fontSize: 14
+    fontSize: 14,
+    color: Colors['light'].text
   },
   moreEventInfo: {
     flexDirection: 'row',
@@ -706,11 +711,13 @@ const styles = StyleSheet.create({
   },
   moreEventInfoActionable: {
     fontSize: 14,
-    fontWeight: '500'
+    fontWeight: '500',
+    color: Colors['light'].text
   },
   moreEventInfoText: {
     fontSize: 16,
-    marginTop: 5
+    marginTop: 5,
+    color: Colors['light'].text
   },
   ticketsContainer: {
     marginTop: 20,
@@ -760,6 +767,7 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
     paddingHorizontal: 20,
     borderRadius: 35,
+    backgroundColor: Colors[theme].cartContainerBackground,
     ...Platform.select({
       web: {
         boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.15)'
@@ -797,6 +805,7 @@ const styles = StyleSheet.create({
     paddingBottom: 18,
     paddingHorizontal: 16,
     borderRadius: 35,
+    backgroundColor: Colors[theme].cartContainerBackground,
     ...Platform.select({
       web: {
         boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.15)'
@@ -842,10 +851,12 @@ const styles = StyleSheet.create({
     gap: 5
   },
   transactionFeePrice: {
-    fontSize: 16
+    fontSize: 16,
+    color: Colors[theme].cartContainerBackgroundContrast
   },
   creditCardText: {
-    fontSize: 14
+    fontSize: 14,
+    color: Colors[theme].cartContainerBackgroundContrast
   },
   creditCardSubtext: {
     fontSize: 11
@@ -853,7 +864,8 @@ const styles = StyleSheet.create({
   buyButton: {
     width: '100%',
     paddingVertical: 10,
-    borderRadius: 10
+    borderRadius: 10,
+    backgroundColor: Colors[theme].cartContainerButtonBackground
   },
   buyButtonText: {
     color: '#fff',
