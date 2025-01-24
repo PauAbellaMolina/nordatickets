@@ -45,22 +45,24 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
   const renderItem = useCallback(({item}: {item: WalletTicket}) => (
     <Text>{ item.event_tickets_name } - { item.price / 100 }€</Text>
   ), []);
-  
+
+  const style = styles(theme);
+
   return (
-    <View style={[styles.container, {backgroundColor: Colors[theme].backgroundContrast}]}>
+    <View style={style.container}>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <View>
-          <Text style={styles.orderTitle}>{ i18n?.t('invoiceNumber') }:</Text>
-          <Text style={styles.orderTitle}>{ orderDbId }</Text>
+          <Text style={style.orderTitle}>{ i18n?.t('invoiceNumber') }:</Text>
+          <Text style={style.orderTitle}>{ orderDbId }</Text>
         </View>
         <View>
-          <Text style={styles.orderInfo}>{ new Date(order[0].created_at).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) }h</Text>
+          <Text style={style.orderInfo}>{ new Date(order[0].created_at).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) }h</Text>
           { eventName ?
-            <Text style={styles.orderInfo}>{ eventName }</Text>
+            <Text style={style.orderInfo}>{ eventName }</Text>
           : null }
         </View>
       </View>
-      <View style={styles.orderContent}>
+      <View style={style.orderContent}>
         <FlatList
           data={order}
           renderItem={renderItem}
@@ -74,11 +76,11 @@ export default function ReceiptsOrderComponent({ order, eventName, eventTicketFe
           : null }
         </View>
       </View>
-      <Pressable style={styles.goToReceiptContainer} onPress={onGoToReceiptDetail}>
+      <Pressable style={style.goToReceiptContainer} onPress={onGoToReceiptDetail}>
         <FeatherIcon name="file-text" size={25} color={Colors[theme].text} />
       </Pressable>
       { thereIsRefundedTicket ?
-        <Pressable style={styles.goToRefundReceiptContainer} onPress={onGoToRefundedReceiptDetail}>
+        <Pressable style={style.goToRefundReceiptContainer} onPress={onGoToRefundedReceiptDetail}>
           <FeatherIcon name="file-plus" size={25} color={Colors[theme].text} />
         </Pressable>
       : null }
@@ -97,13 +99,14 @@ const containerMobileShadow = {
   shadowRadius: 1.5
 };
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   container: {
     marginHorizontal: 15,
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 10,
     gap: 10,
+    backgroundColor: Colors[theme].backgroundContrast,
     ...Platform.select({
       web: {
         boxShadow: '0px 1px 1.5px rgba(0, 0, 0, 0.10)'

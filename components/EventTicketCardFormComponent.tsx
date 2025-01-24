@@ -8,7 +8,7 @@ import Colors from '../constants/Colors';
 import { formatDateInput, isValidDate, isValidEmail, isValidNumber } from '../utils/formValidationUtils';
 import { Picker } from '@react-native-picker/picker';
 
-export default function EventAccessTicketCardFormComponent({ event_id, ticket_form_templates_id, formSubmitted, onPriceMultiplierChange, onSubmit }: { event_id: number, ticket_form_templates_id: number, formSubmitted: boolean, onPriceMultiplierChange: (priceMultiplier: number) => void, onSubmit: (ticketFormSubmit: Partial<TicketFormSubmit>) => void }) {
+export default function EventTicketCardFormComponent({ event_id, ticket_form_templates_id, formSubmitted, onPriceMultiplierChange, onSubmit }: { event_id: number, ticket_form_templates_id: number, formSubmitted: boolean, onPriceMultiplierChange: (priceMultiplier: number) => void, onSubmit: (ticketFormSubmit: Partial<TicketFormSubmit>) => void }) {
   const { i18n, theme } = useSupabase();
   
   const [ticketFormTemplate, setTicketFormTemplate] = useState<TicketFormTemplate>(null);
@@ -76,16 +76,15 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
 
   const renderDropdown = (key: string, required: boolean, options: string[], formSubmitted: boolean) => {
     return (
-      <View style={styles.pickerContainer}>
+      <View style={style.pickerContainer}>
         <Picker
           selectedValue={formData[key] || ''}
           onValueChange={(itemValue) => itemValue !== 'misc' && setFormData(prev => ({ ...prev, [key]: itemValue }))}
           enabled={!formSubmitted}
           style={[
-            styles.optionsPicker,
-            { color: Colors[theme].text },
-            (attemptedSubmit && required && !formData[key]) ? styles.inputError : null,
-            formSubmitted ? styles.submittedInput : null
+            style.optionsPicker,
+            (attemptedSubmit && required && !formData[key]) ? style.inputError : null,
+            formSubmitted ? style.submittedInput : null
           ]}
         >
           <Picker.Item label={ i18n?.t('selectAnOption') } value="misc" />
@@ -129,26 +128,25 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
 
     if (type === 'OPTIONS' && options) {
       return (
-        <View key={key} style={styles.questionContainer}>
-          <Text style={styles.questionText}>{question}{isRequired}</Text>
+        <View key={key} style={style.questionContainer}>
+          <Text style={style.questionText}>{question}{isRequired}</Text>
           {renderDropdown(key, required, options, formSubmitted)}
         </View>
       );
     }
     
     return (
-      <View key={key} style={styles.questionContainer}>
-        <Text style={styles.questionText}>{question}{isRequired}</Text>
+      <View key={key} style={style.questionContainer}>
+        <Text style={style.questionText}>{question}{isRequired}</Text>
         <TextInput
           style={[
-          styles.input,
-          { color: Colors[theme].text, borderColor: Colors[theme].inputBorderColor },
+          style.input,
           (attemptedSubmit && required && !formData[key]) ||
           (type === 'DATE' && formData[key] && !isValidDate(formData[key])) ||
           (type === 'EMAIL' && formData[key] && !isValidEmail(formData[key])) ||
           (type === 'NUMBER' && formData[key] && !isValidNumber(formData[key], maxValue))
-            ? styles.inputError : null,
-          formSubmitted ? styles.submittedInput : null
+            ? style.inputError : null,
+          formSubmitted ? style.submittedInput : null
         ]}
           textContentType={type === 'EMAIL' ? 'emailAddress' : 'none'}
           editable={!formSubmitted}
@@ -163,8 +161,10 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
     );
   };
 
+  const style = styles(theme);
+
   return (
-    <View style={styles.container}>
+    <View style={style.container}>
       { ticketFormTemplate && Object.entries(ticketFormTemplate)
         .filter(([key, question]) => key.startsWith('q') && !key.includes('_') && typeof question === 'string' && question.length)
         .map(([key, question]) => {
@@ -175,14 +175,14 @@ export default function EventAccessTicketCardFormComponent({ event_id, ticket_fo
           return renderInput(key, String(question), type, required, options, multipliesTicketPrice, formSubmitted);
         })
       }
-      <Pressable onPress={onPressSubmit} style={[styles.submitButton, { backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity, opacity: formSubmitted ? 0.5 : 1 }]}>
-        <Text style={[styles.submitButtonText, { color: Colors[theme].text }]}>{i18n?.t('addToCart')}</Text>
+      <Pressable onPress={onPressSubmit} style={[style.submitButton, { opacity: formSubmitted ? 0.5 : 1 }]}>
+        <Text style={style.submitButtonText}>{i18n?.t('addToCart')}</Text>
       </Pressable>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   container: {
     marginTop: 10,
     flexDirection: 'row',
@@ -204,7 +204,9 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 8,
     padding: 8,
-    fontSize: 14
+    fontSize: 14,
+    color: Colors[theme].text,
+    borderColor: Colors[theme].inputBorderColor
   },
   submittedInput: {
     borderColor: 'transparent',
@@ -220,11 +222,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8
+    marginTop: 8,
+    backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity
   },
   submitButtonText: {
     fontSize: 14,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    color: Colors[theme].text
   },
   pickerContainer: {
     borderRadius: 8,
@@ -237,6 +241,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     fontSize: 14,
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
+    color: Colors[theme].text
   },
 });

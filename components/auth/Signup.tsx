@@ -79,18 +79,20 @@ export default function Signup() {
 
   const onGoToTerms = () => {
     router.navigate('/terms');
-  }
+  };
+
+  const style = styles(theme);
 
   return (
-    <View style={styles.container}>
-      <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.wrapper, {backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity}]}>
-        <Text style={styles.title}>{ i18n?.t('accountCreation') }</Text>
-        <Text style={styles.explanation}>{ i18n?.t('emailCodeExplanation') }</Text>
-        <View style={styles.inputContainer}>
+    <View style={style.container}>
+      <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={style.wrapper}>
+        <Text style={style.title}>{ i18n?.t('accountCreation') }</Text>
+        <Text style={style.explanation}>{ i18n?.t('emailCodeExplanation') }</Text>
+        <View style={style.inputContainer}>
           { !emailSent ? <>
             <TextInput
               key="fullnameInput"
-              style={[styles.input, {color: Colors[theme].text + (!fullname ? 'B3' : ''), backgroundColor: Colors[theme].inputBackgroundColor, borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
+              style={[style.input, {color: Colors[theme].text + (!fullname ? 'B3' : ''), borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
               textContentType="name"
               autoComplete="name"
               placeholder={ i18n?.t('fullname') }
@@ -98,7 +100,7 @@ export default function Signup() {
             />
             <TextInput
               key="emailInput"
-              style={[styles.input, {color: Colors[theme].text + (!email ? 'B3' : ''), backgroundColor: Colors[theme].inputBackgroundColor, borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
+              style={[style.input, {color: Colors[theme].text + (!email ? 'B3' : ''), borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
               textContentType="emailAddress"
               autoComplete="email"
               inputMode="email"
@@ -106,27 +108,27 @@ export default function Signup() {
               onChangeText={(text) => setEmail(text.replace(/[<>&]/g, ''))}
             />
             { Platform.OS === 'web' ?
-              <View style={styles.datepickerWrapper}>
-                <Text style={styles.datepickerTitle}>{ i18n?.t('birthdate') }:</Text>
-                <input style={theme === 'light' ? styles.datepickerLight : styles.datepickerDark} type="date" id="birthdate" name="birthdate" value={birthdate || ''} onChange={(e) => setBirthdate(e.target.value)} />
+              <View style={style.datepickerWrapper}>
+                <Text style={style.datepickerTitle}>{ i18n?.t('birthdate') }:</Text>
+                <input style={theme === 'light' ? style.datepickerLight : style.datepickerDark} type="date" id="birthdate" name="birthdate" value={birthdate || ''} onChange={(e) => setBirthdate(e.target.value)} />
               </View>
             : null }
-            <View style={styles.acceptTerms}>
-              <View style={styles.acceptTermsCheckbox}>
+            <View style={style.acceptTerms}>
+              <View style={style.acceptTermsCheckbox}>
                 <Checkbox
-                  style={styles.acceptTermsCheckboxInput}
+                  style={style.acceptTermsCheckboxInput}
                   value={termsChecked}
                   onValueChange={setTermsChecked}
                 />
                 {/* can define checked color like this above: color={termsChecked ? '#613AC5' : undefined} */}
-                <Text style={styles.acceptTermsCheckboxText}>{ i18n?.t('haveReadAndAcceptTermsAndPrivacy') }</Text>
+                <Text style={style.acceptTermsCheckboxText}>{ i18n?.t('haveReadAndAcceptTermsAndPrivacy') }</Text>
               </View>
-              <Pressable onPress={onGoToTerms}><Text style={styles.termsActionLink}>{ i18n?.t('termsAndPrivacy') }</Text></Pressable>
+              <Pressable onPress={onGoToTerms}><Text style={style.termsActionLink}>{ i18n?.t('termsAndPrivacy') }</Text></Pressable>
             </View>
           </> : <>
-            <View style={styles.emailSubmitted}>
+            <View style={style.emailSubmitted}>
               <ScrollView horizontal>
-                <Text style={styles.email}>{email}</Text>
+                <Text style={style.email}>{email}</Text>
               </ScrollView>
               <Pressable onPress={onChangeEmail}>
                 <FeatherIcon name="edit-2" size={18} color={Colors[theme].text} />
@@ -140,7 +142,7 @@ export default function Signup() {
             />
           </>}
           { emailErrorMessage ?
-            <Text style={styles.inputErrorMessage}>{emailErrorMessage}</Text>
+            <Text style={style.inputErrorMessage}>{emailErrorMessage}</Text>
           :
             null
           }
@@ -153,17 +155,17 @@ export default function Signup() {
                   <Pressable
                     disabled={!fullname || !isValidEmail(email) || !termsChecked || !birthdate}
                     onPress={onEmailSignUp}
-                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !fullname || !isValidEmail(email) || !termsChecked || !birthdate ? 0.5 : 1}]}
+                    style={[style.button, {opacity: !fullname || !isValidEmail(email) || !termsChecked || !birthdate ? 0.5 : 1}]}
                   >
-                    <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('send') }</Text>
+                    <Text style={style.buttonText}>{ i18n?.t('send') }</Text>
                   </Pressable>
                 :
                   <Pressable
                     disabled={oneTimeCode.length !== 6}
                     onPress={onCodeSubmit}
-                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: oneTimeCode.length !== 6 ? 0.5 : 1}]}
+                    style={[style.button, {opacity: oneTimeCode.length !== 6 ? 0.5 : 1}]}
                   >
-                    <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('signMeUp') }</Text>
+                    <Text style={style.buttonText}>{ i18n?.t('signMeUp') }</Text>
                   </Pressable>
                 }
               </>
@@ -171,21 +173,21 @@ export default function Signup() {
           </View>
         </View>
       </Animated.View>
-      <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.bottomActionContainer}>
-        <Text style={styles.bottomActionTitle}>{ i18n?.t('alreadyAccountQuestion') }</Text>
-        <Pressable onPress={onGoToLogIn}><Text style={styles.bottomActionLink}>{ i18n?.t('logIn') }</Text></Pressable>
+      <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={style.bottomActionContainer}>
+        <Text style={style.bottomActionTitle}>{ i18n?.t('alreadyAccountQuestion') }</Text>
+        <Pressable onPress={onGoToLogIn}><Text style={style.bottomActionLink}>{ i18n?.t('logIn') }</Text></Pressable>
       </Animated.View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   container: {
     height: '100%',
     overflow: 'hidden',
     paddingHorizontal: 20,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   wrapper: {
     paddingVertical: 20,
@@ -196,7 +198,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 15,
     maxWidth: 500,
-    width: '100%'
+    width: '100%',
+    backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity
   },
   title: {
     fontSize: 30,
@@ -291,7 +294,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     width: '100%',
-    maxWidth: 300
+    maxWidth: 300,
+    backgroundColor: Colors[theme].inputBackgroundColor
   },
   inputErrorMessage: {
     color: '#ff3737',
@@ -302,12 +306,14 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     paddingHorizontal: 25,
     width: '100%',
-    maxWidth: 300
+    maxWidth: 300,
+    backgroundColor: Colors[theme].text
   },
   buttonText: {
     fontWeight: '500',
     fontSize: 18,
-    textAlign: 'center'
+    textAlign: 'center',
+    color: Colors[theme].oppositeThemeText
   },
   bottomActionContainer: {
     position: 'absolute',

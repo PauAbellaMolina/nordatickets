@@ -14,24 +14,26 @@ export default function AuthCta({ text, horizontalButtons }: { text?: string, ho
     router.push('/welcome?action=login');
   };
 
+  const style = styles(theme);
+
   return (
-    <View style={styles.container}>
-      { text && <Text style={styles.text}>{text}</Text> }
-      <View style={[styles.buttonsContainer, horizontalButtons && styles.horizontalButtonsContainer]}>
+    <View style={style.container}>
+      { text && <Text style={style.text}>{text}</Text> }
+      <View style={[style.buttonsContainer, horizontalButtons && style.horizontalButtonsContainer]}>
         <Pressable 
           onPress={onGoToSignUp} 
-          style={[styles.button, {backgroundColor: Colors[theme].text}]}
+          style={style.button}
         >
-          <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>
+          <Text style={style.buttonText}>
             {i18n?.t('createAccount')}
           </Text>
         </Pressable>
-        <Text style={styles.orText}>O</Text>
+        <Text style={style.orText}>O</Text>
         <Pressable 
           onPress={onGoToLogIn} 
-          style={[styles.button, {borderWidth: StyleSheet.hairlineWidth, borderColor: Colors[theme].text}]}
+          style={style.buttonGhost}
         >
-          <Text style={[styles.buttonText, {color: Colors[theme].text}]}>
+          <Text style={style.buttonTextGhost}>
             {i18n?.t('logIn')}
           </Text>
         </Pressable>
@@ -40,7 +42,7 @@ export default function AuthCta({ text, horizontalButtons }: { text?: string, ho
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   container: {
     flex: 1,
     gap: 20,
@@ -63,12 +65,28 @@ const styles = StyleSheet.create({
     borderRadius: 9,
     paddingVertical: 5,
     paddingHorizontal: 19,
-    maxWidth: 300
+    maxWidth: 300,
+    backgroundColor: Colors[theme].text
+  },
+  buttonGhost: {
+    borderRadius: 9,
+    paddingVertical: 5,
+    paddingHorizontal: 19,
+    maxWidth: 300,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: Colors[theme].text
   },
   buttonText: {
     fontWeight: '500',
     fontSize: 16,
-    textAlign: 'center'
+    textAlign: 'center',
+    color: Colors[theme].oppositeThemeText
+  },
+  buttonTextGhost: {
+    fontWeight: '500',
+    fontSize: 16,
+    textAlign: 'center',
+    color: Colors[theme].text
   },
   orText: {
     fontSize: 10,

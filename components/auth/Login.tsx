@@ -69,16 +69,18 @@ export default function Login() {
     router.setParams({ action:'signup' });
   };
 
+  const style = styles(theme);
+
   return (
-    <View style={styles.container}>
-      <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={[styles.wrapper, {backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity}]}>
-        <Text style={styles.title}>{ i18n?.t('logIn') }</Text>
-        <Text style={styles.explanation}>{ i18n?.t('emailCodeExplanation') }</Text>
-        <View style={styles.inputContainer}>
+    <View style={style.container}>
+      <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={style.wrapper}>
+        <Text style={style.title}>{ i18n?.t('logIn') }</Text>
+        <Text style={style.explanation}>{ i18n?.t('emailCodeExplanation') }</Text>
+        <View style={style.inputContainer}>
           { !emailSent ?
             <TextInput
               key="emailInput"
-              style={[styles.input, {color: Colors[theme].text + (!email ? 'B3' : ''), backgroundColor: Colors[theme].inputBackgroundColor, borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
+              style={[style.input, {color: Colors[theme].text + (!email ? 'B3' : ''), borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
               textContentType="emailAddress"
               autoComplete="email"
               inputMode="email"
@@ -86,9 +88,9 @@ export default function Login() {
               onChangeText={(text) => setEmail(text.replace(/[<>&]/g, ''))}
             />
           : <>
-            <View style={styles.emailSubmitted}>
+            <View style={style.emailSubmitted}>
               <ScrollView horizontal>
-                <Text style={styles.email}>{email}</Text>
+                <Text style={style.email}>{email}</Text>
               </ScrollView>
               <Pressable onPress={onChangeEmail}>
                 <FeatherIcon name="edit-2" size={18} color={Colors[theme].text} />
@@ -102,7 +104,7 @@ export default function Login() {
             />
           </>}
           { emailErrorMessage ?
-            <Text style={styles.inputErrorMessage}>{emailErrorMessage}</Text>
+            <Text style={style.inputErrorMessage}>{emailErrorMessage}</Text>
           :
             null
           }
@@ -115,17 +117,17 @@ export default function Login() {
                   <Pressable
                     disabled={!isValidEmail(email)}
                     onPress={onEmailLogIn}
-                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: !isValidEmail(email) ? 0.5 : 1}]}
+                    style={[style.button, {opacity: !isValidEmail(email) ? 0.5 : 1}]}
                   >
-                    <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('send') }</Text>
+                    <Text style={style.buttonText}>{ i18n?.t('send') }</Text>
                   </Pressable>
                 :
                   <Pressable
                     disabled={oneTimeCode.length !== 6}
                     onPress={onCodeSubmit}
-                    style={[styles.button, {backgroundColor: Colors[theme].text, opacity: oneTimeCode.length !== 6 ? 0.5 : 1}]}
+                    style={[style.button, {opacity: oneTimeCode.length !== 6 ? 0.5 : 1}]}
                   >
-                    <Text style={[styles.buttonText, {color: Colors[theme].oppositeThemeText}]}>{ i18n?.t('enter') }</Text>
+                    <Text style={style.buttonText}>{ i18n?.t('enter') }</Text>
                   </Pressable>
                 }
               </>
@@ -133,15 +135,15 @@ export default function Login() {
           </View>
         </View>
       </Animated.View>
-      <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={styles.bottomActionContainer}>
-        <Text style={styles.bottomActionTitle}>{ i18n?.t('noAccountQuestion') }</Text>
-        <Pressable onPress={onGoToSignUp}><Text style={styles.bottomActionLink}>{ i18n?.t('signUp') }</Text></Pressable>
+      <Animated.View entering={FadeIn.duration(250).easing(Easing.inOut(Easing.quad)).reduceMotion(ReduceMotion.Never)} style={style.bottomActionContainer}>
+        <Text style={style.bottomActionTitle}>{ i18n?.t('noAccountQuestion') }</Text>
+        <Pressable onPress={onGoToSignUp}><Text style={style.bottomActionLink}>{ i18n?.t('signUp') }</Text></Pressable>
       </Animated.View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   container: {
     height: '100%',
     overflow: 'hidden',
@@ -158,7 +160,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 15,
     maxWidth: 500,
-    width: '100%'
+    width: '100%',
+    backgroundColor: Colors[theme].oppositeBackgroundHalfOpacity
   },
   title: {
     fontSize: 30,
@@ -195,7 +198,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     width: '100%',
-    maxWidth: 300
+    maxWidth: 300,
+    backgroundColor: Colors[theme].inputBackgroundColor
   },
   inputErrorMessage: {
     color: '#ff3737',
@@ -206,12 +210,14 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     paddingHorizontal: 25,
     width: '100%',
-    maxWidth: 300
+    maxWidth: 300,
+    backgroundColor: Colors[theme].text
   },
   buttonText: {
     fontWeight: '500',
     fontSize: 18,
-    textAlign: 'center'
+    textAlign: 'center',
+    color: Colors[theme].oppositeThemeText
   },
   bottomActionContainer: {
     position: 'absolute',

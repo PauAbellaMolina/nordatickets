@@ -31,20 +31,22 @@ export default function HelpAndTermsScreen() {
 
   const renderItemFaqs = useCallback(({item}: {item: Faq}) => (
     <>
-      <Text style={styles.question}>{item.question}</Text>
-      <Text style={styles.answer}>{item.answer}</Text>
+      <Text style={style.question}>{item.question}</Text>
+      <Text style={style.answer}>{item.answer}</Text>
     </>
   ), [faqs]);
 
+  const style = styles(theme);
+
   return (
-    <View style={styles.container}>
+    <View style={style.container}>
       <GoBackArrow light={theme === 'dark'} />
-      <Text style={styles.title}>{ i18n?.t('helpAndFaqs') }</Text>
-      <View style={styles.wrapper}>
+      <Text style={style.title}>{ i18n?.t('helpAndFaqs') }</Text>
+      <View style={style.wrapper}>
         <Text>{ i18n?.t('getInContactExplanation') }</Text>
         <View style={{display: 'flex', flexDirection: 'row'}}><Text>{ i18n?.t('sendAnEmailTo') } </Text><Text style={{textDecorationLine: 'underline'}}>help@nordatickets.com</Text></View>
-        <View style={[styles.separator, {backgroundColor: Colors[theme].separatorBackgroundColor}]} />
-        <Text style={styles.subtitle}>FAQs:</Text>
+        <View style={style.separator} />
+        <Text style={style.subtitle}>FAQs:</Text>
         { !faqs ? 
           <ActivityIndicator size="small" style={{marginTop: 50}} />
         :
@@ -59,7 +61,7 @@ export default function HelpAndTermsScreen() {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   container: {
     paddingTop: 75,
     paddingBottom: 25,
@@ -94,6 +96,7 @@ const styles = StyleSheet.create({
   },
   separator: {
     marginVertical: 5,
-    height: 1
+    height: 1,
+    backgroundColor: Colors[theme].separatorBackgroundColor
   }
 });

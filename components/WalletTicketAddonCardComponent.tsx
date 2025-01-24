@@ -127,16 +127,18 @@ export default function WalletTicketAddonCardComponent({ walletTicket }: { walle
     }, 5000);
   };
 
+  const style = styles(theme);
+
   return (<>
     { walletTicket?.used_at == null && walletTicket?.refunded_at == null && (eventTicketOrderStatus === 'PAYMENT_SUCCEEDED' || (eventTicketOrderStatus === 'PAYMENT_PENDING')) ?
-      <View style={styles.wrapperContainer}>
-        <View style={[styles.singleTicketContainer, {opacity: eventTicketOrderStatus === 'PAYMENT_PENDING' ? .6 : 1 , backgroundColor: Colors[theme].backgroundHalfOpacity}]}>
-          <View style={styles.ticketIconWrapper}>
+      <View style={style.wrapperContainer}>
+        <View style={[style.singleTicketContainer, {opacity: eventTicketOrderStatus === 'PAYMENT_PENDING' ? .6 : 1}]}>
+          <View style={style.ticketIconWrapper}>
             <EntypoIcon name="cup" size={30} color={Colors['light'].text} />
           </View>
-          <View style={styles.ticketNameWrapper}>
-            <Text style={[styles.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
-            <Text style={[styles.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ eventTicketOrderStatus === 'PAYMENT_PENDING' ? shouldDisplayPendingTicket ? i18n?.t('paymentProcessing')+'...' : i18n?.t('paymentFailed') : i18n?.t('walletTicketAddonExplanation') }</Text>
+          <View style={style.ticketNameWrapper}>
+            <Text style={[style.ticketName, {color: Colors['light'].text}]} numberOfLines={1}>{walletTicket.event_tickets_name}</Text>
+            <Text style={[style.ticketSubtitle, {color: theme === 'dark' ? 'lightgray' : 'gray'}]}>{ eventTicketOrderStatus === 'PAYMENT_PENDING' ? shouldDisplayPendingTicket ? i18n?.t('paymentProcessing')+'...' : i18n?.t('paymentFailed') : i18n?.t('walletTicketAddonExplanation') }</Text>
           </View>
         </View>
       </View>
@@ -144,7 +146,7 @@ export default function WalletTicketAddonCardComponent({ walletTicket }: { walle
   </>);
 };
 
-const styles = StyleSheet.create({
+const styles = (theme: string) => StyleSheet.create({
   wrapperContainer: {
     width: '100%',
     alignItems: 'center',
@@ -156,7 +158,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#00000059',
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: Colors[theme].backgroundHalfOpacity
   },
   ticketIconWrapper: {
     paddingVertical: 20,
