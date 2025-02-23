@@ -2,7 +2,7 @@ import { Platform, Pressable, StyleSheet } from 'react-native';
 import { EventTicket, TicketFormSubmit } from '../types/supabaseplain';
 import Colors from '../constants/Colors';
 import { Text, View } from './Themed';
-import { FeatherIcon, FontAwesome6Icon } from './CustomIcons';
+import { FeatherIcon } from './CustomIcons';
 import { useSupabase } from '../context/SupabaseProvider';
 import EventTicketCardFormComponent from './EventTicketCardFormComponent';
 import { CollapsableComponent } from './CollapsableComponent';
@@ -42,16 +42,6 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
     }
     onRemoveTicket(ticket);
   };
-  const onAdd = () => {
-    if (quantityInCart === 100) {
-      return;
-    }
-    const newTicket = {...ticket};
-    if (priceMultiplier > 1) {
-      newTicket.price = newTicket.price * priceMultiplier;
-    }
-    onAddTicket(newTicket);
-  };
 
   const onSelectedQuantity = (quantity: number) => {
     if (quantityInCart === 100) {
@@ -86,7 +76,6 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
     <View style={style.ticketCard}>
       <View style={style.ticketContents}>
         <View style={style.ticketInfo}>
-          {/* <FontAwesome6Icon name="person-walking-arrow-right" size={20} color={Colors[theme].text} /> */}
           <View style={style.ticketInfoText}>
             <Text style={style.ticketName}>{ticket.name}</Text>
             <View style={style.ticketPricesContainer}>
@@ -111,9 +100,6 @@ export default function EventAccessTicketCardComponent({ticket, eventSelling, qu
                   <FeatherIcon name={formSubmitted ? 'x-circle' : formExpanded ? 'chevron-up' : 'chevron-down'} size={28} color={Colors[theme].text} />
                 </Pressable>
               :
-                // <Pressable onPress={quantityInCart === 1 ? onRemove : onAdd}>
-                //   <FeatherIcon name={quantityInCart === 1 ? 'x-circle' : 'plus-circle'} size={28} color={quantityInCart === 100 ? Colors[theme].text+'60' : Colors[theme].text} />
-                // </Pressable>
                 <Picker
                   style={style.quantityPicker}
                   selectedValue={quantityInCart}
