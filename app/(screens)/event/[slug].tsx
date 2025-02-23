@@ -19,8 +19,7 @@ import Checkbox from 'expo-checkbox';
 import Animated, { Easing, FadeIn, FadeInDown, FadeInUp, FadeOut, FadeOutDown, ReduceMotion } from 'react-native-reanimated';
 import { useEventScreens } from '../../../context/EventScreensProvider';
 import ImageFullscreen from '../../../components/ImageFullscreen';
-
-type CartItem = { eventTicket: EventTicket, quantity: number, associatedTicketFormSubmit?: Partial<TicketFormSubmit> }; //TODO PAU can be imported from EventScreensProvider?
+import { CartItem } from '../../../context/EventScreensProvider';
 
 export default function EventDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -361,7 +360,6 @@ export default function EventDetailScreen() {
               { eventPosterImageUrl !== null ?
                 <View style={style.eventInfoHeaderLeft}>
                   <Pressable onPress={onPosterImagePress} style={style.eventImageFrame}>
-                    {/* TODO PAU implement the no image case */}
                     <Image
                       style={style.image}
                       source={eventPosterImageUrl}

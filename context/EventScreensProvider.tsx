@@ -6,7 +6,7 @@ import Colors from "../constants/Colors";
 import { supabase } from "../supabase";
 import { router } from "expo-router";
 
-type CartItem = { eventTicket: EventTicket, quantity: number, associatedTicketFormSubmit?: Partial<TicketFormSubmit> };
+export type CartItem = { eventTicket: EventTicket, quantity: number, associatedTicketFormSubmit?: Partial<TicketFormSubmit> };
 type Cart = CartItem[] | null;
 
 type EventScreensContextProps = {
