@@ -17,7 +17,7 @@ export default function Signup() {
 
   const [birthdate, setBirthdate] = useState<string>(null);
   const [termsChecked, setTermsChecked] = useState(false);
-  const [fullname, setFullname] = useState<string>('');
+  // const [fullname, setFullname] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [emailSent, setEmailSent] = useState<boolean>(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState<string | undefined>(undefined);
@@ -40,7 +40,8 @@ export default function Signup() {
       email: email,
       options: {
         shouldCreateUser: true,
-        data: {lang: i18n?.locale as AvailableLocales, emailData: emailData, birthdate: birthdate, fullname: fullname}
+        // data: {lang: i18n?.locale as AvailableLocales, emailData: emailData, birthdate: birthdate, fullname: fullname}
+        data: {lang: i18n?.locale as AvailableLocales, emailData: emailData, birthdate: birthdate}
       }
     })
     .then(() => {
@@ -90,14 +91,14 @@ export default function Signup() {
         <Text style={style.explanation}>{ i18n?.t('emailCodeExplanation') }</Text>
         <View style={style.inputContainer}>
           { !emailSent ? <>
-            <TextInput
+            {/* <TextInput
               key="fullnameInput"
               style={[style.input, {color: Colors[theme].text + (!fullname ? 'B3' : ''), borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
               textContentType="name"
               autoComplete="name"
               placeholder={ i18n?.t('fullname') }
               onChangeText={(text) => setFullname(text.replace(/[<>&]/g, ''))}
-            />
+            /> */}
             <TextInput
               key="emailInput"
               style={[style.input, {color: Colors[theme].text + (!email ? 'B3' : ''), borderColor: emailErrorMessage === undefined ? Colors[theme].inputBorderColor : '#ff3737'}]}
@@ -152,10 +153,17 @@ export default function Signup() {
             :
               <>
                 { !emailSent ?
+                  // <Pressable
+                  //   disabled={!fullname || !isValidEmail(email) || !termsChecked || !birthdate}
+                  //   onPress={onEmailSignUp}
+                  //   style={[style.button, {opacity: !fullname || !isValidEmail(email) || !termsChecked || !birthdate ? 0.5 : 1}]}
+                  // >
+                  //   <Text style={style.buttonText}>{ i18n?.t('send') }</Text>
+                  // </Pressable>
                   <Pressable
-                    disabled={!fullname || !isValidEmail(email) || !termsChecked || !birthdate}
+                    disabled={!isValidEmail(email) || !termsChecked || !birthdate}
                     onPress={onEmailSignUp}
-                    style={[style.button, {opacity: !fullname || !isValidEmail(email) || !termsChecked || !birthdate ? 0.5 : 1}]}
+                    style={[style.button, {opacity: !isValidEmail(email) || !termsChecked || !birthdate ? 0.5 : 1}]}
                   >
                     <Text style={style.buttonText}>{ i18n?.t('send') }</Text>
                   </Pressable>
