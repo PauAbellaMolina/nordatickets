@@ -11,7 +11,7 @@ type PaginationParams = {
 };
 
 type TicketsTableStruct = {
-  user_fullname: string;
+  user_fullname: string | null;
   user_email: string;
   tickets: {
     id: number;
@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
         userIndex = ticketsTableStruct.length;
         userIndexMap.set(userId, userIndex);
         ticketsTableStruct.push({
-          user_fullname: userMap.get(userId) || 'Unknown',
+          user_fullname: userMap.get(userId) ?? null,
           user_email: userEmailMap.get(userId) || 'Unknown',
           tickets: []
         });
