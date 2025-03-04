@@ -342,7 +342,7 @@ export default function ActivateTicketScreen() {
                 </CollapsableComponent>
               </View>
             : null }
-            { purchasedAdditionalInfo ?
+            { purchasedAdditionalInfo || purchasedConditionsNotice ?
               <View style={style.additionalInfoContainer}>
                 <Pressable onPress={() => setPurchasedAdditionalInfoExpanded(!purchasedAdditionalInfoExpanded)}>
                   <View style={style.additionalInfoCollapsableContainer}>
@@ -352,10 +352,14 @@ export default function ActivateTicketScreen() {
                 </Pressable>
                 <CollapsableComponent expanded={purchasedAdditionalInfoExpanded} maxHeight={125}>
                   <View style={style.additionalInfoContent}>
-                    <Text style={style.additionalInfoTitle}>{ i18n?.t('additionalInfo') }:</Text>
-                    <Text style={style.additionalInfoText}>{ purchasedAdditionalInfo }</Text>
-                    <Text style={style.additionalInfoTitle}>{ i18n?.t('conditions') }:</Text>
-                    <Text style={style.additionalInfoText}>{ purchasedConditionsNotice }</Text>
+                    { purchasedAdditionalInfo ? <>
+                      <Text style={style.additionalInfoTitle}>{ i18n?.t('additionalInfo') }:</Text>
+                      <Text style={style.additionalInfoText}>{ purchasedAdditionalInfo }</Text>
+                    </> : null }
+                    { purchasedConditionsNotice ? <>
+                      <Text style={style.additionalInfoTitle}>{ i18n?.t('conditions') }:</Text>
+                      <Text style={style.additionalInfoText}>{ purchasedConditionsNotice }</Text>
+                    </> : null }
                   </View>
                 </CollapsableComponent>
               </View>
